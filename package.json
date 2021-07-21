@@ -1,0 +1,28 @@
+{
+	"name": "webgl2-webpack-template",
+	"version": "1.0.0",
+	"description": "A template for a simple WebGL 2 application",
+	"private": true,
+	"scripts": {
+		"watch": "NODE_ENV=development webpack --watch",
+		"start": "NODE_ENV=development webpack serve --open",
+		"build": "NODE_ENV=production webpack"
+	},
+	"keywords": [
+		"webgl",
+		"js"
+	],
+	"author": "Andrea Franchini <hello@andreafranchini.com>",
+	"license": "MIT",
+	"devDependencies": {
+		"css-loader": "^5.2.4",
+		"html-webpack-plugin": "^5.3.1",
+		"prettier": "2.3.0",
+		"style-loader": "^2.0.0",
+		"twgl.js": "^4.19.1",
+		"webpack": "^5.37.0",
+		"webpack-cli": "^4.7.0",
+		"webpack-dev-server": "^3.11.2",
+		"webpack-glsl-loader": "^1.0.1"
+	}
+}

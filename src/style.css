@@ -1,0 +1,11 @@
+* {
+	/* Since it's a fullscreen application, remove annoying  */
+	overflow: hidden;
+}
+body {
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	width: 100vw;
+	background-color: black;
+}
