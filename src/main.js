@@ -1,63 +1,16 @@
-import "./style.css";
-
-// Import example dependencies
-import utils from "./utils/utils";
-
 import {
-	vertexPositionData,
-	normalData,
 	indexData,
 	initSphere,
+	normalData,
+	vertexPositionData,
 } from "./assets/shapesDefinition";
-
-import vertexShaderSrc from "./shaders/scene-graph-example/vs.glsl";
+import { Node } from "./SceneGraph";
 import fragmentShaderSrc from "./shaders/scene-graph-example/fs.glsl";
+import vertexShaderSrc from "./shaders/scene-graph-example/vs.glsl";
+import "./style.css";
+import utils from "./utils/utils";
 
-var gl;
-var baseDir;
-var shaderDir;
-var program;
-
-//example taken from webGLTutorial2
-var Node = function () {
-	this.children = [];
-	this.localMatrix = utils.identityMatrix();
-	this.worldMatrix = utils.identityMatrix();
-};
-
-Node.prototype.setParent = function (parent) {
-	// remove us from our parent
-	if (this.parent) {
-		var ndx = this.parent.children.indexOf(this);
-		if (ndx >= 0) {
-			this.parent.children.splice(ndx, 1);
-		}
-	}
-
-	// Add us to our new parent
-	if (parent) {
-		parent.children.push(this);
-	}
-	this.parent = parent;
-};
-
-Node.prototype.updateWorldMatrix = function (matrix) {
-	if (matrix) {
-		// a matrix was passed in so do the math
-		this.worldMatrix = utils.multiplyMatrices(matrix, this.localMatrix);
-	} else {
-		// no matrix was passed in so just copy.
-		utils.copy(this.localMatrix, this.worldMatrix);
-	}
-
-	// now process all the children
-	var worldMatrix = this.worldMatrix;
-	this.children.forEach(function (child) {
-		child.updateWorldMatrix(worldMatrix);
-	});
-};
-
-function main() {
+function main(gl, program) {
 	var dirLightAlpha = -utils.degToRad(-60);
 	var dirLightBeta = -utils.degToRad(120);
 	var directionalLight = [
@@ -153,11 +106,11 @@ function main() {
 		vertexArray: vao,
 	};
 
-	sunNode.setParent(sunOrbitNode);
-	earthOrbitNode.setParent(sunOrbitNode);
-	earthNode.setParent(earthOrbitNode);
-	moonOrbitNode.setParent(earthOrbitNode);
-	moonNode.setParent(moonOrbitNode);
+	sunNode.SetParent(sunOrbitNode);
+	earthOrbitNode.SetParent(sunOrbitNode);
+	earthNode.SetParent(earthOrbitNode);
+	moonOrbitNode.SetParent(earthOrbitNode);
+	moonNode.SetParent(moonOrbitNode);
 
 	var objects = [sunNode, earthNode, moonNode];
 
@@ -211,10 +164,10 @@ function main() {
 		);
 
 		// Update all world matrices in the scene graph
-		sunOrbitNode.updateWorldMatrix();
+		sunOrbitNode.UpdateWorldMatrix();
 
 		// Compute all the matrices for rendering
-		objects.forEach(function (object) {
+		objects.forEach((object) => {
 			gl.useProgram(object.drawInfo.programInfo);
 
 			var projectionMatrix = utils.multiplyMatrices(
@@ -257,10 +210,10 @@ function main() {
 }
 
 function init() {
-	var canvas = document.getElementById("main-canvas");
-	gl = canvas.getContext("webgl2");
+	const canvas = document.getElementById("main-canvas");
+	const gl = canvas.getContext("webgl2");
 	if (!gl) {
-		document.write("GL context not opened");
+		console.error("GL context not opened");
 		return;
 	}
 	utils.resizeCanvasToDisplaySize(gl.canvas);
@@ -276,11 +229,11 @@ function init() {
 		fragmentShaderSrc
 	);
 
-	program = utils.createProgram(gl, vertexShader, fragmentShader);
+	const program = utils.createProgram(gl, vertexShader, fragmentShader);
 
 	gl.useProgram(program);
 
-	main();
+	main(gl, program);
 }
 
 window.onload = init();
