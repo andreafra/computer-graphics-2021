@@ -3,8 +3,11 @@
 //Includes texture operations
 //Includes initInteraction() function
 
-export default {
-  createAndCompileShaders: function (gl, shaderText) {
+export class utils {
+  static createAndCompileShaders = function (
+    gl: WebGL2RenderingContext,
+    shaderText: string
+  ) {
     var vertexShader = utils.createShader(gl, gl.VERTEX_SHADER, shaderText[0]);
     var fragmentShader = utils.createShader(
       gl,
@@ -15,9 +18,13 @@ export default {
     var program = utils.createProgram(gl, vertexShader, fragmentShader);
 
     return program;
-  },
+  };
 
-  createShader: function (gl, type, source) {
+  static createShader = function (
+    gl: WebGL2RenderingContext,
+    type: number,
+    source: string
+  ) {
     var shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -27,19 +34,21 @@ export default {
     } else {
       console.log(gl.getShaderInfoLog(shader)); // eslint-disable-line
       if (type == gl.VERTEX_SHADER) {
-        alert("ERROR IN VERTEX SHADER : " + gl.getShaderInfoLog(vertexShader));
+        alert("ERROR IN VERTEX SHADER : " + gl.getShaderInfoLog(shader));
       }
       if (type == gl.FRAGMENT_SHADER) {
-        alert(
-          "ERROR IN FRAGMENT SHADER : " + gl.getShaderInfoLog(vertexShader)
-        );
+        alert("ERROR IN FRAGMENT SHADER : " + gl.getShaderInfoLog(shader));
       }
       gl.deleteShader(shader);
       throw "could not compile shader:" + gl.getShaderInfoLog(shader);
     }
-  },
+  };
 
-  createProgram: function (gl, vertexShader, fragmentShader) {
+  static createProgram = function (
+    gl: WebGL2RenderingContext,
+    vertexShader: WebGLShader,
+    fragmentShader: WebGLShader
+  ) {
     var program = gl.createProgram();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
@@ -53,9 +62,9 @@ export default {
       gl.deleteProgram(program);
       return undefined;
     }
-  },
+  };
 
-  resizeCanvasToDisplaySize: function (canvas) {
+  static resizeCanvasToDisplaySize = function (canvas: HTMLCanvasElement) {
     const expandFullScreen = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -66,260 +75,47 @@ export default {
     expandFullScreen();
     // Resize screen when the browser has triggered the resize event
     window.addEventListener("resize", expandFullScreen);
-  },
-  //**** MODEL UTILS
-  // Function to load a 3D model in JSON format
-  get_json: async function (url, func) {
-    var response = await fetch(url);
-    if (!response.ok) {
-      alert("Network response was not ok");
-      return;
-    }
-    var json = await response.json();
-    func(json);
-  },
-  get_objstr: async function (url) {
-    var response = await fetch(url);
-    if (!response.ok) {
-      alert("Network response was not ok");
-      return;
-    }
-    var text = await response.text();
-    return text;
-  },
+  };
 
   //function to convert decimal value of colors
-  decimalToHex: function (d, padding) {
+  static decimalToHexWithPadding = function (d: string, padding: number = 2) {
     var hex = Number(d).toString(16);
-    padding =
-      typeof padding === "undefined" || padding === null
-        ? (padding = 2)
-        : padding;
-
     while (hex.length < padding) {
       hex = "0" + hex;
     }
 
     return hex;
-  },
+  };
 
-  //*** SHADERS UTILS
-  /*Function to load a shader's code, compile it and return the handle to it
-	Requires:
-		path to the shader's text (url)
-
-	*/
-
-  /*fetch('http://foo.com/static/bar.glsl') .then(response => {
-    if (!response.ok) {
-      alert('Network response was not ok');
-    }
-    return response.text();
-  }).then(data => console.log(data));*/
-
-  loadFile: async function (url, data, callback, errorCallBack) {
-    var response = await fetch(url);
-    if (!response.ok) {
-      alert("Network response was not ok");
-      return;
-    }
-    var text = await response.text();
-    callback(text, data);
-  },
-
-  /*loadFile: function (url, data, callback, errorCallback) {
-		// Set up a synchronous request! Important!
-		var request = new XMLHttpRequest();
-        //The third parameter set to false makes the request synchronous
-		request.open('GET', url, false);
-
-		// Hook the event that gets called as the request progresses
-		request.onreadystatechange = function () {
-			// If the request is "DONE" (completed or failed) and if we got HTTP status 200 (OK)
-			if (request.readyState == 4 && request.status == 200) {
-					callback(request.responseText, data)
-				//} else { // Failed
-				//	errorCallback(url);
-			}
-			
-		};
-
-		request.send(null);    
-	},*/
-
-  loadFiles: async function (urls, callback, errorCallback) {
-    var numUrls = urls.length;
-    var numComplete = 0;
-    var result = [];
-
-    // Callback for a single file
-    function partialCallback(text, urlIndex) {
-      result[urlIndex] = text;
-      numComplete++;
-
-      // When all files have downloaded
-      if (numComplete == numUrls) {
-        callback(result);
-      }
-    }
-
-    for (var i = 0; i < numUrls; i++) {
-      await this.loadFile(urls[i], i, partialCallback, errorCallback);
-    }
-  },
-
-  // loadFiles: function (urls, gl, callback, errorCallback) {
-  //    var numUrls = urls.length;
-  //    var numComplete = 0;
-  //    var result = [];
-
-  // 	// Callback for a single file
-  // 	function partialCallback(text, urlIndex) {
-  // 		result[urlIndex] = text;
-  // 		numComplete++;
-
-  // 		// When all files have downloaded
-  // 		if (numComplete == numUrls) {
-  // 			callback(gl,result);
-  // 		}
-  // 	}
-
-  // 	for (var i = 0; i < numUrls; i++) {
-  // 		this.loadFile(urls[i], i, partialCallback, errorCallback);
-  // 	}
-  // },
-
-  // *** TEXTURE UTILS (to solve problems with non power of 2 textures in webGL
-
-  getTexture: function (context, image_URL) {
-    var image = new Image();
-    image.webglTexture = false;
-    image.isLoaded = false;
-
-    image.onload = function (e) {
-      var texture = context.createTexture();
-
-      context.bindTexture(context.TEXTURE_2D, texture);
-
-      context.texImage2D(
-        context.TEXTURE_2D,
-        0,
-        context.RGBA,
-        context.RGBA,
-        context.UNSIGNED_BYTE,
-        image
-      );
-      //context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, 1);
-      context.texParameteri(
-        context.TEXTURE_2D,
-        context.TEXTURE_WRAP_S,
-        context.CLAMP_TO_EDGE
-      );
-      context.texParameteri(
-        context.TEXTURE_2D,
-        context.TEXTURE_WRAP_T,
-        context.CLAMP_TO_EDGE
-      );
-      context.texParameteri(
-        context.TEXTURE_2D,
-        context.TEXTURE_MAG_FILTER,
-        context.LINEAR
-      );
-      context.texParameteri(
-        context.TEXTURE_2D,
-        context.TEXTURE_MIN_FILTER,
-        context.NEAREST_MIPMAP_LINEAR
-      );
-      context.generateMipmap(context.TEXTURE_2D);
-
-      context.bindTexture(context.TEXTURE_2D, null);
-      image.webglTexture = texture;
-      image.isLoaded = true;
-    };
-
-    image.src = image_URL;
-
-    return image;
-  },
-
-  isPowerOfTwo: function (x) {
+  static isPowerOfTwo = function (x: number) {
     return (x & (x - 1)) == 0;
-  },
+  };
 
-  nextHighestPowerOfTwo: function (x) {
+  static getNextHighestPowerOfTwo = function (x: number) {
     --x;
     for (var i = 1; i < 32; i <<= 1) {
       x = x | (x >> i);
     }
     return x + 1;
-  },
-
-  //*** Interaction UTILS
-  initInteraction: function () {
-    var keyFunction = function (e) {
-      if (e.keyCode == 37) {
-        // Left arrow
-        cx -= delta;
-      }
-      if (e.keyCode == 39) {
-        // Right arrow
-        cx += delta;
-      }
-      if (e.keyCode == 38) {
-        // Up arrow
-        cz -= delta;
-      }
-      if (e.keyCode == 40) {
-        // Down arrow
-        cz += delta;
-      }
-      if (e.keyCode == 107) {
-        // Add
-        cy += delta;
-      }
-      if (e.keyCode == 109) {
-        // Subtract
-        cy -= delta;
-      }
-
-      if (e.keyCode == 65) {
-        // a
-        angle -= delta * 10.0;
-      }
-      if (e.keyCode == 68) {
-        // d
-        angle += delta * 10.0;
-      }
-      if (e.keyCode == 87) {
-        // w
-        elevation += delta * 10.0;
-      }
-      if (e.keyCode == 83) {
-        // s
-        elevation -= delta * 10.0;
-      }
-    };
-    //'window' is a JavaScript object (if "canvas", it will not work)
-    window.addEventListener("keyup", keyFunction, false);
-  },
+  };
 
   //*** MATH LIBRARY
 
-  degToRad: function (angle) {
+  static degToRad = function (angle: number) {
     return (angle * Math.PI) / 180;
-  },
+  };
 
-  identityMatrix: function () {
+  static identityMatrix = function () {
     return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-  },
+  };
 
-  identityMatrix3: function () {
+  static identityMatrix3 = function () {
     return [1, 0, 0, 0, 1, 0, 0, 0, 1];
-  },
+  };
 
   // returns the 3x3 submatrix from a Matrix4x4
-  sub3x3from4x4: function (m) {
-    out = [];
+  static sub3x3from4x4 = function (m: number[]): number[] {
+    let out = [];
     out[0] = m[0];
     out[1] = m[1];
     out[2] = m[2];
@@ -330,11 +126,14 @@ export default {
     out[7] = m[9];
     out[8] = m[10];
     return out;
-  },
+  };
 
   // Multiply the mat3 with a vec3.
-  multiplyMatrix3Vector3: function (m, a) {
-    out = [];
+  static multiplyMatrix3Vector3 = function (
+    m: number[],
+    a: number[]
+  ): number[] {
+    let out = [];
     var x = a[0],
       y = a[1],
       z = a[2];
@@ -342,12 +141,12 @@ export default {
     out[1] = x * m[3] + y * m[4] + z * m[5];
     out[2] = x * m[6] + y * m[7] + z * m[8];
     return out;
-  },
+  };
 
   //Transpose the values of a mat3
 
-  transposeMatrix3: function (a) {
-    out = [];
+  static transposeMatrix3 = function (a: number[]): number[] {
+    let out = [];
 
     out[0] = a[0];
     out[1] = a[3];
@@ -360,11 +159,10 @@ export default {
     out[8] = a[8];
 
     return out;
-  },
+  };
 
-  invertMatrix3: function (m) {
-    out = [];
-
+  static invertMatrix3 = function (m: number[]): number[] {
+    var out = [];
     var a00 = m[0],
       a01 = m[1],
       a02 = m[2],
@@ -396,10 +194,10 @@ export default {
     out[8] = (a11 * a00 - a01 * a10) * det;
 
     return out;
-  },
+  };
 
   //requires as a parameter a 4x4 matrix (array of 16 values)
-  invertMatrix: function (m) {
+  static invertMatrix = function (m: number[]): number[] {
     var out = [];
     var inv = [];
     var det, i;
@@ -534,7 +332,7 @@ export default {
 
     det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
 
-    if (det == 0) return (out = this.identityMatrix());
+    if (det == 0) return (out = utils.identityMatrix());
 
     det = 1.0 / det;
 
@@ -543,9 +341,9 @@ export default {
     }
 
     return out;
-  },
+  };
 
-  transposeMatrix: function (m) {
+  static transposeMatrix = function (m: number[]): number[] {
     var out = [];
 
     var row, column, row_offset;
@@ -558,9 +356,9 @@ export default {
       }
     }
     return out;
-  },
+  };
 
-  multiplyMatrices: function (m1, m2) {
+  static multiplyMatrices = function (m1: number[], m2: number[]): number[] {
     // Perform matrix product  { out = m1 * m2;}
     var out = [];
 
@@ -578,9 +376,9 @@ export default {
       }
     }
     return out;
-  },
+  };
 
-  multiplyMatrixVector: function (m, v) {
+  static multiplyMatrixVector = function (m: number[], v: number[]): number[] {
     /* Mutiplies a matrix [m] by a vector [v] */
 
     var out = [];
@@ -598,27 +396,27 @@ export default {
         m[row_offset + 3] * v[3];
     }
     return out;
-  },
+  };
 
   //*** MODEL MATRIX OPERATIONS
 
-  MakeTranslateMatrix: function (dx, dy, dz) {
+  static MakeTranslateMatrix = (dx: number, dy: number, dz: number) => {
     // Create a transform matrix for a translation of ({dx}, {dy}, {dz}).
 
-    var out = this.identityMatrix();
+    var out = utils.identityMatrix();
 
     out[3] = dx;
     out[7] = dy;
     out[11] = dz;
     return out;
-  },
+  };
 
-  MakeRotateXMatrix: function (a) {
+  static MakeRotateXMatrix = (a: number) => {
     // Create a transform matrix for a rotation of {a} along the X axis.
 
-    var out = this.identityMatrix();
+    var out = utils.identityMatrix();
 
-    var adeg = this.degToRad(a);
+    var adeg = utils.degToRad(a);
     var c = Math.cos(adeg);
     var s = Math.sin(adeg);
 
@@ -627,14 +425,14 @@ export default {
     out[9] = s;
 
     return out;
-  },
+  };
 
-  MakeRotateYMatrix: function (a) {
+  static MakeRotateYMatrix = (a: number) => {
     // Create a transform matrix for a rotation of {a} along the Y axis.
 
-    var out = this.identityMatrix();
+    var out = utils.identityMatrix();
 
-    var adeg = this.degToRad(a);
+    var adeg = utils.degToRad(a);
 
     var c = Math.cos(adeg);
     var s = Math.sin(adeg);
@@ -644,14 +442,14 @@ export default {
     out[8] = s;
 
     return out;
-  },
+  };
 
-  MakeRotateZMatrix: function (a) {
+  static MakeRotateZMatrix = (a: number) => {
     // Create a transform matrix for a rotation of {a} along the Z axis.
 
-    var out = this.identityMatrix();
+    var out = utils.identityMatrix();
 
-    var adeg = this.degToRad(a);
+    var adeg = utils.degToRad(a);
     var c = Math.cos(adeg);
     var s = Math.sin(adeg);
 
@@ -660,50 +458,69 @@ export default {
     out[1] = s;
 
     return out;
-  },
+  };
 
-  MakeRotateXYZMatrix: function (rx, ry, rz, s) {
+  static MakeRotateXYZMatrix = (
+    rx: number,
+    ry: number,
+    rz: number,
+    s: number
+  ) => {
     //Creates a world matrix for an object.
 
-    var Rx = this.MakeRotateXMatrix(ry);
-    var Ry = this.MakeRotateYMatrix(rx);
-    var Rz = this.MakeRotateZMatrix(rz);
+    var Rx = utils.MakeRotateXMatrix(ry);
+    var Ry = utils.MakeRotateYMatrix(rx);
+    var Rz = utils.MakeRotateZMatrix(rz);
 
-    out = this.multiplyMatrices(Ry, Rz);
-    out = this.multiplyMatrices(Rx, out);
+    let out = utils.multiplyMatrices(Ry, Rz);
+    out = utils.multiplyMatrices(Rx, out);
 
     return out;
-  },
+  };
 
-  MakeScaleMatrix: function (s) {
+  static MakeScaleMatrix = (s: number) => {
     // Create a transform matrix for proportional scale
 
-    var out = this.identityMatrix();
+    var out = utils.identityMatrix();
 
     out[0] = out[5] = out[10] = s;
 
     return out;
-  },
+  };
 
   //***Projection Matrix operations
-  MakeWorld: function (tx, ty, tz, rx, ry, rz, s) {
+  static MakeWorld = (
+    tx: number,
+    ty: number,
+    tz: number,
+    rx: number,
+    ry: number,
+    rz: number,
+    s: number
+  ) => {
     //Creates a world matrix for an object.
 
-    var Rx = this.MakeRotateXMatrix(ry);
-    var Ry = this.MakeRotateYMatrix(rx);
-    var Rz = this.MakeRotateZMatrix(rz);
-    var S = this.MakeScaleMatrix(s);
-    var T = this.MakeTranslateMatrix(tx, ty, tz);
+    var Rx = utils.MakeRotateXMatrix(ry);
+    var Ry = utils.MakeRotateYMatrix(rx);
+    var Rz = utils.MakeRotateZMatrix(rz);
+    var S = utils.MakeScaleMatrix(s);
+    var T = utils.MakeTranslateMatrix(tx, ty, tz);
 
-    out = this.multiplyMatrices(Rz, S);
-    out = this.multiplyMatrices(Ry, out);
-    out = this.multiplyMatrices(Rx, out);
-    out = this.multiplyMatrices(T, out);
+    let out = utils.multiplyMatrices(Rz, S);
+    out = utils.multiplyMatrices(Ry, out);
+    out = utils.multiplyMatrices(Rx, out);
+    out = utils.multiplyMatrices(T, out);
 
     return out;
-  },
+  };
 
-  MakeView: function (cx, cy, cz, elev, ang) {
+  static MakeView = (
+    cx: number,
+    cy: number,
+    cz: number,
+    elev: number,
+    ang: number
+  ) => {
     // Creates in {out} a view matrix. The camera is centerd in ({cx}, {cy}, {cz}).
     // It looks {ang} degrees on y axis, and {elev} degrees on the x axis.
 
@@ -713,21 +530,26 @@ export default {
     var tmp = [];
     var out = [];
 
-    T = this.MakeTranslateMatrix(-cx, -cy, -cz);
-    Rx = this.MakeRotateXMatrix(-elev);
-    Ry = this.MakeRotateYMatrix(-ang);
+    T = utils.MakeTranslateMatrix(-cx, -cy, -cz);
+    Rx = utils.MakeRotateXMatrix(-elev);
+    Ry = utils.MakeRotateYMatrix(-ang);
 
-    tmp = this.multiplyMatrices(Ry, T);
-    out = this.multiplyMatrices(Rx, tmp);
+    tmp = utils.multiplyMatrices(Ry, T);
+    out = utils.multiplyMatrices(Rx, tmp);
 
     return out;
-  },
+  };
 
-  LookAt: function (cameraPosition, target, up, dst) {
-    dst = dst || new Float32Array(16);
-    var zAxis = this.normalize(this.subtractVectors(cameraPosition, target));
-    var xAxis = this.normalize(this.cross(up, zAxis));
-    var yAxis = this.normalize(this.cross(zAxis, xAxis));
+  static LookAt = function (
+    cameraPosition: number[],
+    target: number[],
+    up: number[],
+    dst?: number[]
+  ) {
+    dst = dst || new Array<number>(16);
+    var zAxis = utils.normalize(utils.subtractVectors(cameraPosition, target));
+    var xAxis = utils.normalize(utils.cross(up, zAxis));
+    var yAxis = utils.normalize(utils.cross(zAxis, xAxis));
 
     dst[0] = xAxis[0];
     dst[1] = yAxis[0];
@@ -747,10 +569,10 @@ export default {
     dst[15] = 1.0;
 
     return dst;
-  },
+  };
 
-  normalize: function (v, dst) {
-    dst = dst || new Float32Array(3);
+  static normalize = (v: number[], dst?: number[]): number[] => {
+    dst = dst || new Array<number>(3);
     var length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     // make sure we don't divide by 0.
     if (length > 0.00001) {
@@ -759,26 +581,26 @@ export default {
       dst[2] = v[2] / length;
     }
     return dst;
-  },
+  };
 
-  cross: function (a, b, dst) {
-    dst = dst || new Float32Array(3);
+  static cross = (a: number[], b: number[], dst?: number[]) => {
+    dst = dst || new Array<number>(3);
     dst[0] = a[1] * b[2] - a[2] * b[1];
     dst[1] = a[2] * b[0] - a[0] * b[2];
     dst[2] = a[0] * b[1] - a[1] * b[0];
     return dst;
-  },
+  };
 
-  subtractVectors: function (a, b, dst) {
-    dst = dst || new Float32Array(3);
+  static subtractVectors = (a: number[], b: number[], dst?: number[]) => {
+    dst = dst || new Array<number>(3);
     dst[0] = a[0] - b[0];
     dst[1] = a[1] - b[1];
     dst[2] = a[2] - b[2];
     return dst;
-  },
+  };
 
-  copy: function (src, dst) {
-    dst = dst || new Float32Array(16);
+  static copy = (src: number[], dst: number[]) => {
+    dst = dst || new Array<number>(16);
 
     dst[0] = src[0];
     dst[1] = src[1];
@@ -798,16 +620,16 @@ export default {
     dst[15] = src[15];
 
     return dst;
-  },
+  };
 
-  MakePerspective: function (fovy, a, n, f) {
+  static MakePerspective = (fovy: number, a: number, n: number, f: number) => {
     // Creates the perspective projection matrix. The matrix is returned.
     // {fovy} contains the vertical field-of-view in degrees. {a} is the aspect ratio.
     // {n} is the distance of the near plane, and {f} is the far plane.
 
-    var perspective = this.identityMatrix();
+    var perspective = utils.identityMatrix();
 
-    var halfFovyRad = this.degToRad(fovy / 2); // stores {fovy/2} in radiants
+    var halfFovyRad = utils.degToRad(fovy / 2); // stores {fovy/2} in radiants
     var ct = 1.0 / Math.tan(halfFovyRad); // cotangent of {fov/2}
 
     perspective[0] = ct / a;
@@ -818,5 +640,5 @@ export default {
     perspective[15] = 0.0;
 
     return perspective;
-  },
-};
+  };
+}

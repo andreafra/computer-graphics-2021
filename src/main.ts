@@ -5,12 +5,14 @@ import {
 	vertexPositionData,
 } from "./assets/shapesDefinition";
 import { Node } from "./SceneGraph";
+
+// Suppress TS complaining
 import fragmentShaderSrc from "./shaders/scene-graph-example/fs.glsl";
 import vertexShaderSrc from "./shaders/scene-graph-example/vs.glsl";
 import "./style.css";
-import utils from "./utils/utils";
+import { utils } from "./utils/utils";
 
-function main(gl, program) {
+function main(gl: WebGL2RenderingContext, program: WebGLProgram) {
 	var dirLightAlpha = -utils.degToRad(-60);
 	var dirLightBeta = -utils.degToRad(120);
 	var directionalLight = [
@@ -67,9 +69,9 @@ function main(gl, program) {
 		gl.STATIC_DRAW
 	);
 
-	//Define the scene Graph
+	// gl.bindFramebuffer(gl.ARRAY_BUFFER, null);
 
-	var objects = [];
+	//Define the scene Graph
 
 	var sunOrbitNode = new Node();
 	var earthOrbitNode = new Node();
@@ -79,7 +81,7 @@ function main(gl, program) {
 	moonOrbitNode.localMatrix = utils.MakeTranslateMatrix(30, 0, 0);
 
 	var sunNode = new Node();
-	sunNode.localMatrix = utils.MakeScaleMatrix(5, 5, 5);
+	sunNode.localMatrix = utils.MakeScaleMatrix(5);
 	sunNode.drawInfo = {
 		materialColor: [0.6, 0.6, 0.0],
 		programInfo: program,
@@ -89,7 +91,7 @@ function main(gl, program) {
 
 	var earthNode = new Node();
 
-	earthNode.localMatrix = utils.MakeScaleMatrix(2, 2, 2);
+	earthNode.localMatrix = utils.MakeScaleMatrix(2);
 	earthNode.drawInfo = {
 		materialColor: [0.2, 0.5, 0.8],
 		programInfo: program,
@@ -98,7 +100,7 @@ function main(gl, program) {
 	};
 
 	var moonNode = new Node();
-	moonNode.localMatrix = utils.MakeScaleMatrix(0.7, 0.7, 0.7);
+	moonNode.localMatrix = utils.MakeScaleMatrix(0.7);
 	moonNode.drawInfo = {
 		materialColor: [0.6, 0.6, 0.6],
 		programInfo: program,
@@ -112,14 +114,14 @@ function main(gl, program) {
 	moonOrbitNode.SetParent(earthOrbitNode);
 	moonNode.SetParent(moonOrbitNode);
 
-	var objects = [sunNode, earthNode, moonNode];
+	var sceneObjects = [sunNode, earthNode, moonNode];
 
 	//---------------SceneGraph defined
 
 	requestAnimationFrame(drawScene);
 
 	// Draw the scene.
-	function drawScene(time) {
+	function drawScene(time: number) {
 		time *= 0.001;
 
 		gl.clearColor(0.85, 0.85, 0.85, 1.0);
@@ -167,7 +169,7 @@ function main(gl, program) {
 		sunOrbitNode.UpdateWorldMatrix();
 
 		// Compute all the matrices for rendering
-		objects.forEach((object) => {
+		sceneObjects.forEach((object) => {
 			gl.useProgram(object.drawInfo.programInfo);
 
 			var projectionMatrix = utils.multiplyMatrices(
@@ -180,12 +182,12 @@ function main(gl, program) {
 
 			gl.uniformMatrix4fv(
 				matrixLocation,
-				gl.FALSE,
+				false,
 				utils.transposeMatrix(projectionMatrix)
 			);
 			gl.uniformMatrix4fv(
 				normalMatrixPositionHandle,
-				gl.FALSE,
+				false,
 				utils.transposeMatrix(normalMatrix)
 			);
 
@@ -210,13 +212,13 @@ function main(gl, program) {
 }
 
 function init() {
-	const canvas = document.getElementById("main-canvas");
+	const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
 	const gl = canvas.getContext("webgl2");
 	if (!gl) {
 		console.error("GL context not opened");
 		return;
 	}
-	utils.resizeCanvasToDisplaySize(gl.canvas);
+	utils.resizeCanvasToDisplaySize(canvas);
 
 	var vertexShader = utils.createShader(
 		gl,
@@ -236,4 +238,4 @@ function init() {
 	main(gl, program);
 }
 
-window.onload = init();
+window.onload = () => init();

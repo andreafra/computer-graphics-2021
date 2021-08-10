@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
 	// The main JS file
-	entry: "./src/main.js",
+	entry: "./src/main.ts",
 	// Where the output get saved. Import "bundle.js" in index.html.
 	output: {
 		filename: "bundle.js",
@@ -40,17 +40,31 @@ module.exports = {
 			// 	test: /\.xml$/i,
 			// 	use: ["xml-loader"],
 			// },
-			// GLSL -> string
-			{
-				test: /\.glsl$/,
-				loader: "webpack-glsl-loader",
-			},
+			// GLSL -> string (for JS project)
+			// {
+			// 	test: /\.glsl$/,
+			// 	loader: "webpack-glsl-loader",
+			// },
 			// OBJ -> Object
 			{
 				test: /\.obj$/,
 				loader: "webpack-obj-loader",
 			},
+			// Typescript
+			{
+				test: /\.tsx?$/,
+				use: "ts-loader",
+				//exclude: /node_modules/,
+			},
+			// GLSL -> string (for TS project)
+			{
+				test: /\.(glsl|vs|fs)$/,
+				loader: "ts-shader-loader",
+			},
 		],
+	},
+	resolve: {
+		extensions: [".ts", ".js"],
 	},
 	plugins: [
 		new HtmlWebpackPlugin({
