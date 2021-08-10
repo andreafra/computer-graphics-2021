@@ -40,10 +40,15 @@ module.exports = {
 			// 	test: /\.xml$/i,
 			// 	use: ["xml-loader"],
 			// },
-			// Import GLSL files as strings.
+			// GLSL -> string
 			{
 				test: /\.glsl$/,
 				loader: "webpack-glsl-loader",
+			},
+			// OBJ -> Object
+			{
+				test: /\.obj$/,
+				loader: "webpack-obj-loader",
 			},
 		],
 	},
