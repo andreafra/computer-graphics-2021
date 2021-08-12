@@ -1,4 +1,3 @@
-import * as planetSG from "../PlatetsSceneGraph";
 import { utils } from "../utils/utils";
 import { Node, State } from "./SceneGraph";
 
@@ -10,8 +9,6 @@ export function main(gl: WebGL2RenderingContext) {
 	gl.clearColor(0.85, 0.85, 0.85, 1.0);
 	gl.enable(gl.DEPTH_TEST);
 
-	// Setup Scenegraph nodes
-	planetSG.init(gl);
 
 	// Render Loop
 	let lastUpdate = 0;
