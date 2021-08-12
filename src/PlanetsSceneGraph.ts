@@ -1,5 +1,5 @@
 import { indices, normals, vertices } from "./assets/shapesDefinition";
-import { ROOT_NODE } from "./engine/Core";
+import * as Engine from "./engine/Core";
 import sampleLight from "./engine/LightData";
 import {
 	Action,
@@ -90,7 +90,7 @@ export function init(gl: WebGL2RenderingContext) {
 	moonNode.state.rotateSpeed = -0.1;
 
 	// Set relationships between nodes
-	sunOrbitNode.SetParent(ROOT_NODE);
+	sunOrbitNode.SetParent(Engine.ROOT_NODE);
 	sunNode.SetParent(sunOrbitNode);
 	earthOrbitNode.SetParent(sunOrbitNode);
 	earthNode.SetParent(earthOrbitNode);
@@ -149,4 +149,15 @@ export function init(gl: WebGL2RenderingContext) {
 	sunNode.renderAction = renderAction;
 	earthNode.renderAction = renderAction;
 	moonNode.renderAction = renderAction;
+
+	// Demonstrate moving camera
+	Engine.ROOT_NODE.AddAction((state) => {
+		const direction = Math.sin(Engine.GetTime()) > 0 ? 1 : -1;
+		const lastPos = Engine.GetCamera();
+		const newPos = utils.multiplyMatrices(
+			utils.MakeTranslateMatrix(direction * 0.2, 0, 0),
+			lastPos
+		);
+		Engine.SetCamera(newPos);
+	});
 }
