@@ -1,6 +1,6 @@
 import "./style.css";
 import { utils } from "./utils/utils";
-import { main } from "./engine/Core";
+import * as Engine from "./engine/Core";
 import * as planetSG from "./PlanetsSceneGraph";
 
 function init() {
@@ -12,10 +12,23 @@ function init() {
 	}
 	utils.resizeCanvasToDisplaySize(canvas);
 
-	main(gl);
+	Engine.Setup(gl);
+	Engine.SetProjection(utils.MakePerspective(
+		60.0,
+		canvas.width / canvas.height,
+		1.0,
+		2000.0
+	));
+	Engine.SetCamera(utils.LookAt(
+		[0.0, -200.0, 0.0],	// Position
+		[0.0, 0.0, 0.0],	// Target
+		[0.0, 0.0, 1.0]		// Up
+	));
 
 	// Setup Scenegraph nodes
 	planetSG.init(gl);
+
+	Engine.Start();
 }
 
 window.onload = () => init();
