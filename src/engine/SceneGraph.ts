@@ -76,19 +76,12 @@ export class Node<T extends State> {
 
 	AddAction(action: (state: T) => void) {
 		this.actions.push(action);
-	}
+	};
 
-	UpdateAndRender = (
-		deltaTime: number,
-		VPMatrix: number[],
-		worldMatrix?: number[]
-	) => {
+	UpdateAndRender(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
 		this.UpdateWorldMatrix(worldMatrix);
 		this.ExecuteActions();
-		// Draw if render node
-		if (this instanceof RenderNode) {
-			this.Render(VPMatrix);
-		}
+
 		this.children.forEach((child) =>
 			child.UpdateAndRender(deltaTime, VPMatrix, this.state.worldMatrix)
 		);
@@ -98,7 +91,8 @@ export class Node<T extends State> {
 export class RenderNode<T extends State> extends Node<T> {
 	renderAction: RenderAction<State>;
 
-	Render(VPMatrix: number[]) {
+	override UpdateAndRender(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+		super.UpdateAndRender(deltaTime, VPMatrix, worldMatrix);
 		this.renderAction(this.state, VPMatrix);
 	}
 }
