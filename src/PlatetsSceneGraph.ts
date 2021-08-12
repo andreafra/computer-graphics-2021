@@ -1,0 +1,152 @@
+import { indices, normals, vertices } from "./assets/shapesDefinition";
+import { ROOT_NODE } from "./engine/Core";
+import sampleLight from "./engine/LightData";
+import {
+	Action,
+	Node,
+	RenderAction,
+	RenderNode,
+	State,
+} from "./engine/SceneGraph";
+import { getSampleShader as getSampleProgram } from "./engine/Shaders";
+import { createVAO } from "./engine/VertexArrayObjectFactory";
+import { utils } from "./utils/utils";
+
+// Define common structure for state of these nodes
+interface PlanetState extends State {
+	rotateSpeed: number;
+}
+
+export function init(gl: WebGL2RenderingContext) {
+	// SHADERS
+	const program = getSampleProgram(gl);
+	gl.useProgram(program);
+
+	// Setup Attribute Location (requires a shader)
+	const positionAttributeLoc = gl.getAttribLocation(program, "inPosition");
+	const normalAttributeLoc = gl.getAttribLocation(program, "inNormal");
+
+	// Setup Uniform Location (requires a shader)
+	const matrixLoc = gl.getUniformLocation(program, "matrix");
+	const materialDiffColorLoc = gl.getUniformLocation(program, "mDiffColor");
+	const lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
+	const lightColorLoc = gl.getUniformLocation(program, "lightColor");
+	const normalMatrixPositionLoc = gl.getUniformLocation(program, "nMatrix");
+
+	// CREATE MODEL
+	const vao = createVAO(
+		gl,
+		{
+			vertices: vertices,
+			vertexNormals: normals,
+			indices: indices,
+		},
+		{
+			verticesAttribLocation: positionAttributeLoc,
+			vertexNormalsAttribLocation: normalAttributeLoc,
+		}
+	);
+
+	// SETUP NODES
+
+	var sunOrbitNode = new Node<PlanetState>();
+	sunOrbitNode.state.rotateSpeed = 0;
+
+	var earthOrbitNode = new Node<PlanetState>(
+		utils.MakeTranslateMatrix(100, 0, 0)
+	);
+	earthOrbitNode.state.rotateSpeed = 0.3;
+
+	var moonOrbitNode = new Node<PlanetState>(
+		utils.MakeTranslateMatrix(30, 0, 0)
+	);
+	moonOrbitNode.state.rotateSpeed = 0.6;
+
+	var sunNode = new RenderNode<PlanetState>(utils.MakeScaleMatrix(5));
+	sunNode.state.drawInfo = {
+		materialColor: [0.6, 0.6, 0.0],
+		program: program,
+		bufferLength: indices.length,
+		vertexArrayObject: vao,
+	};
+	sunNode.state.rotateSpeed = 0.05;
+
+	var earthNode = new RenderNode<PlanetState>(utils.MakeScaleMatrix(2));
+	earthNode.state.drawInfo = {
+		materialColor: [0.2, 0.5, 0.8],
+		program: program,
+		bufferLength: indices.length,
+		vertexArrayObject: vao,
+	};
+	earthNode.state.rotateSpeed = 0.5;
+
+	var moonNode = new RenderNode<PlanetState>(utils.MakeScaleMatrix(0.7));
+	moonNode.state.drawInfo = {
+		materialColor: [0.6, 0.6, 0.6],
+		program: program,
+		bufferLength: indices.length,
+		vertexArrayObject: vao,
+	};
+	moonNode.state.rotateSpeed = -0.1;
+
+	// Set relationships between nodes
+	sunOrbitNode.SetParent(ROOT_NODE);
+	sunNode.SetParent(sunOrbitNode);
+	earthOrbitNode.SetParent(sunOrbitNode);
+	earthNode.SetParent(earthOrbitNode);
+	moonOrbitNode.SetParent(earthOrbitNode);
+	moonNode.SetParent(moonOrbitNode);
+
+	const RotatePositionAction: Action<PlanetState> = (state) => {
+		state.localMatrix = utils.multiplyMatrices(
+			utils.MakeRotateYMatrix(state.rotateSpeed),
+			state.localMatrix
+		);
+	};
+
+	earthOrbitNode.AddAction(RotatePositionAction);
+	moonOrbitNode.AddAction(RotatePositionAction);
+	sunNode.AddAction(RotatePositionAction);
+	earthNode.AddAction(RotatePositionAction);
+	moonNode.AddAction(RotatePositionAction);
+
+	// Depends on the attributes/unifors defined at the beginning
+	const renderAction: RenderAction<PlanetState> = (state, VPMatrix) => {
+		gl.useProgram(state.drawInfo.program);
+
+		let projectionMatrix = utils.multiplyMatrices(
+			VPMatrix,
+			state.worldMatrix
+		);
+		let normalMatrix = utils.invertMatrix(
+			utils.transposeMatrix(state.worldMatrix)
+		);
+
+		gl.uniformMatrix4fv(
+			matrixLoc,
+			false,
+			utils.transposeMatrix(projectionMatrix)
+		);
+		gl.uniformMatrix4fv(
+			normalMatrixPositionLoc,
+			false,
+			utils.transposeMatrix(normalMatrix)
+		);
+
+		gl.uniform3fv(materialDiffColorLoc, state.drawInfo.materialColor);
+		gl.uniform3fv(lightColorLoc, sampleLight.color);
+		gl.uniform3fv(lightDirectionLoc, sampleLight.direction);
+
+		gl.bindVertexArray(state.drawInfo.vertexArrayObject);
+		gl.drawElements(
+			gl.TRIANGLES,
+			state.drawInfo.bufferLength,
+			gl.UNSIGNED_SHORT,
+			0
+		);
+	};
+
+	sunNode.renderAction = renderAction;
+	earthNode.renderAction = renderAction;
+	moonNode.renderAction = renderAction;
+}

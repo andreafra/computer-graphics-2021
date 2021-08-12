@@ -15,11 +15,11 @@ trim_trailing_whitespace = true
 charset = utf-8
 
 # Indentation override for files  under src/
-[src/*.{js,ts,css,glsl}]
+[src/**/*.{js,ts,css,glsl}]
 indent_style = tab
 indent_size = 4
 
-[src/*.html]
+[src/**/*.html]
 indent_style = tab
 indent_size = 2
 
