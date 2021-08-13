@@ -1,5 +1,6 @@
 import { utils } from "../utils/utils";
 import * as Engine from "./Core";
+import { Light } from "./Lights";
 
 // Object containing data useful for rendering
 interface DrawInfo {
@@ -95,5 +96,19 @@ export class RenderNode<T extends State> extends Node<T> {
 	override Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
 		super.Update(deltaTime, VPMatrix, worldMatrix);
 		Engine.QueueRender(() => this.renderAction(this.state, VPMatrix));
+	}
+}
+
+export class LightNode<T extends State> extends Node<T> {
+	light: Light = new Light();
+
+	constructor(light: Light, localMatrix?: number[]) {
+		super(localMatrix);
+		this.light = light;
+	}
+
+	override Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+		super.Update(deltaTime, VPMatrix, worldMatrix);
+		Engine.AddLight(this.light);
 	}
 }

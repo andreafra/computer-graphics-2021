@@ -39,6 +39,9 @@ function Render(time: DOMHighResTimeStamp) {
 
 	// Navigate the SceneGraph tree to update all elements // O(n)
 	renderQueue = [];
+	for(let i = 0; i < lights.length; i++)
+		lights[i] = new Light();
+	lightIdx = 0;
 	ROOT_NODE.Update(deltaTime, viewProjectionMatrix);
 	for (let renderAction of renderQueue) {
 		renderAction();
