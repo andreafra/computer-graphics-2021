@@ -1,6 +1,6 @@
 import { indices, normals, vertices } from "./assets/shapesDefinition";
 import * as Engine from "./engine/Core";
-import sampleLight from "./engine/LightData";
+import { Light, LightType } from "./engine/Lights";
 import { MakeVAO } from "./engine/Models";
 import {
 	Action,
@@ -27,7 +27,8 @@ export function init(gl: WebGL2RenderingContext) {
 	const materialDiffColorLoc = gl.getUniformLocation(program, "mDiffColor");
 	const lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
 	const lightColorLoc = gl.getUniformLocation(program, "lightColor");
-	const normalMatrixPositionLoc = gl.getUniformLocation(program, "nMatrix");
+	const normalMatrixLoc = gl.getUniformLocation(program, "nMatrix");
+	const positionMatrixLoc = gl.getUniformLocation(program, "pMatrix");
 
 	// CREATE MODEL
 	const vao = MakeVAO(gl, program, {
@@ -117,14 +118,19 @@ export function init(gl: WebGL2RenderingContext) {
 			utils.transposeMatrix(projectionMatrix)
 		);
 		gl.uniformMatrix4fv(
-			normalMatrixPositionLoc,
+			normalMatrixLoc,
 			false,
 			utils.transposeMatrix(normalMatrix)
 		);
+		gl.uniformMatrix4fv(
+			positionMatrixLoc,
+			false,
+			utils.transposeMatrix(state.worldMatrix)
+		);
 
 		gl.uniform3fv(materialDiffColorLoc, state.drawInfo.materialColor);
-		gl.uniform3fv(lightColorLoc, sampleLight.color);
-		gl.uniform3fv(lightDirectionLoc, sampleLight.direction);
+
+		Engine.BindAllLightUniforms(gl, state.drawInfo.program);
 
 		gl.bindVertexArray(state.drawInfo.vertexArrayObject);
 		gl.drawElements(
@@ -149,4 +155,16 @@ export function init(gl: WebGL2RenderingContext) {
 		);
 		Engine.SetCamera(newPos);
 	});
+
+	// Demonstrate a static light
+	let dirLightAlpha = -utils.degToRad(-60);
+	let dirLightBeta = -utils.degToRad(120);
+	let directionalLightDir = [
+		Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
+		Math.sin(dirLightAlpha),
+		Math.cos(dirLightAlpha) * Math.sin(dirLightBeta),
+	];
+	let directionalLightColor = [0.8, 1.0, 1.0, 1.0];
+	let directionalLight = Light.MakeDirectional(directionalLightDir, directionalLightColor);
+	Engine.AddLight(directionalLight);
 }
