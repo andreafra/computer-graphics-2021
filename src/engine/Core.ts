@@ -1,10 +1,14 @@
 import { utils } from "../utils/utils";
 import { Node, State } from "./SceneGraph";
+import { Light } from "./Lights";
 
 export const ROOT_NODE: Node<State> = new Node();
 let gl: WebGL2RenderingContext;
 let projectionMatrix = utils.identityMatrix();
 let cameraMatrix = utils.identityMatrix();
+
+const lights = [new Light(), new Light(), new Light()];
+let lightIdx = 0;
 
 // Entrypoint of the WebGL program
 export function Setup(_gl: WebGL2RenderingContext) {
@@ -61,4 +65,17 @@ export function GetCamera(): number[] {
 
 export function GetTime() {
 	return lastUpdate;
+}
+
+export function BindAllLightUniforms(gl: WebGL2RenderingContext, program: WebGLProgram) {
+	for (let i = 0; i < 3; i++) {
+		lights[i].BindUniforms(gl, program, i);
+	}
+}
+
+export function AddLight(light: Light) {
+	if (lightIdx > 2)
+		throw "Cannot add any more lights"
+	lights[lightIdx] = light;
+	lightIdx++;
 }
