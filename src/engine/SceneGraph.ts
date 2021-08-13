@@ -109,6 +109,7 @@ export class LightNode<T extends State> extends Node<T> {
 
 	override Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
 		super.Update(deltaTime, VPMatrix, worldMatrix);
+		this.light.pos = utils.GetPositionFromMatrix(this.state.worldMatrix);
 		Engine.AddLight(this.light);
 	}
 }

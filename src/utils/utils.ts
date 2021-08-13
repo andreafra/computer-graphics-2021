@@ -654,4 +654,12 @@ export class utils {
 
 		return perspective;
 	};
+
+	static GetPositionFromMatrix(m: number[]) {
+		return [
+			m[3] / m[15],
+			m[7] / m[15],
+			m[11] / m[15]
+		];
+	}
 }

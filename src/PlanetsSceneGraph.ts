@@ -151,7 +151,7 @@ export function init(gl: WebGL2RenderingContext) {
 		const direction = Math.sin(Engine.GetTime()) > 0 ? 1 : -1;
 		const lastPos = Engine.GetCamera();
 		const newPos = utils.multiplyMatrices(
-			utils.MakeTranslateMatrix(direction * 0.2, 0, 0),
+			utils.MakeTranslateMatrix(direction * 0.5, 0, 0),
 			lastPos
 		);
 		Engine.SetCamera(newPos);
@@ -169,4 +169,11 @@ export function init(gl: WebGL2RenderingContext) {
 	let dirLightNode = new LightNode(
 		Light.MakeDirectional(directionalLightDir, directionalLightColor));
 	dirLightNode.SetParent(Engine.ROOT_NODE);
+
+	// Demonstrate a moving point light placed above the earth
+	const pointLightColor = [1.0, 0.0, 0.0, 1.0];
+	const pointLightNode = new LightNode(
+		Light.MakePoint(pointLightColor),
+		utils.MakeTranslateMatrix(0, -15, 0));
+	pointLightNode.SetParent(earthNode);
 }

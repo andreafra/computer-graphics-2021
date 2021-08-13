@@ -46,4 +46,15 @@ export class Light {
 		l.lightColor = color;
 		return l;
 	}
+
+	static MakePoint(color: number[], targetDistance?: number, decay?: number) {
+		const l = new Light();
+		l.lightType = LightType.Point;
+		l.lightColor = color;
+		if (targetDistance)
+			l.target = targetDistance;
+		if (decay)
+			l.decay = decay;
+		return l;
+	}
 }
