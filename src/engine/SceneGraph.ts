@@ -1,4 +1,5 @@
 import { utils } from "../utils/utils";
+import * as Engine from "./Core";
 
 // Object containing data useful for rendering
 interface DrawInfo {
@@ -78,12 +79,12 @@ export class Node<T extends State> {
 		this.actions.push(action);
 	};
 
-	UpdateAndRender(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+	Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
 		this.UpdateWorldMatrix(worldMatrix);
 		this.ExecuteActions();
 
 		this.children.forEach((child) =>
-			child.UpdateAndRender(deltaTime, VPMatrix, this.state.worldMatrix)
+			child.Update(deltaTime, VPMatrix, this.state.worldMatrix)
 		);
 	};
 }
@@ -91,8 +92,8 @@ export class Node<T extends State> {
 export class RenderNode<T extends State> extends Node<T> {
 	renderAction: RenderAction<State>;
 
-	override UpdateAndRender(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
-		super.UpdateAndRender(deltaTime, VPMatrix, worldMatrix);
-		this.renderAction(this.state, VPMatrix);
+	override Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+		super.Update(deltaTime, VPMatrix, worldMatrix);
+		Engine.QueueRender(() => this.renderAction(this.state, VPMatrix));
 	}
 }
