@@ -7,6 +7,8 @@ let gl: WebGL2RenderingContext;
 let projectionMatrix = utils.identityMatrix();
 let cameraMatrix = utils.identityMatrix();
 
+let renderQueue: (() => void)[] = [];
+
 const lights = [new Light(), new Light(), new Light()];
 let lightIdx = 0;
 
@@ -36,7 +38,11 @@ function Render(time: DOMHighResTimeStamp) {
 	);
 
 	// Navigate the SceneGraph tree to update all elements // O(n)
-	ROOT_NODE.UpdateAndRender(deltaTime, viewProjectionMatrix);
+	renderQueue = [];
+	ROOT_NODE.Update(deltaTime, viewProjectionMatrix);
+	for (let renderAction of renderQueue) {
+		renderAction();
+	}
 
 	// Render next frame
 	requestAnimationFrame(Render);
@@ -65,6 +71,10 @@ export function GetCamera(): number[] {
 
 export function GetTime() {
 	return lastUpdate;
+}
+
+export function QueueRender(renderAction: () => void) {
+	renderQueue.push(renderAction);
 }
 
 export function BindAllLightUniforms(gl: WebGL2RenderingContext, program: WebGLProgram) {
