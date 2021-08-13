@@ -7,6 +7,7 @@ import {
 	Node,
 	RenderAction,
 	RenderNode,
+	LightNode,
 	State,
 } from "./engine/SceneGraph";
 import { getSampleShader as getSampleProgram } from "./engine/Shaders";
@@ -165,6 +166,7 @@ export function init(gl: WebGL2RenderingContext) {
 		Math.cos(dirLightAlpha) * Math.sin(dirLightBeta),
 	];
 	let directionalLightColor = [0.8, 1.0, 1.0, 1.0];
-	let directionalLight = Light.MakeDirectional(directionalLightDir, directionalLightColor);
-	Engine.AddLight(directionalLight);
+	let dirLightNode = new LightNode(
+		Light.MakeDirectional(directionalLightDir, directionalLightColor));
+	dirLightNode.SetParent(Engine.ROOT_NODE);
 }
