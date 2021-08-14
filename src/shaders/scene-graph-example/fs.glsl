@@ -9,33 +9,16 @@ out vec4 outColor;
 uniform vec3 mDiffColor; //material diffuse color
 
 // 3 configurable lights
+#define N_LIGHTS 16
 // Light type is one-hot encoded on 3 bits
-uniform vec3 LAlightType;
-uniform vec3 LAPos;
-uniform vec3 LADir;
-uniform float LAConeOut;
-uniform float LAConeIn;
-uniform float LADecay;
-uniform float LATarget;
-uniform vec4 LAlightColor;
-
-uniform vec3 LBlightType;
-uniform vec3 LBPos;
-uniform vec3 LBDir;
-uniform float LBConeOut;
-uniform float LBConeIn;
-uniform float LBDecay;
-uniform float LBTarget;
-uniform vec4 LBlightColor;
-
-uniform vec3 LClightType;
-uniform vec3 LCPos;
-uniform vec3 LCDir;
-uniform float LCConeOut;
-uniform float LCConeIn;
-uniform float LCDecay;
-uniform float LCTarget;
-uniform vec4 LClightColor;
+uniform vec3 LType[N_LIGHTS];
+uniform vec3 LPos[N_LIGHTS];
+uniform vec3 LDir[N_LIGHTS];
+uniform float LConeOut[N_LIGHTS];
+uniform float LConeIn[N_LIGHTS];
+uniform float LDecay[N_LIGHTS];
+uniform float LTarget[N_LIGHTS];
+uniform vec4 LColor[N_LIGHTS];
 
 vec3 compLightDir(vec3 LPos, vec3 LDir, vec3 lightType) {
 	//lights
@@ -77,22 +60,14 @@ void main() {
 	vec3 normalVec = normalize(fsNormal);
 
 	//lights
-	vec3 LAlightDir = compLightDir(LAPos, LADir, LAlightType);
-	vec4 LAlightCol = compLightColor(LAlightColor, LATarget, LADecay, LAPos, LADir,
-								     LAConeOut, LAConeIn, LAlightType);
-	
-	vec3 LBlightDir = compLightDir(LBPos, LBDir, LBlightType);
-	vec4 LBlightCol = compLightColor(LBlightColor, LBTarget, LBDecay, LBPos, LBDir,
-								     LBConeOut, LBConeIn, LBlightType);
-	
-	vec3 LClightDir = compLightDir(LCPos, LCDir, LClightType);
-	vec4 LClightCol = compLightColor(LClightColor, LCTarget, LCDecay, LCPos, LCDir,
-								     LCConeOut, LCConeIn, LClightType);
+	vec4 lights;
+	for (int i = 0; i < N_LIGHTS; i++) {
+		vec3 lightDir = compLightDir(LPos[i], LDir[i], LType[i]);
+		vec4 lightCol = compLightColor(LColor[i], LTarget[i], LDecay[i], LPos[i], LDir[i],
+									     LConeOut[i], LConeIn[i], LType[i]);
+		lights += dot(lightDir, normalVec) * lightCol;
+	}
 
-    vec4 LA = dot(LAlightDir, normalVec) * LAlightCol;
-    vec4 LB = dot(LBlightDir, normalVec) * LBlightCol;
-    vec4 LC = dot(LClightDir, normalVec) * LClightCol;
-
-	vec4 lambertColor = vec4(mDiffColor, 1.0) * (LA + LB + LC);
+	vec4 lambertColor = vec4(mDiffColor, 1.0) * lights;
 	outColor = clamp(lambertColor, 0.00, 1.0);
 }

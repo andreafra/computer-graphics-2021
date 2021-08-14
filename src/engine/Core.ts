@@ -9,7 +9,8 @@ let cameraMatrix = utils.identityMatrix();
 
 let renderQueue: (() => void)[] = [];
 
-const lights = [new Light(), new Light(), new Light()];
+const N_LIGHTS = 16;
+const lights = new Array<Light>(N_LIGHTS);
 let lightIdx = 0;
 
 // Entrypoint of the WebGL program
@@ -39,8 +40,7 @@ function Render(time: DOMHighResTimeStamp) {
 
 	// Navigate the SceneGraph tree to update all elements // O(n)
 	renderQueue = [];
-	for(let i = 0; i < lights.length; i++)
-		lights[i] = new Light();
+	lights.fill(new Light());
 	lightIdx = 0;
 	ROOT_NODE.Update(deltaTime, viewProjectionMatrix);
 	for (let renderAction of renderQueue) {
@@ -81,9 +81,14 @@ export function QueueRender(renderAction: () => void) {
 }
 
 export function BindAllLightUniforms(gl: WebGL2RenderingContext, program: WebGLProgram) {
-	for (let i = 0; i < 3; i++) {
-		lights[i].BindUniforms(gl, program, i);
-	}
+	gl.uniform3fv(gl.getUniformLocation(program, "LType"), lights.map(l => l.EncodeTypeOneHot()).flat(1));
+	gl.uniform3fv(gl.getUniformLocation(program, "LPos"), lights.map(l => l.pos).flat(1));
+	gl.uniform3fv(gl.getUniformLocation(program, "LDir"), lights.map(l => l.dir.map(d => -d)).flat(1));
+	gl.uniform1fv(gl.getUniformLocation(program, "LConeOut"), lights.map(l => l.coneOut));
+	gl.uniform1fv(gl.getUniformLocation(program, "LConeIn"), lights.map(l => l.coneIn));
+	gl.uniform1fv(gl.getUniformLocation(program, "LDecay"), lights.map(l => l.decay));
+	gl.uniform1fv(gl.getUniformLocation(program, "LTarget"), lights.map(l => l.target));
+	gl.uniform4fv(gl.getUniformLocation(program, "LColor"), lights.map(l => l.lightColor).flat(1));
 }
 
 export function AddLight(light: Light) {
