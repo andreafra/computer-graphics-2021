@@ -1,8 +1,8 @@
 import * as Engine from "./engine/Core";
-import sampleLight from "./engine/LightData";
 import { MakeTexture, MakeVAO } from "./engine/Models";
 import { RenderAction, RenderNode, State } from "./engine/SceneGraph";
 import { utils } from "./utils/utils";
+import { getShader } from "./engine/Shaders";
 
 // Assets
 import toad_OBJ from "./assets/cpt_toad/toad.obj";
@@ -15,10 +15,7 @@ interface ToadState extends State {}
 
 export function init(gl: WebGL2RenderingContext) {
 	// SHADERS
-	const program = utils.createAndCompileShaders(gl, [
-		vertShaderSrc,
-		fragShaderSrc,
-	]);
+	const program = getShader(gl, true /* useTextures */);
 	gl.useProgram(program);
 
 	// Setup Uniform Location (requires a shader)
@@ -26,7 +23,8 @@ export function init(gl: WebGL2RenderingContext) {
 	const materialDiffColorLoc = gl.getUniformLocation(program, "mDiffColor");
 	const lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
 	const lightColorLoc = gl.getUniformLocation(program, "lightColor");
-	const normalMatrixPositionLoc = gl.getUniformLocation(program, "nMatrix");
+	const normalMatrixLoc = gl.getUniformLocation(program, "nMatrix");
+	const positionMatrixLoc = gl.getUniformLocation(program, "pMatrix");
 
 	// CREATE MODEL
 	const vao = MakeVAO(gl, program, {
@@ -38,12 +36,13 @@ export function init(gl: WebGL2RenderingContext) {
 
 	const SetupTextureRender = MakeTexture(gl, program, {
 		dataSrc: bodyTextureSrc,
-		uniformName: "bodyTexture",
+		uniformName: "tex",
 	});
 
 	// SETUP NODES
 	let tMatrix = utils.multiplyMatrices(
-		utils.MakeScaleMatrix(100),
+		utils.MakeTranslateMatrix(0, 0, -70),
+		utils.MakeScaleMatrix(40),
 		utils.MakeRotateXYZMatrix(0, 90, 0)
 	);
 	var toadNode = new RenderNode<ToadState>(tMatrix);
@@ -75,15 +74,19 @@ export function init(gl: WebGL2RenderingContext) {
 			utils.transposeMatrix(projectionMatrix)
 		);
 		gl.uniformMatrix4fv(
-			normalMatrixPositionLoc,
+			normalMatrixLoc,
 			false,
 			utils.transposeMatrix(normalMatrix)
 		);
+		gl.uniformMatrix4fv(
+			positionMatrixLoc,
+			false,
+			utils.transposeMatrix(state.worldMatrix)
+		);
 
-		// Send Light Data to GPU
 		gl.uniform3fv(materialDiffColorLoc, state.drawInfo.materialColor);
-		gl.uniform3fv(lightColorLoc, sampleLight.color);
-		gl.uniform3fv(lightDirectionLoc, sampleLight.direction);
+
+		Engine.BindAllLightUniforms(gl, state.drawInfo.program);
 
 		// Send Texture Data to GPU
 		SetupTextureRender();

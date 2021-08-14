@@ -10,7 +10,7 @@ import {
 	LightNode,
 	State,
 } from "./engine/SceneGraph";
-import { getSampleShader as getSampleProgram } from "./engine/Shaders";
+import { getShader } from "./engine/Shaders";
 import { utils } from "./utils/utils";
 
 // Define common structure for state of these nodes
@@ -20,7 +20,7 @@ interface PlanetState extends State {
 
 export function init(gl: WebGL2RenderingContext) {
 	// SHADERS
-	const program = getSampleProgram(gl);
+	const program = getShader(gl);
 	gl.useProgram(program);
 
 	// Setup Uniform Location (requires a shader)
