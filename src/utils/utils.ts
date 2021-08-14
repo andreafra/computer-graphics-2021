@@ -366,7 +366,20 @@ export class utils {
 		return out;
 	};
 
-	static multiplyMatrices = function (m1: number[], m2: number[]): number[] {
+
+	static multiplyMatrices = function (...m: number[][]): number[] {
+	    let i = m.length - 1;
+	    let res = m[i];
+	    i--;
+
+	    for (; i >= 0; i--) {
+	        res = utils.multiplyTwo(m[i], res);
+	    }
+
+	    return res;
+	}
+
+	static multiplyTwo = function (m1: number[], m2: number[]): number[] {
 		// Perform matrix product  { out = m1 * m2;}
 		var out = [];
 
