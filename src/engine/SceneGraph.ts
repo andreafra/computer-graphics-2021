@@ -30,8 +30,9 @@ export class Node<T extends State> {
 	children: Node<State>[];
 	state: T;
 	actions: Action<T>[];
-
-	constructor(localMatrix?: number[]) {
+	name: string;
+	constructor(name: string, localMatrix?: number[]) {
+		this.name = name;
 		this.parent = null;
 		this.children = [];
 		this.actions = [];
@@ -102,8 +103,8 @@ export class RenderNode<T extends State> extends Node<T> {
 export class LightNode<T extends State> extends Node<T> {
 	light: Light = new Light();
 
-	constructor(light: Light, localMatrix?: number[]) {
-		super(localMatrix);
+	constructor(name: string, light: Light, localMatrix?: number[]) {
+		super(name, localMatrix);
 		this.light = light;
 	}
 
