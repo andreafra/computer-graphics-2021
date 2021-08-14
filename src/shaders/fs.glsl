@@ -1,5 +1,7 @@
 #version 300 es
 
+//NO_USE_TEXTURES
+
 precision mediump float;
 
 in vec3 fsNormal;
@@ -7,6 +9,10 @@ in vec3 fsPosition;
 out vec4 outColor;
 
 uniform vec3 mDiffColor; //material diffuse color
+#ifdef USE_TEXTURES
+in vec2 uvCoord;
+uniform sampler2D tex;
+#endif
 
 // 3 configurable lights
 #define N_LIGHTS 16
@@ -68,6 +74,11 @@ void main() {
 		lights += dot(lightDir, normalVec) * lightCol;
 	}
 
-	vec4 lambertColor = vec4(mDiffColor, 1.0) * lights;
+	vec4 diffColor = vec4(mDiffColor, 1.0);
+#ifdef USE_TEXTURES
+	diffColor = texture(tex, uvCoord);
+#endif
+
+	vec4 lambertColor = diffColor * lights;
 	outColor = clamp(lambertColor, 0.00, 1.0);
 }
