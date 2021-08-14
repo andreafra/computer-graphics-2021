@@ -1,7 +1,7 @@
-import { indices, normals, vertices } from "./assets/shapesDefinition";
-import * as Engine from "./engine/Core";
-import { Light, LightType } from "./engine/Lights";
-import { MakeVAO } from "./engine/Models";
+import { indices, normals, vertices } from "../assets/shapesDefinition";
+import * as Engine from "../engine/Core";
+import { Light, LightType } from "../engine/Lights";
+import { MakeVAO } from "../engine/Models";
 import {
 	Action,
 	Node,
@@ -9,9 +9,9 @@ import {
 	RenderNode,
 	LightNode,
 	State,
-} from "./engine/SceneGraph";
-import { getShader } from "./engine/Shaders";
-import { utils } from "./utils/utils";
+} from "../engine/SceneGraph";
+import { getShader } from "../engine/Shaders";
+import { utils } from "../utils/utils";
 
 // Define common structure for state of these nodes
 interface PlanetState extends State {
@@ -40,20 +40,22 @@ export function init(gl: WebGL2RenderingContext) {
 
 	// SETUP NODES
 
-	var sunOrbitNode = new Node<PlanetState>();
+	var sunOrbitNode = new Node<PlanetState>("sun-orbit");
 	sunOrbitNode.state.rotateSpeed = 0;
 
 	var earthOrbitNode = new Node<PlanetState>(
+		"earth-orbit",
 		utils.MakeTranslateMatrix(100, 0, 0)
 	);
 	earthOrbitNode.state.rotateSpeed = 0.3;
 
 	var moonOrbitNode = new Node<PlanetState>(
+		"moon-orbit",
 		utils.MakeTranslateMatrix(30, 0, 0)
 	);
 	moonOrbitNode.state.rotateSpeed = 0.6;
 
-	var sunNode = new RenderNode<PlanetState>(utils.MakeScaleMatrix(5));
+	var sunNode = new RenderNode<PlanetState>("sun", utils.MakeScaleMatrix(5));
 	sunNode.state.drawInfo = {
 		materialColor: [0.6, 0.6, 0.0],
 		program: program,
@@ -62,7 +64,10 @@ export function init(gl: WebGL2RenderingContext) {
 	};
 	sunNode.state.rotateSpeed = 0.05;
 
-	var earthNode = new RenderNode<PlanetState>(utils.MakeScaleMatrix(2));
+	var earthNode = new RenderNode<PlanetState>(
+		"earth",
+		utils.MakeScaleMatrix(2)
+	);
 	earthNode.state.drawInfo = {
 		materialColor: [0.2, 0.5, 0.8],
 		program: program,
@@ -71,7 +76,10 @@ export function init(gl: WebGL2RenderingContext) {
 	};
 	earthNode.state.rotateSpeed = 0.5;
 
-	var moonNode = new RenderNode<PlanetState>(utils.MakeScaleMatrix(0.7));
+	var moonNode = new RenderNode<PlanetState>(
+		"moon",
+		utils.MakeScaleMatrix(0.7)
+	);
 	moonNode.state.drawInfo = {
 		materialColor: [0.6, 0.6, 0.6],
 		program: program,
@@ -160,6 +168,7 @@ export function init(gl: WebGL2RenderingContext) {
 	// Demonstrate a static light
 	let directionalLightColor = [0.8, 1.0, 1.0, 1.0];
 	let dirLightNode = new LightNode(
+		"sun-light",
 		Light.MakeDirectional(directionalLightColor),
 		utils.multiplyMatrices(
 			utils.MakeRotateZMatrix(-60),
@@ -169,6 +178,7 @@ export function init(gl: WebGL2RenderingContext) {
 	// Demonstrate a moving point light placed above the earth
 	const pointLightColor = [1.0, 0.0, 0.0, 1.0];
 	const pointLightNode = new LightNode(
+		"earth-is-on-fire-light",
 		Light.MakePoint(pointLightColor),
 		utils.MakeTranslateMatrix(0, -15, 0));
 	pointLightNode.SetParent(earthNode);

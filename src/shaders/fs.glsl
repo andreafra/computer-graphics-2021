@@ -11,7 +11,7 @@ out vec4 outColor;
 uniform vec3 mDiffColor; //material diffuse color
 #ifdef USE_TEXTURES
 in vec2 uvCoord;
-uniform sampler2D tex;
+uniform sampler2D baseTexture;
 #endif
 
 // 3 configurable lights
@@ -76,7 +76,7 @@ void main() {
 
 	vec4 diffColor = vec4(mDiffColor, 1.0);
 #ifdef USE_TEXTURES
-	diffColor = texture(tex, uvCoord);
+	diffColor = texture(baseTexture, uvCoord);
 #endif
 
 	vec4 lambertColor = diffColor * lights;

@@ -3,7 +3,7 @@ import { Node, State } from "./SceneGraph";
 import { Light } from "./Lights";
 import * as DebugLine from "../debug/Lines";
 
-export const ROOT_NODE: Node<State> = new Node();
+export const ROOT_NODE: Node<State> = new Node("root");
 let gl: WebGL2RenderingContext;
 let projectionMatrix = utils.identityMatrix();
 let cameraMatrix = utils.identityMatrix();
@@ -19,7 +19,7 @@ export function Setup(_gl: WebGL2RenderingContext) {
 	gl = _gl;
 
 	// ONCE
-	gl.clearColor(0.85, 0.85, 0.85, 1.0);
+	gl.clearColor(1, 1, 1, 1);
 	gl.enable(gl.DEPTH_TEST);
 }
 

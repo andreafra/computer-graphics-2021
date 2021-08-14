@@ -1,19 +1,32 @@
-import * as Engine from "./engine/Core";
-import { MakeTexture, MakeVAO } from "./engine/Models";
-import { RenderAction, RenderNode, State } from "./engine/SceneGraph";
-import { utils } from "./utils/utils";
-import { getShader } from "./engine/Shaders";
+import * as Engine from "../engine/Core";
+import { MakeTexture, MakeVAO } from "../engine/Models";
+import { RenderAction, RenderNode, Node, State } from "../engine/SceneGraph";
+import { utils } from "../utils/utils";
+import { getShader } from "../engine/Shaders";
 
 // Assets
-import toad_OBJ from "./assets/cpt_toad/toad.obj";
-import bodyTextureSrc from "./assets/cpt_toad/Textures/baked_txt.png";
-import fragShaderSrc from "./shaders/toad/fs.glsl";
-import vertShaderSrc from "./shaders/toad/vs.glsl";
+import cube_W_OBJ from "../assets/cube/cube_white.obj";
+import cube_Y_OBJ from "../assets/cube/cube_yellow.obj";
+import cubeTextureSrc from "../assets/cube/grass.png";
 
 // Define common structure for state of these nodes
-interface ToadState extends State {}
+interface CubeState extends State {}
 
-export function init(gl: WebGL2RenderingContext) {
+export enum Type {
+	White = 0,
+	Yellow = 1,
+}
+
+const MESHES = [cube_W_OBJ, cube_Y_OBJ];
+
+export function init(
+	gl: WebGL2RenderingContext,
+	type: Type,
+	translateVec: number[],
+	parentNode: Node<State>
+) {
+	let blockOBJ = MESHES[type];
+
 	// SHADERS
 	const program = getShader(gl, true /* useTextures */);
 	gl.useProgram(program);
@@ -28,36 +41,36 @@ export function init(gl: WebGL2RenderingContext) {
 
 	// CREATE MODEL
 	const vao = MakeVAO(gl, program, {
-		positions: toad_OBJ.vertices,
-		normals: toad_OBJ.vertexNormals,
-		indices: toad_OBJ.indices,
-		uvCoord: toad_OBJ.textures,
+		positions: blockOBJ.vertices,
+		normals: blockOBJ.vertexNormals,
+		indices: blockOBJ.indices,
+		uvCoord: blockOBJ.textures,
 	});
 
 	const SetupTextureRender = MakeTexture(gl, program, {
-		dataSrc: bodyTextureSrc,
-		uniformName: "tex",
+		dataSrc: cubeTextureSrc,
+		uniformName: "baseTexture",
 	});
 
 	// SETUP NODES
-	let tMatrix = utils.multiplyMatrices(
-		utils.MakeTranslateMatrix(0, 0, -70),
-		utils.MakeScaleMatrix(40),
-		utils.MakeRotateXYZMatrix(0, 90, 0)
+	let tMatrix = utils.MakeTranslateMatrix(
+		translateVec[0],
+		translateVec[1],
+		translateVec[2]
 	);
-	var toadNode = new RenderNode<ToadState>(tMatrix);
-	toadNode.state.drawInfo = {
-		materialColor: [0.0, 0.0, 0.0],
+	var blockNode = new RenderNode<CubeState>(`block-${type}`, tMatrix);
+	blockNode.state.drawInfo = {
+		materialColor: [0, 0, 0],
 		program: program,
-		bufferLength: toad_OBJ.indices.length,
+		bufferLength: blockOBJ.indices.length,
 		vertexArrayObject: vao,
 	};
 
 	// Set relationships between nodes
-	toadNode.SetParent(Engine.ROOT_NODE);
+	blockNode.SetParent(parentNode);
 
 	// Depends on the attributes/unifors defined at the beginning
-	const renderAction: RenderAction<ToadState> = (state, VPMatrix) => {
+	const renderAction: RenderAction<CubeState> = (state, VPMatrix) => {
 		gl.useProgram(state.drawInfo.program);
 
 		let projectionMatrix = utils.multiplyMatrices(
@@ -100,5 +113,5 @@ export function init(gl: WebGL2RenderingContext) {
 		);
 	};
 
-	toadNode.renderAction = renderAction;
+	blockNode.renderAction = renderAction;
 }
