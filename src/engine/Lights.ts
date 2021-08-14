@@ -24,21 +24,6 @@ export class Light {
 		return arr;
 	}
 
-	BindUniforms(gl: WebGL2RenderingContext,
-				 program: WebGLProgram,
-				 i: number) {
-		const lightName = String.fromCharCode(65 + i);
-
-		gl.uniform3fv(gl.getUniformLocation(program, "L"+lightName+"lightType"), this.EncodeTypeOneHot());
-		gl.uniform3fv(gl.getUniformLocation(program, "L"+lightName+"Pos"), this.pos);
-		gl.uniform3fv(gl.getUniformLocation(program, "L"+lightName+"Dir"), this.dir.map(d => -d));
-		gl.uniform1f(gl.getUniformLocation(program,  "L"+lightName+"ConeOut"), this.coneOut);
-		gl.uniform1f(gl.getUniformLocation(program,  "L"+lightName+"ConeIn"), this.coneIn);
-		gl.uniform1f(gl.getUniformLocation(program,  "L"+lightName+"Decay"), this.decay);
-		gl.uniform1f(gl.getUniformLocation(program,  "L"+lightName+"Target"), this.target);
-		gl.uniform4fv(gl.getUniformLocation(program, "L"+lightName+"lightColor"), this.lightColor);
-	}
-
 	static MakeDirectional(color: number[]) {
 		const l = new Light();
 		l.lightType = LightType.Direct;
