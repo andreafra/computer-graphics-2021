@@ -39,10 +39,9 @@ export class Light {
 		gl.uniform4fv(gl.getUniformLocation(program, "L"+lightName+"lightColor"), this.lightColor);
 	}
 
-	static MakeDirectional(dir: number[], color: number[]) {
+	static MakeDirectional(color: number[]) {
 		const l = new Light();
 		l.lightType = LightType.Direct;
-		l.dir = dir;
 		l.lightColor = color;
 		return l;
 	}
