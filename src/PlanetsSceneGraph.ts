@@ -1,6 +1,7 @@
 import { indices, normals, vertices } from "./assets/shapesDefinition";
 import * as Engine from "./engine/Core";
 import sampleLight from "./engine/LightData";
+import { MakeVAO } from "./engine/Models";
 import {
 	Action,
 	Node,
@@ -9,7 +10,6 @@ import {
 	State,
 } from "./engine/SceneGraph";
 import { getSampleShader as getSampleProgram } from "./engine/Shaders";
-import { createVAO } from "./engine/VertexArrayObjectFactory";
 import { utils } from "./utils/utils";
 
 // Define common structure for state of these nodes
@@ -22,10 +22,6 @@ export function init(gl: WebGL2RenderingContext) {
 	const program = getSampleProgram(gl);
 	gl.useProgram(program);
 
-	// Setup Attribute Location (requires a shader)
-	const positionAttributeLoc = gl.getAttribLocation(program, "inPosition");
-	const normalAttributeLoc = gl.getAttribLocation(program, "inNormal");
-
 	// Setup Uniform Location (requires a shader)
 	const matrixLoc = gl.getUniformLocation(program, "matrix");
 	const materialDiffColorLoc = gl.getUniformLocation(program, "mDiffColor");
@@ -34,18 +30,11 @@ export function init(gl: WebGL2RenderingContext) {
 	const normalMatrixPositionLoc = gl.getUniformLocation(program, "nMatrix");
 
 	// CREATE MODEL
-	const vao = createVAO(
-		gl,
-		{
-			vertices: vertices,
-			vertexNormals: normals,
-			indices: indices,
-		},
-		{
-			verticesAttribLocation: positionAttributeLoc,
-			vertexNormalsAttribLocation: normalAttributeLoc,
-		}
-	);
+	const vao = MakeVAO(gl, program, {
+		positions: vertices,
+		normals: normals,
+		indices: indices,
+	});
 
 	// SETUP NODES
 
