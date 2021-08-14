@@ -6,7 +6,7 @@
 export class utils {
 	static createAndCompileShaders = function (
 		gl: WebGL2RenderingContext,
-		shaderText: string
+		shaderText: string[]
 	) {
 		var vertexShader = utils.createShader(
 			gl,
@@ -471,12 +471,7 @@ export class utils {
 		return out;
 	};
 
-	static MakeRotateXYZMatrix = (
-		rx: number,
-		ry: number,
-		rz: number,
-		s: number
-	) => {
+	static MakeRotateXYZMatrix = (rx: number, ry: number, rz: number) => {
 		//Creates a world matrix for an object.
 
 		var Rx = utils.MakeRotateXMatrix(ry);

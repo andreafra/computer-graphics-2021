@@ -38,6 +38,10 @@ function Render(time: DOMHighResTimeStamp) {
 	requestAnimationFrame(Render);
 }
 
+function PrintSceneGraph() {
+	console.log(ROOT_NODE);
+}
+
 export function SetProjection(m: number[]) {
 	projectionMatrix = m;
 }
@@ -47,6 +51,7 @@ export function SetCamera(m: number[]) {
 }
 
 export function Start() {
+	PrintSceneGraph();
 	requestAnimationFrame(Render);
 }
 

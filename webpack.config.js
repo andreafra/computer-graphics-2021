@@ -9,6 +9,7 @@ module.exports = {
 		filename: "bundle.js",
 		path: path.resolve(__dirname, "dist"),
 		clean: true,
+		assetModuleFilename: "static/[hash][ext][query]",
 	},
 
 	// Use source maps
@@ -30,6 +31,16 @@ module.exports = {
 			{
 				test: /\.(png|svg|jpg|jpeg|gif)$/i,
 				type: "asset/resource",
+				generator: {
+					filename: "static/textures/[hash][ext][query]",
+				},
+			},
+			{
+				test: /\.(glb|gltf)$/i,
+				type: "asset/resource",
+				generator: {
+					filename: "static/models/[hash][ext][query]",
+				},
 			},
 			// Import CSV, XML // Run `npm i -D csv-loader xml-loader`.
 			// {
@@ -40,11 +51,6 @@ module.exports = {
 			// 	test: /\.xml$/i,
 			// 	use: ["xml-loader"],
 			// },
-			// GLSL -> string (for JS project)
-			// {
-			// 	test: /\.glsl$/,
-			// 	loader: "webpack-glsl-loader",
-			// },
 			// OBJ -> Object
 			{
 				test: /\.obj$/,
@@ -54,7 +60,7 @@ module.exports = {
 			{
 				test: /\.tsx?$/,
 				use: "ts-loader",
-				//exclude: /node_modules/,
+				exclude: /node_modules/,
 			},
 			// GLSL -> string (for TS project)
 			{
