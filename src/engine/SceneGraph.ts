@@ -109,7 +109,12 @@ export class LightNode<T extends State> extends Node<T> {
 
 	override Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
 		super.Update(deltaTime, VPMatrix, worldMatrix);
-		this.light.pos = utils.GetPositionFromMatrix(this.state.worldMatrix);
+		this.light.pos = utils.ComputePosition(this.state.worldMatrix, [0, 0, 0]);
+		const forward = [1, 0, 0]; // default direction
+		const p2 = utils.ComputePosition(this.state.worldMatrix, forward);
+		for (let i = 0; i < 3; i++) {
+			this.light.dir[i] = p2[i] - this.light.pos[i];
+		}
 		Engine.AddLight(this.light);
 	}
 }

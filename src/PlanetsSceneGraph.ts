@@ -158,16 +158,12 @@ export function init(gl: WebGL2RenderingContext) {
 	});
 
 	// Demonstrate a static light
-	let dirLightAlpha = -utils.degToRad(-60);
-	let dirLightBeta = -utils.degToRad(120);
-	let directionalLightDir = [
-		Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
-		Math.sin(dirLightAlpha),
-		Math.cos(dirLightAlpha) * Math.sin(dirLightBeta),
-	];
 	let directionalLightColor = [0.8, 1.0, 1.0, 1.0];
 	let dirLightNode = new LightNode(
-		Light.MakeDirectional(directionalLightDir, directionalLightColor));
+		Light.MakeDirectional(directionalLightColor),
+		utils.multiplyMatrices(
+			utils.MakeRotateZMatrix(-60),
+			utils.MakeRotateXMatrix(120)));
 	dirLightNode.SetParent(Engine.ROOT_NODE);
 
 	// Demonstrate a moving point light placed above the earth

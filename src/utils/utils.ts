@@ -655,11 +655,16 @@ export class utils {
 		return perspective;
 	};
 
-	static GetPositionFromMatrix(m: number[]) {
+	static ComputePosition(m: number[], v: number[]) {
+		if (v.length < 4)
+			v[3] = 1;
+
+		const p = utils.multiplyMatrixVector(m, v);
+
 		return [
-			m[3] / m[15],
-			m[7] / m[15],
-			m[11] / m[15]
+			p[0] / p[3],
+			p[1] / p[3],
+			p[2] / p[3]
 		];
 	}
 }
