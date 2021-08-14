@@ -1,14 +1,14 @@
 import * as Engine from "./engine/Core";
 import sampleLight from "./engine/LightData";
+import { MakeTexture, MakeVAO } from "./engine/Models";
 import { RenderAction, RenderNode, State } from "./engine/SceneGraph";
-import { createVAO } from "./engine/VertexArrayObjectFactory";
 import { utils } from "./utils/utils";
 
-import vertShaderSrc from "./shaders/toad/vs.glsl";
-import fragShaderSrc from "./shaders/toad/fs.glsl";
-
+// Assets
 import toad_OBJ from "./assets/cpt_toad/toad.obj";
 import bodyTextureSrc from "./assets/cpt_toad/Textures/baked_txt.png";
+import fragShaderSrc from "./shaders/toad/fs.glsl";
+import vertShaderSrc from "./shaders/toad/vs.glsl";
 
 // Define common structure for state of these nodes
 interface ToadState extends State {}
@@ -21,57 +21,25 @@ export function init(gl: WebGL2RenderingContext) {
 	]);
 	gl.useProgram(program);
 
-	// Setup Attribute Location (requires a shader)
-	const positionAttributeLoc = gl.getAttribLocation(program, "aPosition");
-	const normalAttributeLoc = gl.getAttribLocation(program, "aNormal");
-	const textureAttributeLoc = gl.getAttribLocation(program, "aTexCoord");
-
 	// Setup Uniform Location (requires a shader)
 	const matrixLoc = gl.getUniformLocation(program, "matrix");
 	const materialDiffColorLoc = gl.getUniformLocation(program, "mDiffColor");
 	const lightDirectionLoc = gl.getUniformLocation(program, "lightDirection");
 	const lightColorLoc = gl.getUniformLocation(program, "lightColor");
 	const normalMatrixPositionLoc = gl.getUniformLocation(program, "nMatrix");
-	const bodyTextureFileLoc = gl.getUniformLocation(program, "bodyTexture");
 
 	// CREATE MODEL
-	const vao = createVAO(
-		gl,
-		{
-			vertices: toad_OBJ.vertices,
-			vertexNormals: toad_OBJ.vertexNormals,
-			indices: toad_OBJ.indices,
-			uv: toad_OBJ.textures,
-		},
-		{
-			verticesAttribLocation: positionAttributeLoc,
-			vertexNormalsAttribLocation: normalAttributeLoc,
-			uvAttribLocation: textureAttributeLoc,
-		}
-	);
+	const vao = MakeVAO(gl, program, {
+		positions: toad_OBJ.vertices,
+		normals: toad_OBJ.vertexNormals,
+		indices: toad_OBJ.indices,
+		uvCoord: toad_OBJ.textures,
+	});
 
-	console.log(toad_OBJ);
-
-	let bodyTexture: WebGLTexture;
-	let bodyTextureImage = new Image();
-	bodyTextureImage.src = bodyTextureSrc;
-	bodyTextureImage.onload = () => {
-		bodyTexture = gl.createTexture();
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, bodyTexture);
-		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-		gl.texImage2D(
-			gl.TEXTURE_2D,
-			0,
-			gl.RGBA,
-			gl.RGBA,
-			gl.UNSIGNED_BYTE,
-			bodyTextureImage
-		);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.generateMipmap(gl.TEXTURE_2D);
-	};
+	const SetupTextureRender = MakeTexture(gl, program, {
+		dataSrc: bodyTextureSrc,
+		uniformName: "bodyTexture",
+	});
 
 	// SETUP NODES
 	let tMatrix = utils.multiplyMatrices(
@@ -112,13 +80,13 @@ export function init(gl: WebGL2RenderingContext) {
 			utils.transposeMatrix(normalMatrix)
 		);
 
+		// Send Light Data to GPU
 		gl.uniform3fv(materialDiffColorLoc, state.drawInfo.materialColor);
 		gl.uniform3fv(lightColorLoc, sampleLight.color);
 		gl.uniform3fv(lightDirectionLoc, sampleLight.direction);
 
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, bodyTexture);
-		gl.uniform1i(bodyTextureFileLoc, 0);
+		// Send Texture Data to GPU
+		SetupTextureRender();
 
 		gl.bindVertexArray(state.drawInfo.vertexArrayObject);
 		gl.drawElements(
