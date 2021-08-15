@@ -17,9 +17,9 @@ export const MIN_CAMERA_DISTANCE = 2;
 export const MAX_CAMERA_DISTANCE = 64;
 
 export var cameraOrbit: CameraOrbit = {
-	ox: 0.3161081231791238,
-	oy: 0.5877852522924731,
-	oz: 0.7447040698476447,
+	ox: 0.9650064789340802,
+	oy: 0.25881904510252074,
+	oz: 0.0042146331262235956,
 	tx: 0,
 	ty: 0,
 	tz: 0,
