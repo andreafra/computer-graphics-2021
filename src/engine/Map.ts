@@ -32,12 +32,6 @@ for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
 	}
 }
 
-// EXAMPLE: Place some blocks
-map[0][0][0] = { type: CellType.BlockWhite };
-map[0][0][1] = { type: CellType.BlockYellow };
-map[1][0][0] = { type: CellType.BlockWhite };
-map[0][1][0] = { type: CellType.BlockYellow };
-
 export function Init(gl: WebGL2RenderingContext) {
 	let mapRoot = new SceneGraph.Node("map-root");
 	mapRoot.SetParent(Core.ROOT_NODE);
@@ -102,4 +96,12 @@ export function DrawGrid() {
 			color
 		);
 	}
+}
+
+export function InitSampleCubes() {
+	// EXAMPLE: Place some blocks
+	map[0][0][0] = { type: CellType.BlockWhite };
+	map[0][0][1] = { type: CellType.BlockYellow };
+	map[1][0][0] = { type: CellType.BlockWhite };
+	map[0][1][0] = { type: CellType.BlockYellow };
 }

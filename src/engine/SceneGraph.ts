@@ -2,20 +2,21 @@ import * as DebugLine from "../debug/Lines";
 import { utils } from "../utils/utils";
 import * as Engine from "./Core";
 import { Light } from "./Lights";
+import { WebGLProgramInfo } from "./Shaders";
 
 // Object containing data useful for rendering
 interface DrawInfo {
 	materialColor: number[];
-	program: WebGLProgram;
+	programInfo: WebGLProgramInfo;
 	bufferLength: number;
 	vertexArrayObject: WebGLVertexArrayObject;
+	texture?: () => void
 }
 
 // A function that receives the state of the Node and performs actions on it
 export type Action<T> = (state: T) => void;
 // A function that receives the state and the view projectection matrix of a Node and renders it
 // by calling `gl.drawElements(...)`
-export type RenderAction<T> = (state: T, VPMatrix: number[]) => void;
 
 // The state of a node. Extend it if you need other variables for that node
 export interface State {
@@ -82,26 +83,67 @@ export class Node<T extends State> {
 		this.actions.push(action);
 	}
 
-	Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+	Update(gl: WebGL2RenderingContext, deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
 		this.UpdateWorldMatrix(worldMatrix);
 		this.ExecuteActions();
 
 		this.children.forEach((child) =>
-			child.Update(deltaTime, VPMatrix, this.state.worldMatrix)
+			child.Update(gl, deltaTime, VPMatrix, this.state.worldMatrix)
 		);
 	}
 }
 
 export class RenderNode<T extends State> extends Node<T> {
-	renderAction: RenderAction<State>;
-
 	override Update(
+		gl: WebGL2RenderingContext,
 		deltaTime: number,
 		VPMatrix: number[],
 		worldMatrix?: number[]
 	) {
-		super.Update(deltaTime, VPMatrix, worldMatrix);
-		Engine.QueueRender(() => this.renderAction(this.state, VPMatrix));
+		super.Update(gl, deltaTime, VPMatrix, worldMatrix);
+	
+		gl.useProgram(this.state.drawInfo.programInfo.program);
+
+		let projectionMatrix = utils.multiplyMatrices(
+			VPMatrix,
+			this.state.worldMatrix
+		);
+		let normalMatrix = utils.invertMatrix(
+			utils.transposeMatrix(this.state.worldMatrix)
+		);
+
+		gl.uniformMatrix4fv(
+			this.state.drawInfo.programInfo.locations.matrix,
+			false,
+			utils.transposeMatrix(projectionMatrix)
+		);
+		gl.uniformMatrix4fv(
+			this.state.drawInfo.programInfo.locations.normalMatrix,
+			false,
+			utils.transposeMatrix(normalMatrix)
+		);
+		gl.uniformMatrix4fv(
+			this.state.drawInfo.programInfo.locations.positionMatrix,
+			false,
+			utils.transposeMatrix(this.state.worldMatrix)
+		);
+
+		gl.uniform3fv(this.state.drawInfo.programInfo.locations.materialDiffColor, this.state.drawInfo.materialColor);
+
+		Engine.BindAllLightUniforms(gl, this.state.drawInfo.programInfo.program);
+
+		// Render Texture
+		if (this.state.drawInfo.texture) {
+			this.state.drawInfo.texture()
+		}
+
+		gl.bindVertexArray(this.state.drawInfo.vertexArrayObject);
+		gl.drawElements(
+			gl.TRIANGLES,
+			this.state.drawInfo.bufferLength,
+			gl.UNSIGNED_SHORT,
+			0
+		);
 	}
 }
 
@@ -114,11 +156,12 @@ export class LightNode<T extends State> extends Node<T> {
 	}
 
 	override Update(
+		gl: WebGL2RenderingContext,
 		deltaTime: number,
 		VPMatrix: number[],
 		worldMatrix?: number[]
 	) {
-		super.Update(deltaTime, VPMatrix, worldMatrix);
+		super.Update(gl, deltaTime, VPMatrix, worldMatrix);
 		this.light.pos = utils.ComputePosition(
 			this.state.worldMatrix,
 			[0, 0, 0]

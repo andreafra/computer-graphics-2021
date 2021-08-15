@@ -1,7 +1,8 @@
 interface TextureData {
 	dataSrc: string;
-	uniformName: string;
 }
+
+const BASE_TEXTURE = "baseTexture";
 
 // Returns a function to call during the rendering step
 export function MakeTexture(
@@ -9,10 +10,7 @@ export function MakeTexture(
 	program: WebGLProgram,
 	textureData: TextureData
 ) {
-	const bodyTextureFileLoc = gl.getUniformLocation(
-		program,
-		textureData.uniformName
-	);
+	const bodyTextureFileLoc = gl.getUniformLocation(program, BASE_TEXTURE);
 
 	let bodyTexture: WebGLTexture;
 	let bodyTextureImage = new Image();
@@ -36,6 +34,7 @@ export function MakeTexture(
 	};
 
 	return () => {
+		// We don't need to use useProgram since it will be called
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, bodyTexture);
 		gl.uniform1i(bodyTextureFileLoc, 0);

@@ -4,7 +4,6 @@ import * as Engine from "./engine/Core";
 import * as toad from "./models/Toad";
 import * as block from "./models/Block";
 import * as Map from "./engine/Map";
-import * as Grid from "./models/Grid";
 import { Light } from "./engine/Lights";
 import { LightNode } from "./engine/SceneGraph";
 import * as Camera from "./engine/Camera";
@@ -35,7 +34,6 @@ async function init() {
 	DebugLine.Setup(gl);
 
 	// Setup Scenegraph nodes
-	Map.Init(gl);
 	Map.DrawGrid();
 
 	// Add some light
@@ -46,6 +44,13 @@ async function init() {
 		utils.MakeRotateXYZMatrix(30, 30, 120)
 	);
 	sunlightNode.SetParent(Engine.ROOT_NODE);
+
+	Map.InitSampleCubes();
+	Map.Init(gl);
+
+	toad.init(gl);
+	// Map.InitSampleCubes();
+	// Map.Init(gl);
 
 	// Draw axis in origin
 	DebugLine.DrawLine([0, 0, 0], [5, 0, 0], 1);
