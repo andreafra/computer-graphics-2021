@@ -1,7 +1,13 @@
 import { utils } from "../utils/utils";
-import { Node, State } from "./SceneGraph";
 import { Light } from "./Lights";
+//import { DoRaycast } from "./Raycast";
+import { Node, RenderNode, State } from "./SceneGraph";
+import * as Input from "./Input";
 import * as DebugLine from "../debug/Lines";
+
+type Mode = "EDITOR" | "GAME";
+
+export var EditorMode: Mode = "EDITOR";
 
 export const ROOT_NODE: Node<State> = new Node("root");
 let gl: WebGL2RenderingContext;
@@ -21,6 +27,8 @@ export function Setup(_gl: WebGL2RenderingContext) {
 	// ONCE
 	gl.clearColor(1, 1, 1, 1);
 	gl.enable(gl.DEPTH_TEST);
+
+	Input.Init(gl);
 }
 
 let lastUpdate: DOMHighResTimeStamp = 0;
@@ -126,3 +134,35 @@ export function AddLight(light: Light) {
 	lights[lightIdx] = light;
 	lightIdx++;
 }
+
+export function GetSceneRenderNodes() {
+	let nodes: RenderNode<State>[] = [];
+	type X = Node<State>;
+
+	function GetRenderNodes(_nodes: X[]) {
+		_nodes.forEach((node) => {
+			if (node instanceof RenderNode) nodes.push(node);
+			GetRenderNodes(node.children);
+		});
+	}
+
+	GetRenderNodes(ROOT_NODE.children);
+
+	return nodes;
+}
+
+// export function EnableRaycast(
+// 	canvas: HTMLCanvasElement,
+// 	viewport: { width: number; height: number },
+// 	cameraOrigin: number[]
+// ) {
+// 	canvas.addEventListener("mousedown", (ev: MouseEvent) => {
+// 		DoRaycast(
+// 			{ x: ev.x, y: ev.y },
+// 			viewport,
+// 			projectionMatrix,
+// 			cameraMatrix,
+// 			cameraOrigin
+// 		);
+// 	});
+// }
