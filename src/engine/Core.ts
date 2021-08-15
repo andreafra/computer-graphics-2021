@@ -1,6 +1,7 @@
 import { utils } from "../utils/utils";
 import { Node, State } from "./SceneGraph";
 import { Light } from "./Lights";
+import * as DebugLine from "../debug/Lines";
 
 export const ROOT_NODE: Node<State> = new Node();
 let gl: WebGL2RenderingContext;
@@ -47,6 +48,8 @@ function Render(time: DOMHighResTimeStamp) {
 		renderAction();
 	}
 
+	DebugLine.Render(gl, viewProjectionMatrix);
+
 	// Render next frame
 	requestAnimationFrame(Render);
 }
@@ -80,20 +83,46 @@ export function QueueRender(renderAction: () => void) {
 	renderQueue.push(renderAction);
 }
 
-export function BindAllLightUniforms(gl: WebGL2RenderingContext, program: WebGLProgram) {
-	gl.uniform3fv(gl.getUniformLocation(program, "LType"), lights.map(l => l.EncodeTypeOneHot()).flat(1));
-	gl.uniform3fv(gl.getUniformLocation(program, "LPos"), lights.map(l => l.pos).flat(1));
-	gl.uniform3fv(gl.getUniformLocation(program, "LDir"), lights.map(l => l.dir.map(d => -d)).flat(1));
-	gl.uniform1fv(gl.getUniformLocation(program, "LConeOut"), lights.map(l => l.coneOut));
-	gl.uniform1fv(gl.getUniformLocation(program, "LConeIn"), lights.map(l => l.coneIn));
-	gl.uniform1fv(gl.getUniformLocation(program, "LDecay"), lights.map(l => l.decay));
-	gl.uniform1fv(gl.getUniformLocation(program, "LTarget"), lights.map(l => l.target));
-	gl.uniform4fv(gl.getUniformLocation(program, "LColor"), lights.map(l => l.lightColor).flat(1));
+export function BindAllLightUniforms(
+	gl: WebGL2RenderingContext,
+	program: WebGLProgram
+) {
+	gl.uniform3fv(
+		gl.getUniformLocation(program, "LType"),
+		lights.map((l) => l.EncodeTypeOneHot()).flat(1)
+	);
+	gl.uniform3fv(
+		gl.getUniformLocation(program, "LPos"),
+		lights.map((l) => l.pos).flat(1)
+	);
+	gl.uniform3fv(
+		gl.getUniformLocation(program, "LDir"),
+		lights.map((l) => l.dir.map((d) => -d)).flat(1)
+	);
+	gl.uniform1fv(
+		gl.getUniformLocation(program, "LConeOut"),
+		lights.map((l) => l.coneOut)
+	);
+	gl.uniform1fv(
+		gl.getUniformLocation(program, "LConeIn"),
+		lights.map((l) => l.coneIn)
+	);
+	gl.uniform1fv(
+		gl.getUniformLocation(program, "LDecay"),
+		lights.map((l) => l.decay)
+	);
+	gl.uniform1fv(
+		gl.getUniformLocation(program, "LTarget"),
+		lights.map((l) => l.target)
+	);
+	gl.uniform4fv(
+		gl.getUniformLocation(program, "LColor"),
+		lights.map((l) => l.lightColor).flat(1)
+	);
 }
 
 export function AddLight(light: Light) {
-	if (lightIdx > 2)
-		throw "Cannot add any more lights"
+	if (lightIdx > 2) throw "Cannot add any more lights";
 	lights[lightIdx] = light;
 	lightIdx++;
 }

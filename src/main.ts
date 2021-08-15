@@ -3,6 +3,7 @@ import { utils } from "./utils/utils";
 import * as Engine from "./engine/Core";
 import * as planets from "./PlanetsSceneGraph";
 import * as toad from "./Toad";
+import * as DebugLine from "./debug/Lines";
 
 async function init() {
 	const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
@@ -25,10 +26,15 @@ async function init() {
 		)
 	);
 
+	DebugLine.Setup(gl);
+
 	// Setup Scenegraph nodes
 	planets.init(gl);
 
-	toad.init(gl);
+	// Draw axis in origin
+	DebugLine.DrawLine(gl, [0, 0, 0], [5, 0, 0], 1);
+	DebugLine.DrawLine(gl, [0, 0, 0], [0, 5, 0], 2);
+	DebugLine.DrawLine(gl, [0, 0, 0], [0, 0, 5], 3);
 
 	Engine.Start();
 }
