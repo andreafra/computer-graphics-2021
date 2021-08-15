@@ -13,20 +13,21 @@ interface CameraOrbit {
 
 export const CAMERA_SPEED = 0.25;
 export const CAMERA_DISTANCE_INCREMENT = 1;
-export const MIN_CAMERA_DISTANCE = 0.5;
+export const MIN_CAMERA_DISTANCE = 2;
 export const MAX_CAMERA_DISTANCE = 64;
 
 export var cameraOrbit: CameraOrbit = {
-	ox: 1,
-	oy: 1,
-	oz: 1,
+	ox: 0.3161081231791238,
+	oy: 0.5877852522924731,
+	oz: 0.7447040698476447,
 	tx: 0,
 	ty: 0,
 	tz: 0,
-	radius: 5,
+	radius: 10,
 };
 
 export function Update() {
+	console.log(cameraOrbit);
 	let cameraPos = utils.multiplyVectorScalar(
 		[cameraOrbit.ox, cameraOrbit.oy, cameraOrbit.oz],
 		cameraOrbit.radius

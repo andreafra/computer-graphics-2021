@@ -19,6 +19,7 @@ export function Init(gl: WebGL2RenderingContext) {
 	gl.canvas.addEventListener("pointerdown", HandleInputFromPointer);
 	gl.canvas.addEventListener("pointerup", () => (isPointerActive = false));
 	gl.canvas.addEventListener("pointermove", HandleDragInputFromPointer);
+	gl.canvas.addEventListener("mousewheel", HandleScroll);
 }
 
 export var moveDir = [0, 0, 0];
@@ -92,7 +93,6 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 
 			// Camera controls
 			case "PageUp":
-				console.log("hello");
 				Camera.cameraOrbit.radius = utils.Clamp(
 					Camera.cameraOrbit.radius +
 						Camera.CAMERA_DISTANCE_INCREMENT,
@@ -212,4 +212,17 @@ function HandleInputFromPointer(ev: PointerEvent) {
 		beta: beta,
 	};
 	isPointerActive = true;
+}
+
+function HandleScroll(ev: any) {
+	ev.preventDefault();
+	let scrollDir = -Math.sign(ev.wheelDeltaY);
+
+	Camera.cameraOrbit.radius = utils.Clamp(
+		Camera.cameraOrbit.radius +
+			Camera.CAMERA_DISTANCE_INCREMENT * scrollDir,
+		Camera.MIN_CAMERA_DISTANCE,
+		Camera.MAX_CAMERA_DISTANCE
+	);
+	Camera.Update();
 }
