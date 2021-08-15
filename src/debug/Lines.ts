@@ -32,11 +32,14 @@ interface Line {
 	matrixLoc: WebGLUniformLocation;
 }
 
-enum LineColor {
+export enum LineColor {
 	BLACK = 0,
 	RED = 1,
 	GREEN = 2,
 	BLUE = 3,
+	YELLOW = 4,
+	PURPLE = 5,
+	GREY = 6,
 }
 
 const COLORS = [
@@ -44,13 +47,21 @@ const COLORS = [
 	[1, 0, 0],
 	[0, 1, 0],
 	[0, 0, 1],
+	[0.7, 0.7, 0],
+	[1, 0, 1],
+	[0.5, 0.5, 0.5],
 ];
 
 let lines: Line[] = [];
 
 let program: WebGLProgram;
 
-export function Setup(gl: WebGL2RenderingContext) {
+let gl: WebGL2RenderingContext;
+
+export function Setup(_gl: WebGL2RenderingContext) {
+	// gl context
+	gl = _gl;
+
 	// Shaders
 	program = utils.createAndCompileShaders(gl, [
 		vertexShaderSrc,
@@ -59,7 +70,7 @@ export function Setup(gl: WebGL2RenderingContext) {
 }
 
 export function DrawLine(
-	gl: WebGL2RenderingContext,
+	//gl: WebGL2RenderingContext,
 	start: number[],
 	end: number[],
 	color: LineColor = LineColor.BLACK

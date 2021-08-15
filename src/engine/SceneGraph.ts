@@ -1,3 +1,4 @@
+import * as DebugLine from "../debug/Lines";
 import { utils } from "../utils/utils";
 import * as Engine from "./Core";
 import { Light } from "./Lights";
@@ -79,7 +80,7 @@ export class Node<T extends State> {
 
 	AddAction(action: (state: T) => void) {
 		this.actions.push(action);
-	};
+	}
 
 	Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
 		this.UpdateWorldMatrix(worldMatrix);
@@ -88,13 +89,17 @@ export class Node<T extends State> {
 		this.children.forEach((child) =>
 			child.Update(deltaTime, VPMatrix, this.state.worldMatrix)
 		);
-	};
+	}
 }
 
 export class RenderNode<T extends State> extends Node<T> {
 	renderAction: RenderAction<State>;
 
-	override Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+	override Update(
+		deltaTime: number,
+		VPMatrix: number[],
+		worldMatrix?: number[]
+	) {
 		super.Update(deltaTime, VPMatrix, worldMatrix);
 		Engine.QueueRender(() => this.renderAction(this.state, VPMatrix));
 	}
@@ -108,14 +113,31 @@ export class LightNode<T extends State> extends Node<T> {
 		this.light = light;
 	}
 
-	override Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+	override Update(
+		deltaTime: number,
+		VPMatrix: number[],
+		worldMatrix?: number[]
+	) {
 		super.Update(deltaTime, VPMatrix, worldMatrix);
-		this.light.pos = utils.ComputePosition(this.state.worldMatrix, [0, 0, 0]);
+		this.light.pos = utils.ComputePosition(
+			this.state.worldMatrix,
+			[0, 0, 0]
+		);
 		const forward = [1, 0, 0]; // default direction
 		const p2 = utils.ComputePosition(this.state.worldMatrix, forward);
 		for (let i = 0; i < 3; i++) {
 			this.light.dir[i] = p2[i] - this.light.pos[i];
 		}
+
+		this.light.dir = utils.normalize(this.light.dir);
+
+		// Draw a vector to represent the light position
+		DebugLine.DrawLine(
+			this.light.pos,
+			utils.addVectors(this.light.pos, this.light.dir),
+			DebugLine.LineColor.YELLOW
+		);
+
 		Engine.AddLight(this.light);
 	}
 }

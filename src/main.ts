@@ -35,23 +35,22 @@ async function init() {
 	DebugLine.Setup(gl);
 
 	// Setup Scenegraph nodes
-	Grid.init(gl);
 	Map.Init(gl);
+	Map.DrawGrid();
 
 	// Add some light
 	let sunlightColor = [0.9, 1.0, 1.0, 1.0];
 	let sunlightNode = new LightNode(
 		"sunlight",
 		Light.MakeDirectional(sunlightColor),
-		utils.multiplyMatrices(
-			utils.MakeRotateZMatrix(60),
-			utils.MakeRotateYMatrix(-30)));
+		utils.MakeRotateXYZMatrix(30, 30, 120)
+	);
 	sunlightNode.SetParent(Engine.ROOT_NODE);
 
 	// Draw axis in origin
-	DebugLine.DrawLine(gl, [0, 0, 0], [5, 0, 0], 1);
-	DebugLine.DrawLine(gl, [0, 0, 0], [0, 5, 0], 2);
-	DebugLine.DrawLine(gl, [0, 0, 0], [0, 0, 5], 3);
+	DebugLine.DrawLine([0, 0, 0], [5, 0, 0], 1);
+	DebugLine.DrawLine([0, 0, 0], [0, 5, 0], 2);
+	DebugLine.DrawLine([0, 0, 0], [0, 0, 5], 3);
 
 	Engine.Start();
 

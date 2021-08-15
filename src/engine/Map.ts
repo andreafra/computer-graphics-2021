@@ -1,7 +1,7 @@
 import * as Block from "../models/Block";
 import * as Core from "./Core";
 import * as SceneGraph from "./SceneGraph";
-
+import * as DebugLine from "../debug/Lines";
 export enum CellType {
 	Empty = 0,
 	BlockWhite = 1,
@@ -80,4 +80,26 @@ export function ClampMapCoordinates(v: number[]) {
 		y < 0 ? 0 : y >= MAP_MAX_XZ_SIZE ? MAP_MAX_Y_SIZE - 1 : y,
 		z < 0 ? 0 : z >= MAP_MAX_XZ_SIZE ? MAP_MAX_XZ_SIZE - 1 : z,
 	];
+}
+
+export function DrawGrid() {
+	const halfMapSize = MAP_MAX_XZ_SIZE / 2;
+	const color = DebugLine.LineColor.GREY;
+	const epsilon = -0.00001; // so we can see the axis
+	for (let x = 0; x <= MAP_MAX_XZ_SIZE; x++) {
+		let _x = x - halfMapSize;
+		DebugLine.DrawLine(
+			[_x, epsilon, -halfMapSize],
+			[_x, epsilon, halfMapSize],
+			color
+		);
+	}
+	for (let z = 0; z <= MAP_MAX_XZ_SIZE; z++) {
+		let _z = z - halfMapSize;
+		DebugLine.DrawLine(
+			[-halfMapSize, epsilon, _z],
+			[halfMapSize, epsilon, _z],
+			color
+		);
+	}
 }
