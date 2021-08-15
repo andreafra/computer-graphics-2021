@@ -72,13 +72,17 @@ export class utils {
 		}
 	};
 
-	static resizeCanvasToDisplaySize = function (canvas: HTMLCanvasElement) {
+	static resizeCanvasToDisplaySize = function (
+		canvas: HTMLCanvasElement,
+		callback?: () => void
+	) {
 		const expandFullScreen = () => {
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 			// console.log(
 			//   `Canvas Width = ${canvas.width}\nWindow Width = ${window.innerWidth}`
 			// );
+			callback();
 		};
 		expandFullScreen();
 		// Resize screen when the browser has triggered the resize event
@@ -604,11 +608,29 @@ export class utils {
 		return dst;
 	};
 
+	static dot = (a: number[], b: number[]) => {
+		return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+	};
+
 	static cross = (a: number[], b: number[], dst?: number[]) => {
 		dst = dst || new Array<number>(3);
 		dst[0] = a[1] * b[2] - a[2] * b[1];
 		dst[1] = a[2] * b[0] - a[0] * b[2];
 		dst[2] = a[0] * b[1] - a[1] * b[0];
+		return dst;
+	};
+
+	static vectorTimesScalar = (v: number[], a: number): number[] => [
+		v[0] * a,
+		v[1] * a,
+		v[2] * a,
+	];
+
+	static addVectors = (a: number[], b: number[], dst?: number[]) => {
+		dst = dst || new Array<number>(3);
+		dst[0] = a[0] + b[0];
+		dst[1] = a[1] + b[1];
+		dst[2] = a[2] + b[2];
 		return dst;
 	};
 

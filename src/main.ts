@@ -16,17 +16,25 @@ async function init() {
 		console.error("GL context not opened");
 		return;
 	}
-	utils.resizeCanvasToDisplaySize(canvas);
+	// Callback allows us to update the projection matrix
+	utils.resizeCanvasToDisplaySize(canvas, () =>
+		Engine.SetProjection(
+			utils.MakePerspective(
+				60.0,
+				canvas.width / canvas.height,
+				1.0,
+				2000.0
+			)
+		)
+	);
 
-	let cameraDistance = 5;
+	let cameraDistance = 10;
+	let cameraWorldCoord = [0, cameraDistance, cameraDistance];
 
 	Engine.Setup(gl);
-	Engine.SetProjection(
-		utils.MakePerspective(60.0, canvas.width / canvas.height, 1.0, 2000.0)
-	);
 	Engine.SetCamera(
 		utils.LookAt(
-			[cameraDistance, cameraDistance, cameraDistance], // Position
+			cameraWorldCoord, // Position
 			[0.0, 0.0, 0.0], // Target
 			[0.0, 1.0, 0.0] // Up
 		)
@@ -36,7 +44,7 @@ async function init() {
 
 	// Setup Scenegraph nodes
 	Grid.init(gl);
-	Map.initMap(gl);
+	Map.Init(gl);
 
 	// Add some light
 	let sunlightColor = [0.9, 1.0, 1.0, 1.0];
@@ -54,6 +62,15 @@ async function init() {
 	DebugLine.DrawLine(gl, [0, 0, 0], [0, 0, 5], 3);
 
 	Engine.Start();
+
+	// Engine.EnableRaycast(
+	// 	canvas,
+	// 	{
+	// 		width: canvas.width,
+	// 		height: canvas.height,
+	// 	},
+	// 	cameraWorldCoord
+	// );
 }
 
 window.onload = () => init();

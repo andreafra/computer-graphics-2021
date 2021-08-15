@@ -19,6 +19,7 @@ type Map = Cell[][][];
 
 let map: Map = [];
 
+// Init map
 for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
 	map[x] = [];
 	for (let y = 0; y < MAP_MAX_Y_SIZE; y++) {
@@ -31,12 +32,13 @@ for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
 	}
 }
 
+// EXAMPLE: Place some blocks
 map[0][0][0] = { type: CellType.BlockWhite };
 map[0][0][1] = { type: CellType.BlockYellow };
 map[1][0][0] = { type: CellType.BlockWhite };
 map[0][1][0] = { type: CellType.BlockYellow };
 
-export function initMap(gl: WebGL2RenderingContext) {
+export function Init(gl: WebGL2RenderingContext) {
 	let mapRoot = new SceneGraph.Node("map-root");
 	mapRoot.SetParent(Core.ROOT_NODE);
 
@@ -66,4 +68,16 @@ export function initMap(gl: WebGL2RenderingContext) {
 			}
 		}
 	}
+}
+
+export function ClampMapCoordinates(v: number[]) {
+	let x = v[0],
+		y = v[1],
+		z = v[2];
+
+	return [
+		x < 0 ? 0 : x >= MAP_MAX_XZ_SIZE ? MAP_MAX_XZ_SIZE - 1 : x,
+		y < 0 ? 0 : y >= MAP_MAX_XZ_SIZE ? MAP_MAX_Y_SIZE - 1 : y,
+		z < 0 ? 0 : z >= MAP_MAX_XZ_SIZE ? MAP_MAX_XZ_SIZE - 1 : z,
+	];
 }
