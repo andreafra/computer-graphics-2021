@@ -83,25 +83,27 @@ export class Node<T extends State> {
 		this.actions.push(action);
 	}
 
-	Update(gl: WebGL2RenderingContext, deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+	Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
 		this.UpdateWorldMatrix(worldMatrix);
 		this.ExecuteActions();
 
 		this.children.forEach((child) =>
-			child.Update(gl, deltaTime, VPMatrix, this.state.worldMatrix)
+			child.Update(deltaTime, VPMatrix, this.state.worldMatrix)
 		);
 	}
 }
 
 export class RenderNode<T extends State> extends Node<T> {
 	override Update(
-		gl: WebGL2RenderingContext,
 		deltaTime: number,
 		VPMatrix: number[],
 		worldMatrix?: number[]
 	) {
-		super.Update(gl, deltaTime, VPMatrix, worldMatrix);
-	
+		super.Update(deltaTime, VPMatrix, worldMatrix);
+		Engine.QueueRender((gl: WebGL2RenderingContext) => this.Render(gl, VPMatrix));
+	}
+
+	Render(gl: WebGL2RenderingContext, VPMatrix: number[]) {
 		gl.useProgram(this.state.drawInfo.programInfo.program);
 
 		let projectionMatrix = utils.multiplyMatrices(
@@ -156,12 +158,11 @@ export class LightNode<T extends State> extends Node<T> {
 	}
 
 	override Update(
-		gl: WebGL2RenderingContext,
 		deltaTime: number,
 		VPMatrix: number[],
 		worldMatrix?: number[]
 	) {
-		super.Update(gl, deltaTime, VPMatrix, worldMatrix);
+		super.Update(deltaTime, VPMatrix, worldMatrix);
 		this.light.pos = utils.ComputePosition(
 			this.state.worldMatrix,
 			[0, 0, 0]

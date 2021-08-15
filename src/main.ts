@@ -35,6 +35,9 @@ async function init() {
 
 	// Setup Scenegraph nodes
 	Map.DrawGrid();
+	Map.InitSampleCubes();
+	Map.Init(gl);
+	toad.init(gl);
 
 	// Add some light
 	let sunlightColor = [0.9, 1.0, 1.0, 1.0];
@@ -44,13 +47,6 @@ async function init() {
 		utils.MakeRotateXYZMatrix(30, 30, 120)
 	);
 	sunlightNode.SetParent(Engine.ROOT_NODE);
-
-	Map.InitSampleCubes();
-	Map.Init(gl);
-
-	toad.init(gl);
-	// Map.InitSampleCubes();
-	// Map.Init(gl);
 
 	// Draw axis in origin
 	DebugLine.DrawLine([0, 0, 0], [5, 0, 0], 1);

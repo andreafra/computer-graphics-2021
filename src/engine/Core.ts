@@ -18,6 +18,8 @@ const N_LIGHTS = 16;
 const lights = new Array<Light>(N_LIGHTS);
 let lightIdx = 0;
 
+let renderQueue: ((gl: WebGL2RenderingContext) => void)[] = [];
+
 // Entrypoint of the WebGL program
 export function Setup(_gl: WebGL2RenderingContext) {
 	gl = _gl;
@@ -48,7 +50,11 @@ function Render(time: DOMHighResTimeStamp) {
 	// Navigate the SceneGraph tree to update all elements // O(n)
 	lights.fill(new Light());
 	lightIdx = 0;
-	ROOT_NODE.Update(gl, deltaTime, viewProjectionMatrix);
+	renderQueue = [];
+	ROOT_NODE.Update(deltaTime, viewProjectionMatrix);
+	for (let renderFunction of renderQueue) {
+		renderFunction(gl);
+	}
 
 	DebugLine.Render(gl, viewProjectionMatrix);
 
@@ -79,6 +85,10 @@ export function GetCamera(): number[] {
 
 export function GetTime() {
 	return lastUpdate;
+}
+
+export function QueueRender(renderAction: (gl: WebGL2RenderingContext) => void) {
+	renderQueue.push(renderAction);
 }
 
 export function BindAllLightUniforms(
