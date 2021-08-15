@@ -27,7 +27,6 @@ export var cameraOrbit: CameraOrbit = {
 };
 
 export function Update() {
-	console.log(cameraOrbit);
 	let cameraPos = utils.multiplyVectorScalar(
 		[cameraOrbit.ox, cameraOrbit.oy, cameraOrbit.oz],
 		cameraOrbit.radius
