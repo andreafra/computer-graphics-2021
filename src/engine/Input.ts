@@ -19,7 +19,7 @@ export function Init(gl: WebGL2RenderingContext) {
 	gl.canvas.addEventListener("pointerdown", HandleInputFromPointer);
 	gl.canvas.addEventListener("pointerup", () => (isPointerActive = false));
 	gl.canvas.addEventListener("pointermove", HandleDragInputFromPointer);
-	gl.canvas.addEventListener("mousewheel", HandleScroll);
+	gl.canvas.addEventListener("wheel", HandleScroll);
 }
 
 export var moveDir = [0, 0, 0];
