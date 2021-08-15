@@ -7,6 +7,7 @@ import * as Map from "./engine/Map";
 import * as Grid from "./models/Grid";
 import { Light } from "./engine/Lights";
 import { LightNode } from "./engine/SceneGraph";
+import * as Camera from "./engine/Camera";
 import * as DebugLine from "./debug/Lines";
 
 async function init() {
@@ -28,17 +29,8 @@ async function init() {
 		)
 	);
 
-	let cameraDistance = 10;
-	let cameraWorldCoord = [0, cameraDistance, cameraDistance];
-
 	Engine.Setup(gl);
-	Engine.SetCamera(
-		utils.LookAt(
-			cameraWorldCoord, // Position
-			[0.0, 0.0, 0.0], // Target
-			[0.0, 1.0, 0.0] // Up
-		)
-	);
+	Camera.Update();
 
 	DebugLine.Setup(gl);
 

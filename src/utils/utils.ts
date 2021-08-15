@@ -620,7 +620,7 @@ export class utils {
 		return dst;
 	};
 
-	static vectorTimesScalar = (v: number[], a: number): number[] => [
+	static multiplyVectorScalar = (v: number[], a: number): number[] => [
 		v[0] * a,
 		v[1] * a,
 		v[2] * a,
@@ -702,4 +702,8 @@ export class utils {
 			p[2] / p[3]
 		];
 	}
+
+	static Clamp = (value: number, min: number, max: number) => {
+		return Math.min(max, Math.max(min, value));
+	};
 }

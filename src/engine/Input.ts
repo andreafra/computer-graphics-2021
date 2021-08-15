@@ -1,13 +1,21 @@
-import * as Core from "./Core";
+import { utils } from "../utils/utils";
+import * as Engine from "./Core";
 import * as Editor from "./Editor";
 import { CellType } from "./Map";
+import * as Camera from "./Camera";
 
 let isPointerActive: boolean;
+let mouseDownPos: { x: number; y: number; alpha: number; beta: number };
+
+let alpha = 0, // angle between X-axis and camera (X,Z) position - (0,0)
+	beta = 0, // angle between XZ plane and camera (X,Y,Z) position - (0,0,0)
+	alphaRad = 0,
+	betaRad = 0;
+/* --------------------------------------------------- */
 
 export function Init(gl: WebGL2RenderingContext) {
 	document.addEventListener("keydown", HandleInputFromKeyboad);
 	document.addEventListener("keyup", HandleInputReleaseFromKeyboard);
-	gl.canvas.addEventListener("pointerdown", () => (isPointerActive = true));
 	gl.canvas.addEventListener("pointerdown", HandleInputFromPointer);
 	gl.canvas.addEventListener("pointerup", () => (isPointerActive = false));
 	gl.canvas.addEventListener("pointermove", HandleDragInputFromPointer);
@@ -19,7 +27,7 @@ export var moveDir = [0, 0, 0];
 // to listen for both a key release and a key press
 
 function HandleInputFromKeyboad(ev: KeyboardEvent) {
-	if (Core.EditorMode === "EDITOR")
+	if (Engine.EditorMode === "EDITOR")
 		switch (ev.key) {
 			// Movement
 			case "w":
@@ -45,6 +53,27 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 				Editor.MoveSelectionDown();
 				break;
 
+			// Camera Movement
+			case "ArrowUp":
+				Camera.cameraOrbit.tz -= 1;
+				Camera.Update();
+				break;
+
+			case "ArrowDown":
+				Camera.cameraOrbit.tz += 1;
+				Camera.Update();
+				break;
+
+			case "ArrowLeft":
+				Camera.cameraOrbit.tx -= 1;
+				Camera.Update();
+				break;
+
+			case "ArrowRight":
+				Camera.cameraOrbit.tx += 1;
+				Camera.Update();
+				break;
+
 			// Change blocks
 			case "0":
 				Editor.SetActiveBlock(CellType.Empty);
@@ -60,9 +89,30 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 			case "Enter":
 				Editor.DoActionOnSelectedBlock();
 				break;
+
+			// Camera controls
+			case "PageUp":
+				console.log("hello");
+				Camera.cameraOrbit.radius = utils.Clamp(
+					Camera.cameraOrbit.radius +
+						Camera.CAMERA_DISTANCE_INCREMENT,
+					Camera.MIN_CAMERA_DISTANCE,
+					Camera.MAX_CAMERA_DISTANCE
+				);
+				Camera.Update();
+				break;
+			case "PageDown":
+				Camera.cameraOrbit.radius = utils.Clamp(
+					Camera.cameraOrbit.radius -
+						Camera.CAMERA_DISTANCE_INCREMENT,
+					Camera.MIN_CAMERA_DISTANCE,
+					Camera.MAX_CAMERA_DISTANCE
+				);
+				Camera.Update();
+				break;
 		}
 
-	if (Core.EditorMode === "GAME") {
+	if (Engine.EditorMode === "GAME") {
 		switch (ev.key) {
 			// Movement
 			case "w":
@@ -92,7 +142,7 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 }
 
 function HandleInputReleaseFromKeyboard(ev: KeyboardEvent) {
-	if (Core.EditorMode === "GAME") {
+	if (Engine.EditorMode === "GAME") {
 		switch (ev.key) {
 			// Movement
 			case "w":
@@ -122,11 +172,44 @@ function HandleInputReleaseFromKeyboard(ev: KeyboardEvent) {
 }
 
 function HandleDragInputFromPointer(ev: PointerEvent) {
+	ev.preventDefault();
 	if (isPointerActive) {
 		// Do stuff with mouse (requires raycasts)
+		if (ev.ctrlKey) {
+			// ROTATE CAMERA
+			alpha =
+				(ev.clientX - mouseDownPos.x) * Camera.CAMERA_SPEED +
+				mouseDownPos.alpha;
+			beta =
+				(ev.clientY - mouseDownPos.y) * Camera.CAMERA_SPEED +
+				mouseDownPos.beta;
+
+			//alpha = utils.Clamp(alpha, 1, 359);
+			beta = utils.Clamp(beta, 15, 89.9);
+
+			alphaRad = utils.degToRad(alpha);
+			betaRad = utils.degToRad(beta);
+			//console.log(alpha, beta);
+
+			Camera.cameraOrbit.ox = Math.cos(alphaRad) * Math.cos(betaRad);
+			Camera.cameraOrbit.oy = Math.sin(betaRad);
+			Camera.cameraOrbit.oz = Math.sin(alphaRad) * Math.cos(betaRad);
+
+			Camera.Update();
+		} else if (ev.shiftKey) {
+			// TODO: PAN CAMERA
+		}
 	}
 }
 
 function HandleInputFromPointer(ev: PointerEvent) {
+	ev.preventDefault();
 	// Handle mouse down events
+	mouseDownPos = {
+		x: ev.clientX,
+		y: ev.clientY,
+		alpha: alpha,
+		beta: beta,
+	};
+	isPointerActive = true;
 }
