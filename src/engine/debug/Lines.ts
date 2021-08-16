@@ -1,4 +1,4 @@
-import { utils } from "../utils/utils";
+import { utils } from "../../utils/utils";
 
 // Vertex shader source code
 const vertexShaderSrc = `#version 300 es

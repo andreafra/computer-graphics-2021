@@ -3,11 +3,17 @@ import { utils } from "./utils/utils";
 import * as Engine from "./engine/Core";
 import * as toad from "./models/Toad";
 import * as block from "./models/Block";
-import * as Map from "./engine/Map";
 import { Light } from "./engine/Lights";
 import { LightNode } from "./engine/SceneGraph";
-import * as Camera from "./engine/Camera";
-import * as DebugLine from "./debug/Lines";
+import * as DebugLine from "./engine/debug/Lines";
+
+import * as Camera from "./Camera";
+import * as Input from "./Input";
+import * as Map from "./Map";
+
+type Mode = "EDITOR" | "GAME";
+
+let editorMode: Mode = "EDITOR";
 
 async function init() {
 	const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
@@ -29,6 +35,8 @@ async function init() {
 	);
 
 	Engine.Setup(gl);
+
+	Input.Init(gl);
 	Camera.Update();
 
 	DebugLine.Setup(gl);
@@ -63,6 +71,10 @@ async function init() {
 	// 	},
 	// 	cameraWorldCoord
 	// );
+}
+
+export function GetEditorMode() {
+	return editorMode;
 }
 
 window.onload = () => init();

@@ -1,4 +1,4 @@
-import * as DebugLine from "../debug/Lines";
+import * as DebugLine from "./debug/Lines";
 import { utils } from "../utils/utils";
 import * as Engine from "./Core";
 import { Light } from "./Lights";

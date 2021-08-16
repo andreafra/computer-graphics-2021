@@ -2,13 +2,8 @@ import { utils } from "../utils/utils";
 import { Light } from "./Lights";
 //import { DoRaycast } from "./Raycast";
 import { Node, RenderNode, State } from "./SceneGraph";
-import * as Input from "./Input";
-import * as DebugLine from "../debug/Lines";
+import * as DebugLine from "./debug/Lines";
 import { WebGLProgramInfo } from "./Shaders";
-
-type Mode = "EDITOR" | "GAME";
-
-export var EditorMode: Mode = "EDITOR";
 
 export const ROOT_NODE: Node<State> = new Node("root");
 let gl: WebGL2RenderingContext;
@@ -28,8 +23,6 @@ export function Setup(_gl: WebGL2RenderingContext) {
 	// ONCE
 	gl.clearColor(1, 1, 1, 1);
 	gl.enable(gl.DEPTH_TEST);
-
-	Input.Init(gl);
 }
 
 let lastUpdate: DOMHighResTimeStamp = 0;

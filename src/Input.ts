@@ -1,8 +1,9 @@
-import { utils } from "../utils/utils";
-import * as Engine from "./Core";
+import { utils } from "./utils/utils";
+import * as Engine from "./engine/Core";
 import * as Editor from "./Editor";
 import { CellType } from "./Map";
 import * as Camera from "./Camera";
+import { GetEditorMode } from "./main";
 
 let isPointerActive: boolean;
 let mouseDownPos: { x: number; y: number; alpha: number; beta: number };
@@ -28,7 +29,7 @@ export var moveDir = [0, 0, 0];
 // to listen for both a key release and a key press
 
 function HandleInputFromKeyboad(ev: KeyboardEvent) {
-	if (Engine.EditorMode === "EDITOR")
+	if (GetEditorMode() === "EDITOR")
 		switch (ev.key) {
 			// Movement
 			case "w":
@@ -112,7 +113,7 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 				break;
 		}
 
-	if (Engine.EditorMode === "GAME") {
+	if (GetEditorMode() === "GAME") {
 		switch (ev.key) {
 			// Movement
 			case "w":
@@ -142,7 +143,7 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 }
 
 function HandleInputReleaseFromKeyboard(ev: KeyboardEvent) {
-	if (Engine.EditorMode === "GAME") {
+	if (GetEditorMode() === "GAME") {
 		switch (ev.key) {
 			// Movement
 			case "w":

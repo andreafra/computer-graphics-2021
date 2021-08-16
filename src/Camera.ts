@@ -1,5 +1,5 @@
-import { utils } from "../utils/utils";
-import * as Engine from "./Core";
+import { utils } from "./utils/utils";
+import * as Engine from "./engine/Core";
 
 interface CameraOrbit {
 	ox: number;

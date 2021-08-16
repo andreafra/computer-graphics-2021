@@ -1,7 +1,7 @@
-import * as Block from "../models/Block";
-import * as Core from "./Core";
-import * as SceneGraph from "./SceneGraph";
-import * as DebugLine from "../debug/Lines";
+import * as Block from "./models/Block";
+import * as Core from "./engine/Core";
+import * as SceneGraph from "./engine/SceneGraph";
+import * as DebugLine from "./engine/debug/Lines";
 export enum CellType {
 	Empty = 0,
 	BlockWhite = 1,
