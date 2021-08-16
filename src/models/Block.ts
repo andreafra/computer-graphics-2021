@@ -38,7 +38,7 @@ export function init(
 		uvCoord: blockOBJ.textures,
 	});
 
-	const SetupTextureRender = MakeTexture(gl, programInfo.program, {
+	const SetupTextureRender = MakeTexture(gl, programInfo, {
 		dataSrc: cubeTextureSrc,
 	});
 

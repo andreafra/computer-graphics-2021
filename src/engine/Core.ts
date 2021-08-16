@@ -4,6 +4,7 @@ import { Light } from "./Lights";
 import { Node, RenderNode, State } from "./SceneGraph";
 import * as Input from "./Input";
 import * as DebugLine from "../debug/Lines";
+import { WebGLProgramInfo } from "./Shaders";
 
 type Mode = "EDITOR" | "GAME";
 
@@ -93,38 +94,38 @@ export function QueueRender(renderAction: (gl: WebGL2RenderingContext) => void) 
 
 export function BindAllLightUniforms(
 	gl: WebGL2RenderingContext,
-	program: WebGLProgram
+	programInfo: WebGLProgramInfo
 ) {
 	gl.uniform3fv(
-		gl.getUniformLocation(program, "LType"),
+		programInfo.locations.lightType,
 		lights.map((l) => l.EncodeTypeOneHot()).flat(1)
 	);
 	gl.uniform3fv(
-		gl.getUniformLocation(program, "LPos"),
+		programInfo.locations.lightPos,
 		lights.map((l) => l.pos).flat(1)
 	);
 	gl.uniform3fv(
-		gl.getUniformLocation(program, "LDir"),
+		programInfo.locations.lightDir,
 		lights.map((l) => l.dir.map((d) => -d)).flat(1)
 	);
 	gl.uniform1fv(
-		gl.getUniformLocation(program, "LConeOut"),
+		programInfo.locations.lightConeOut,
 		lights.map((l) => l.coneOut)
 	);
 	gl.uniform1fv(
-		gl.getUniformLocation(program, "LConeIn"),
+		programInfo.locations.lightConeIn,
 		lights.map((l) => l.coneIn)
 	);
 	gl.uniform1fv(
-		gl.getUniformLocation(program, "LDecay"),
+		programInfo.locations.lightDecay,
 		lights.map((l) => l.decay)
 	);
 	gl.uniform1fv(
-		gl.getUniformLocation(program, "LTarget"),
+		programInfo.locations.lightTarget,
 		lights.map((l) => l.target)
 	);
 	gl.uniform4fv(
-		gl.getUniformLocation(program, "LColor"),
+		programInfo.locations.lightColor,
 		lights.map((l) => l.lightColor).flat(1)
 	);
 }

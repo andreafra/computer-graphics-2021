@@ -24,7 +24,7 @@ export function init(gl: WebGL2RenderingContext) {
 		uvCoord: toad_OBJ.textures,
 	});
 
-	const SetupTextureRender = MakeTexture(gl, programInfo.program, {
+	const SetupTextureRender = MakeTexture(gl, programInfo, {
 		dataSrc: bodyTextureSrc,
 	});
 

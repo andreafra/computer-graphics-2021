@@ -1,24 +1,22 @@
+import { WebGLProgramInfo } from "./Shaders";
+
 interface TextureData {
 	dataSrc: string;
 }
 
-const BASE_TEXTURE = "baseTexture";
-
 // Returns a function to call during the rendering step
 export function MakeTexture(
 	gl: WebGL2RenderingContext,
-	program: WebGLProgram,
+	programInfo: WebGLProgramInfo,
 	textureData: TextureData
 ) {
-	const bodyTextureFileLoc = gl.getUniformLocation(program, BASE_TEXTURE);
-
-	let bodyTexture: WebGLTexture;
-	let bodyTextureImage = new Image();
-	bodyTextureImage.src = textureData.dataSrc;
-	bodyTextureImage.onload = () => {
-		bodyTexture = gl.createTexture();
+	let baseTexture: WebGLTexture;
+	let baseTextureImage = new Image();
+	baseTextureImage.src = textureData.dataSrc;
+	baseTextureImage.onload = () => {
+		baseTexture = gl.createTexture();
 		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, bodyTexture);
+		gl.bindTexture(gl.TEXTURE_2D, baseTexture);
 		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 		gl.texImage2D(
 			gl.TEXTURE_2D,
@@ -26,7 +24,7 @@ export function MakeTexture(
 			gl.RGBA,
 			gl.RGBA,
 			gl.UNSIGNED_BYTE,
-			bodyTextureImage
+			baseTextureImage
 		);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -36,8 +34,8 @@ export function MakeTexture(
 	return () => {
 		// We don't need to use useProgram since it will be called
 		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, bodyTexture);
-		gl.uniform1i(bodyTextureFileLoc, 0);
+		gl.bindTexture(gl.TEXTURE_2D, baseTexture);
+		gl.uniform1i(programInfo.locations.texture, 0);
 	};
 }
 

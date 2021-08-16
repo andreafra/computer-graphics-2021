@@ -132,7 +132,7 @@ export class RenderNode<T extends State> extends Node<T> {
 
 		gl.uniform3fv(this.state.drawInfo.programInfo.locations.materialDiffColor, this.state.drawInfo.materialColor);
 
-		Engine.BindAllLightUniforms(gl, this.state.drawInfo.programInfo.program);
+		Engine.BindAllLightUniforms(gl, this.state.drawInfo.programInfo);
 
 		// Render Texture
 		if (this.state.drawInfo.texture) {
