@@ -2,11 +2,16 @@ import { utils } from "./utils/utils";
 import * as Engine from "./engine/Core";
 import * as Editor from "./Editor";
 import { CellType } from "./Map";
-import * as Camera from "./Camera";
+import { Camera } from "./Camera";
 import { GetEditorMode } from "./main";
 
+let editorCamera: Camera;
+
 let isPointerActive: boolean;
+let isPointerSecondaryActive: boolean;
 let mouseDownPos: { x: number; y: number; alpha: number; beta: number };
+
+const DRAG_SPEED = 0.25;
 
 let alpha = 0, // angle between X-axis and camera (X,Z) position - (0,0)
 	beta = 0, // angle between XZ plane and camera (X,Y,Z) position - (0,0,0)
@@ -18,9 +23,16 @@ export function Init(gl: WebGL2RenderingContext) {
 	document.addEventListener("keydown", HandleInputFromKeyboad);
 	document.addEventListener("keyup", HandleInputReleaseFromKeyboard);
 	gl.canvas.addEventListener("pointerdown", HandleInputFromPointer);
-	gl.canvas.addEventListener("pointerup", () => (isPointerActive = false));
+	gl.canvas.addEventListener("pointerup", () => {
+		isPointerActive = false;
+		isPointerSecondaryActive = false;
+	});
 	gl.canvas.addEventListener("pointermove", HandleDragInputFromPointer);
+	gl.canvas.addEventListener("contextmenu", HandleRightClick);
 	gl.canvas.addEventListener("wheel", HandleScroll);
+
+	// Get editor camera
+	editorCamera = Camera.Get("editor");
 }
 
 export var moveDir = [0, 0, 0];
@@ -29,7 +41,9 @@ export var moveDir = [0, 0, 0];
 // to listen for both a key release and a key press
 
 function HandleInputFromKeyboad(ev: KeyboardEvent) {
-	if (GetEditorMode() === "EDITOR")
+	if (GetEditorMode() === "EDITOR") {
+		let t: number[];
+
 		switch (ev.key) {
 			// Movement
 			case "w":
@@ -57,23 +71,27 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 
 			// Camera Movement
 			case "ArrowUp":
-				Camera.cameraOrbit.tz -= 1;
-				Camera.Update();
+				t = editorCamera.translation;
+				t[2] -= 1;
+				editorCamera.translation = t;
 				break;
 
 			case "ArrowDown":
-				Camera.cameraOrbit.tz += 1;
-				Camera.Update();
+				t = editorCamera.translation;
+				t[2] += 1;
+				editorCamera.translation = t;
 				break;
 
 			case "ArrowLeft":
-				Camera.cameraOrbit.tx -= 1;
-				Camera.Update();
+				t = editorCamera.translation;
+				t[0] -= 1;
+				editorCamera.translation = t;
 				break;
 
 			case "ArrowRight":
-				Camera.cameraOrbit.tx += 1;
-				Camera.Update();
+				t = editorCamera.translation;
+				t[0] += 1;
+				editorCamera.translation = t;
 				break;
 
 			// Change blocks
@@ -94,25 +112,13 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 
 			// Camera controls
 			case "PageUp":
-				Camera.cameraOrbit.radius = utils.Clamp(
-					Camera.cameraOrbit.radius +
-						Camera.CAMERA_DISTANCE_INCREMENT,
-					Camera.MIN_CAMERA_DISTANCE,
-					Camera.MAX_CAMERA_DISTANCE
-				);
-				Camera.Update();
+				editorCamera.IncrementDistance();
 				break;
 			case "PageDown":
-				Camera.cameraOrbit.radius = utils.Clamp(
-					Camera.cameraOrbit.radius -
-						Camera.CAMERA_DISTANCE_INCREMENT,
-					Camera.MIN_CAMERA_DISTANCE,
-					Camera.MAX_CAMERA_DISTANCE
-				);
-				Camera.Update();
+				editorCamera.DecrementDistance();
 				break;
 		}
-
+	}
 	if (GetEditorMode() === "GAME") {
 		switch (ev.key) {
 			// Movement
@@ -177,30 +183,20 @@ function HandleDragInputFromPointer(ev: PointerEvent) {
 	if (isPointerActive) {
 		// Do stuff with mouse (requires raycasts)
 		if (ev.ctrlKey) {
-			// ROTATE CAMERA
-			alpha =
-				(ev.clientX - mouseDownPos.x) * Camera.CAMERA_SPEED +
-				mouseDownPos.alpha;
-			beta =
-				(ev.clientY - mouseDownPos.y) * Camera.CAMERA_SPEED +
-				mouseDownPos.beta;
-
-			//alpha = utils.Clamp(alpha, 1, 359);
-			beta = utils.Clamp(beta, 15, 89.9);
-
-			alphaRad = utils.degToRad(alpha);
-			betaRad = utils.degToRad(beta);
-			//console.log(alpha, beta);
-
-			Camera.cameraOrbit.ox = Math.cos(alphaRad) * Math.cos(betaRad);
-			Camera.cameraOrbit.oy = Math.sin(betaRad);
-			Camera.cameraOrbit.oz = Math.sin(alphaRad) * Math.cos(betaRad);
-
-			Camera.Update();
+			RotateCamera(ev.clientX, ev.clientY);
 		} else if (ev.shiftKey) {
 			// TODO: PAN CAMERA
 		}
 	}
+	if (isPointerSecondaryActive) {
+		RotateCamera(ev.clientX, ev.clientY);
+	}
+}
+
+function HandleRightClick(ev: MouseEvent) {
+	ev.preventDefault();
+	isPointerSecondaryActive = true;
+	return false;
 }
 
 function HandleInputFromPointer(ev: PointerEvent) {
@@ -219,11 +215,23 @@ function HandleScroll(ev: any) {
 	ev.preventDefault();
 	let scrollDir = -Math.sign(ev.wheelDeltaY);
 
-	Camera.cameraOrbit.radius = utils.Clamp(
-		Camera.cameraOrbit.radius +
-			Camera.CAMERA_DISTANCE_INCREMENT * scrollDir,
-		Camera.MIN_CAMERA_DISTANCE,
-		Camera.MAX_CAMERA_DISTANCE
-	);
-	Camera.Update();
+	if (scrollDir > 0) editorCamera.IncrementDistance();
+	else editorCamera.DecrementDistance();
+}
+
+function RotateCamera(x: number, y: number) {
+	// ROTATE CAMERA
+	alpha = (x - mouseDownPos.x) * DRAG_SPEED + mouseDownPos.alpha;
+	beta = (y - mouseDownPos.y) * DRAG_SPEED + mouseDownPos.beta;
+
+	beta = utils.Clamp(beta, 15, 89.9);
+
+	alphaRad = utils.degToRad(alpha);
+	betaRad = utils.degToRad(beta);
+
+	editorCamera.normDir = [
+		Math.cos(alphaRad) * Math.cos(betaRad),
+		Math.sin(betaRad),
+		Math.sin(alphaRad) * Math.cos(betaRad),
+	];
 }

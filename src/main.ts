@@ -2,12 +2,11 @@ import "./style.css";
 import { utils } from "./utils/utils";
 import * as Engine from "./engine/Core";
 import * as toad from "./models/Toad";
-import * as block from "./models/Block";
 import { Light } from "./engine/Lights";
 import { LightNode } from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
 
-import * as Camera from "./Camera";
+import { Camera } from "./Camera";
 import * as Input from "./Input";
 import * as Map from "./Map";
 
@@ -36,8 +35,11 @@ async function init() {
 
 	Engine.Setup(gl);
 
+	// Setup camera for editor
+	let editorCamera = Camera.Init("editor");
+	editorCamera.Update();
+
 	Input.Init(gl);
-	Camera.Update();
 
 	DebugLine.Setup(gl);
 
