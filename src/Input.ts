@@ -4,6 +4,7 @@ import { CellType } from "./Map";
 import { Camera } from "./Camera";
 import { GetMode } from "./main";
 import { gl } from "./engine/Core";
+import { RayCast } from "./engine/Raycast";
 
 let editorCamera: Camera;
 
@@ -20,16 +21,16 @@ let alpha = 0, // angle between X-axis and camera (X,Z) position - (0,0)
 /* --------------------------------------------------- */
 
 export function Init() {
-	document.addEventListener("keydown", HandleInputFromKeyboad);
-	document.addEventListener("keyup", HandleInputReleaseFromKeyboard);
-	gl.canvas.addEventListener("pointerdown", HandleInputFromPointer);
+	document.addEventListener("keydown", HandleInputKeyDown);
+	document.addEventListener("keyup", HandleInputKeyUp);
+	gl.canvas.addEventListener("pointerdown", HandleInputPointerDown);
 	gl.canvas.addEventListener("pointerup", () => {
 		isPointerActive = false;
 		isPointerSecondaryActive = false;
 	});
-	gl.canvas.addEventListener("pointermove", HandleDragInputFromPointer);
+	gl.canvas.addEventListener("pointermove", HandleInputPointerDrag);
 	gl.canvas.addEventListener("contextmenu", HandleRightClick);
-	gl.canvas.addEventListener("wheel", HandleScroll);
+	gl.canvas.addEventListener("wheel", HandleInputScroll);
 
 	// Get editor camera
 	editorCamera = Camera.Get("editor");
@@ -40,7 +41,7 @@ export var moveDir = [0, 0, 0];
 // Afaik Javascript doesn't let us read keyboard state directly, so we'll have
 // to listen for both a key release and a key press
 
-function HandleInputFromKeyboad(ev: KeyboardEvent) {
+function HandleInputKeyDown(ev: KeyboardEvent) {
 	if (GetMode() === "EDITOR") {
 		let t: number[];
 
@@ -148,7 +149,7 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 	}
 }
 
-function HandleInputReleaseFromKeyboard(ev: KeyboardEvent) {
+function HandleInputKeyUp(ev: KeyboardEvent) {
 	if (GetMode() === "GAME") {
 		switch (ev.key) {
 			// Movement
@@ -178,7 +179,7 @@ function HandleInputReleaseFromKeyboard(ev: KeyboardEvent) {
 	}
 }
 
-function HandleDragInputFromPointer(ev: PointerEvent) {
+function HandleInputPointerDrag(ev: PointerEvent) {
 	ev.preventDefault();
 	if (isPointerActive) {
 		// Do stuff with mouse (requires raycasts)
@@ -199,7 +200,7 @@ function HandleRightClick(ev: MouseEvent) {
 	return false;
 }
 
-function HandleInputFromPointer(ev: PointerEvent) {
+function HandleInputPointerDown(ev: PointerEvent) {
 	ev.preventDefault();
 	// Handle mouse down events
 	mouseDownPos = {
@@ -209,9 +210,12 @@ function HandleInputFromPointer(ev: PointerEvent) {
 		beta: beta,
 	};
 	isPointerActive = true;
+
+	// Raycast
+	RayCast(gl, ev.clientX, ev.clientY, editorCamera);
 }
 
-function HandleScroll(ev: any) {
+function HandleInputScroll(ev: any) {
 	ev.preventDefault();
 	let scrollDir = -Math.sign(ev.wheelDeltaY);
 
