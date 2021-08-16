@@ -77,6 +77,11 @@ export function GetCamera(): number[] {
 	return cameraMatrix;
 }
 
+export function GetCameraPosition(): number[] {
+	// Eye of the camera is at local origin
+	return utils.ComputePosition(cameraMatrix, [0, 0, 0]);
+}
+
 export function GetTime() {
 	return lastUpdate;
 }

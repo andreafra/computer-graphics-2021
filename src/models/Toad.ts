@@ -37,6 +37,7 @@ export function Init() {
 	var toadNode = new RenderNode<ToadState>("cpt-toad", tMatrix);
 	toadNode.state.drawInfo = {
 		materialColor: [0.0, 0.0, 0.0],
+		materialSpecColor: [0.3, 0.3, 0.3],
 		programInfo: programInfo,
 		bufferLength: toad_OBJ.indices.length,
 		vertexArrayObject: vao,

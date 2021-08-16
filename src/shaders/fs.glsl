@@ -9,10 +9,12 @@ in vec3 fsPosition;
 out vec4 outColor;
 
 uniform vec3 mDiffColor; //material diffuse color
+uniform vec3 mSpecColor;
 #ifdef USE_TEXTURES
 in vec2 uvCoord;
 uniform sampler2D baseTexture;
 #endif
+uniform vec3 eyePos;
 
 // 3 configurable lights
 #define N_LIGHTS 16
@@ -25,6 +27,8 @@ uniform float LConeIn[N_LIGHTS];
 uniform float LDecay[N_LIGHTS];
 uniform float LTarget[N_LIGHTS];
 uniform vec4 LColor[N_LIGHTS];
+
+#define SPEC_SHINE 100.0
 
 vec3 compLightDir(vec3 LPos, vec3 LDir, vec3 lightType) {
 	//lights
@@ -61,24 +65,40 @@ vec4 compLightColor(vec4 lightColor, float LTarget, float LDecay, vec3 LPos, vec
 		   spotLightCol * lightType.z;
 }
 
+vec4 compSpecular(vec3 lightDir, vec4 lightCol, vec3 normalVec, vec3 eyedirVec) {
+	// Blinn
+	float LdotN = max(0.0, dot(normalVec, lightDir));
+	vec3 halfVec = normalize(lightDir + eyedirVec);
+	float HdotN = max(dot(normalVec, halfVec), 0.0);
+	vec4 LScol = lightCol * max(sign(LdotN),0.0);
+
+	vec4 specularBlinn = LScol * pow(HdotN, SPEC_SHINE);
+	return specularBlinn;
+}
 
 void main() {
 	vec3 normalVec = normalize(fsNormal);
+	vec3 eyedirVec = normalize(eyePos - fsPosition);
 
 	//lights
-	vec4 lights;
+	vec4 lightsDiffuse;
+	vec4 lightsSpecular;
 	for (int i = 0; i < N_LIGHTS; i++) {
 		vec3 lightDir = compLightDir(LPos[i], LDir[i], LType[i]);
 		vec4 lightCol = compLightColor(LColor[i], LTarget[i], LDecay[i], LPos[i], LDir[i],
 									     LConeOut[i], LConeIn[i], LType[i]);
-		lights += dot(lightDir, normalVec) * lightCol;
+		lightsDiffuse += dot(lightDir, normalVec) * lightCol;
+
+		lightsSpecular += compSpecular(lightDir, lightCol, normalVec, eyedirVec);
 	}
 
 	vec4 diffColor = vec4(mDiffColor, 1.0);
 #ifdef USE_TEXTURES
 	diffColor = texture(baseTexture, uvCoord);
 #endif
+	vec4 specColor = vec4(mSpecColor, 1.0);
 
-	vec4 lambertColor = diffColor * lights;
-	outColor = clamp(lambertColor, 0.00, 1.0);
+	vec4 lambertColor = diffColor * lightsDiffuse;
+	vec4 blinnColor = specColor * lightsSpecular;
+	outColor = clamp(lambertColor + blinnColor, 0.00, 1.0);
 }

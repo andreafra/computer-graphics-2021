@@ -8,6 +8,7 @@ import { gl } from "./Core";
 // Object containing data useful for rendering
 interface DrawInfo {
 	materialColor: number[];
+	materialSpecColor: number[];
 	programInfo: WebGLProgramInfo;
 	bufferLength: number;
 	vertexArrayObject: WebGLVertexArrayObject;
@@ -134,6 +135,15 @@ export class RenderNode<T extends State> extends Node<T> {
 		gl.uniform3fv(
 			this.state.drawInfo.programInfo.locations.materialDiffColor,
 			this.state.drawInfo.materialColor
+		);
+		gl.uniform3fv(
+			this.state.drawInfo.programInfo.locations.materialSpecColor,
+			this.state.drawInfo.materialSpecColor
+		);
+
+		gl.uniform3fv(
+			this.state.drawInfo.programInfo.locations.eyePos,
+			Engine.GetCameraPosition()
 		);
 
 		Engine.BindAllLightUniforms(this.state.drawInfo.programInfo);

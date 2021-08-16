@@ -51,6 +51,7 @@ export function init(
 	var blockNode = new RenderNode<CubeState>(`block-${type}`, tMatrix);
 	blockNode.state.drawInfo = {
 		materialColor: [0, 0, 0],
+		materialSpecColor: [0.2, 0.2, 0.2],
 		programInfo: programInfo,
 		bufferLength: blockOBJ.indices.length,
 		vertexArrayObject: vao,
