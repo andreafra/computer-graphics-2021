@@ -1,20 +1,21 @@
 import * as Engine from "../engine/Core";
-import { MakeTexture, MakeVAO } from "../engine/Models";
+import { MakeTexture, MakeVAO, TextureType } from "../engine/Models";
 import { RenderNode, State } from "../engine/SceneGraph";
-import { getShader } from "../engine/Shaders";
+import { getShader, Features } from "../engine/Shaders";
 import { gl } from "../engine/Core";
 import { utils } from "../utils/utils";
 
 // Assets
 import toad_OBJ from "../assets/cpt_toad/toad.obj";
 import bodyTextureSrc from "../assets/cpt_toad/Textures/baked_txt.png";
+import emissiveMapSrc from "../assets/cpt_toad/Textures/baked_emm.png";
 
 // Define common structure for state of these nodes
 interface ToadState extends State {}
 
 export function Init() {
 	// SHADERS
-	const programInfo = getShader(true /* useTextures */);
+	const programInfo = getShader(Features.Texture | Features.EmissiveMap);
 	gl.useProgram(programInfo.program);
 
 	// CREATE MODEL
@@ -25,8 +26,13 @@ export function Init() {
 		uvCoord: toad_OBJ.textures,
 	});
 
-	const SetupTextureRender = MakeTexture(programInfo, {
+	const baseTexture = MakeTexture(programInfo, {
 		dataSrc: bodyTextureSrc,
+		type: TextureType.BaseTexture,
+	});
+	const emissiveMap = MakeTexture(programInfo, {
+		dataSrc: emissiveMapSrc,
+		type: TextureType.EmissiveMap,
 	});
 
 	// SETUP NODES
@@ -38,10 +44,12 @@ export function Init() {
 	toadNode.state.drawInfo = {
 		materialColor: [0.0, 0.0, 0.0],
 		materialSpecColor: [0.3, 0.3, 0.3],
+		materialEmitColor: [0, 0, 0],	// Use emissive map instead
 		programInfo: programInfo,
 		bufferLength: toad_OBJ.indices.length,
 		vertexArrayObject: vao,
-		texture: SetupTextureRender,
+		texture: baseTexture,
+		emissiveMap: emissiveMap,
 	};
 
 	// Set relationships between nodes

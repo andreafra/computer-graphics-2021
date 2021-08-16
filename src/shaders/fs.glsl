@@ -1,20 +1,26 @@
 #version 300 es
 
-//NO_USE_TEXTURES
+//NO_USE_TEXTURE
+//NO_USE_EMISSIVE_MAP
 
 precision mediump float;
 
 in vec3 fsNormal;
 in vec3 fsPosition;
+in vec2 uvCoord;
 out vec4 outColor;
 
 uniform vec3 mDiffColor; //material diffuse color
 uniform vec3 mSpecColor;
-#ifdef USE_TEXTURES
-in vec2 uvCoord;
+uniform vec3 mEmitColor;
+uniform vec3 eyePos;
+
+#ifdef USE_TEXTURE
 uniform sampler2D baseTexture;
 #endif
-uniform vec3 eyePos;
+#ifdef USE_EMISSIVE_MAP
+uniform sampler2D emissiveMap;
+#endif
 
 // 3 configurable lights
 #define N_LIGHTS 16
@@ -93,12 +99,17 @@ void main() {
 	}
 
 	vec4 diffColor = vec4(mDiffColor, 1.0);
-#ifdef USE_TEXTURES
+	vec4 emitColor = vec4(mEmitColor, 1.0);
+#ifdef USE_TEXTURE
 	diffColor = texture(baseTexture, uvCoord);
+	emitColor = diffColor * max(max(mEmitColor.r, mEmitColor.g), mEmitColor.b);
+#endif
+#ifdef USE_EMISSIVE_MAP
+	emitColor = texture(emissiveMap, uvCoord);
 #endif
 	vec4 specColor = vec4(mSpecColor, 1.0);
 
 	vec4 lambertColor = diffColor * lightsDiffuse;
 	vec4 blinnColor = specColor * lightsSpecular;
-	outColor = clamp(lambertColor + blinnColor, 0.00, 1.0);
+	outColor = clamp(lambertColor + blinnColor + emitColor, 0.00, 1.0);
 }

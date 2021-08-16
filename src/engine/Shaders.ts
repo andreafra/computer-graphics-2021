@@ -4,15 +4,22 @@ import fragmentShaderSrc from "../shaders/fs.glsl";
 import vertexShaderSrc from "../shaders/vs.glsl";
 import { gl } from "./Core";
 
+export enum Features {
+	Texture = 1 << 0,
+	EmissiveMap = 1 << 1,
+}
+
 export interface WebGLProgramInfo {
 	program: WebGLProgram;
 	locations: {
 		matrix: WebGLUniformLocation;
 		materialDiffColor: WebGLUniformLocation;
 		materialSpecColor: WebGLUniformLocation;
+		materialEmitColor: WebGLUniformLocation;
 		normalMatrix: WebGLUniformLocation;
 		positionMatrix: WebGLUniformLocation;
 		texture?: WebGLUniformLocation;
+		emissiveMap?: WebGLUniformLocation;
 		lightType: WebGLUniformLocation;
 		lightPos: WebGLUniformLocation;
 		lightDir: WebGLUniformLocation;
@@ -23,14 +30,19 @@ export interface WebGLProgramInfo {
 		lightColor: WebGLUniformLocation;
 		eyePos: WebGLUniformLocation;
 	};
+	textureNumber?: number;
 }
 
-export function getShader(useTextures = false) {
+export function getShader(features: number) {
 	let vs = vertexShaderSrc;
 	let fs = fragmentShaderSrc;
-	if (useTextures) {
-		vs = vs.replace("//NO_USE_TEXTURES", "#define USE_TEXTURES");
-		fs = fs.replace("//NO_USE_TEXTURES", "#define USE_TEXTURES");
+	if (features & Features.Texture) {
+		vs = vs.replace("//NO_USE_TEXTURE", "#define USE_TEXTURE");
+		fs = fs.replace("//NO_USE_TEXTURE", "#define USE_TEXTURE");
+	}
+	if (features & Features.EmissiveMap) {
+		vs = vs.replace("//NO_USE_EMISSIVE_MAP", "#define USE_EMISSIVE_MAP");
+		fs = fs.replace("//NO_USE_EMISSIVE_MAP", "#define USE_EMISSIVE_MAP");
 	}
 
 	let program = utils.createAndCompileShaders(gl, [vs, fs]);
@@ -41,10 +53,14 @@ export function getShader(useTextures = false) {
 			matrix: gl.getUniformLocation(program, "matrix"),
 			materialDiffColor: gl.getUniformLocation(program, "mDiffColor"),
 			materialSpecColor: gl.getUniformLocation(program, "mSpecColor"),
+			materialEmitColor: gl.getUniformLocation(program, "mEmitColor"),
 			normalMatrix: gl.getUniformLocation(program, "nMatrix"),
 			positionMatrix: gl.getUniformLocation(program, "pMatrix"),
-			texture: useTextures
+			texture: features & Features.Texture
 				? gl.getUniformLocation(program, "baseTexture")
+				: undefined,
+			emissiveMap: features & Features.EmissiveMap
+				? gl.getUniformLocation(program, "emissiveMap")
 				: undefined,
 			lightType: gl.getUniformLocation(program, "LType"),
 			lightPos: gl.getUniformLocation(program, "LPos"),

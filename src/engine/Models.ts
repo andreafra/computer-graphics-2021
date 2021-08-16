@@ -1,8 +1,23 @@
 import { gl } from "./Core";
 import { WebGLProgramInfo } from "./Shaders";
 
+export enum TextureType {
+	BaseTexture,
+	EmissiveMap,
+}
+
 interface TextureData {
 	dataSrc: string;
+	type: TextureType;
+}
+
+function MapTextureToLocator(t: TextureType, programInfo: WebGLProgramInfo) {
+	switch (t) {
+		case TextureType.BaseTexture:
+			return programInfo.locations.texture;
+		case TextureType.EmissiveMap:
+			return programInfo.locations.emissiveMap;
+	}
 }
 
 // Returns a function to call during the rendering step
@@ -10,13 +25,19 @@ export function MakeTexture(
 	programInfo: WebGLProgramInfo,
 	textureData: TextureData
 ) {
-	let baseTexture: WebGLTexture;
-	let baseTextureImage = new Image();
-	baseTextureImage.src = textureData.dataSrc;
-	baseTextureImage.onload = () => {
-		baseTexture = gl.createTexture();
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, baseTexture);
+	if (!programInfo.textureNumber)
+		programInfo.textureNumber = 0;
+
+	// Copy the texture number
+	let textureNo = programInfo.textureNumber;
+
+	let texture: WebGLTexture;
+	let textureImage = new Image();
+	textureImage.src = textureData.dataSrc;
+	textureImage.onload = () => {
+		texture = gl.createTexture();
+		gl.activeTexture(gl.TEXTURE0 + textureNo);
+		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 		gl.texImage2D(
 			gl.TEXTURE_2D,
@@ -24,18 +45,20 @@ export function MakeTexture(
 			gl.RGBA,
 			gl.RGBA,
 			gl.UNSIGNED_BYTE,
-			baseTextureImage
+			textureImage
 		);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		gl.generateMipmap(gl.TEXTURE_2D);
 	};
+	const locator = MapTextureToLocator(textureData.type, programInfo);
+	programInfo.textureNumber++;
 
 	return () => {
 		// We don't need to use useProgram since it will be called
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, baseTexture);
-		gl.uniform1i(programInfo.locations.texture, 0);
+		gl.activeTexture(gl.TEXTURE0 + textureNo);
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.uniform1i(locator, textureNo);
 	};
 }
 

@@ -9,10 +9,12 @@ import { gl } from "./Core";
 interface DrawInfo {
 	materialColor: number[];
 	materialSpecColor: number[];
+	materialEmitColor: number[];
 	programInfo: WebGLProgramInfo;
 	bufferLength: number;
 	vertexArrayObject: WebGLVertexArrayObject;
 	texture?: () => void;
+	emissiveMap?: () => void;
 }
 
 // A function that receives the state of the Node and performs actions on it
@@ -140,6 +142,10 @@ export class RenderNode<T extends State> extends Node<T> {
 			this.state.drawInfo.programInfo.locations.materialSpecColor,
 			this.state.drawInfo.materialSpecColor
 		);
+		gl.uniform3fv(
+			this.state.drawInfo.programInfo.locations.materialEmitColor,
+			this.state.drawInfo.materialEmitColor
+		);
 
 		gl.uniform3fv(
 			this.state.drawInfo.programInfo.locations.eyePos,
@@ -151,6 +157,10 @@ export class RenderNode<T extends State> extends Node<T> {
 		// Render Texture
 		if (this.state.drawInfo.texture) {
 			this.state.drawInfo.texture();
+		}
+
+		if (this.state.drawInfo.emissiveMap) {
+			this.state.drawInfo.emissiveMap();
 		}
 
 		gl.bindVertexArray(this.state.drawInfo.vertexArrayObject);

@@ -1,7 +1,7 @@
-import { MakeTexture, MakeVAO } from "../engine/Models";
+import { MakeTexture, MakeVAO, TextureType } from "../engine/Models";
 import { RenderNode, Node, State } from "../engine/SceneGraph";
 import { utils } from "../utils/utils";
-import { getShader } from "../engine/Shaders";
+import { getShader, Features } from "../engine/Shaders";
 
 // Assets
 import cube_W_OBJ from "../assets/cube/cube_white.obj";
@@ -27,7 +27,7 @@ export function init(
 	let blockOBJ = MESHES[type];
 
 	// SHADERS
-	const programInfo = getShader(true /* useTextures */);
+	const programInfo = getShader(Features.Texture);
 	gl.useProgram(programInfo.program);
 
 	// CREATE MODEL
@@ -40,6 +40,7 @@ export function init(
 
 	const SetupTextureRender = MakeTexture(programInfo, {
 		dataSrc: cubeTextureSrc,
+		type: TextureType.BaseTexture,
 	});
 
 	// SETUP NODES
@@ -52,6 +53,7 @@ export function init(
 	blockNode.state.drawInfo = {
 		materialColor: [0, 0, 0],
 		materialSpecColor: [0.2, 0.2, 0.2],
+		materialEmitColor: [0, 0, 0],
 		programInfo: programInfo,
 		bufferLength: blockOBJ.indices.length,
 		vertexArrayObject: vao,
