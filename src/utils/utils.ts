@@ -370,18 +370,17 @@ export class utils {
 		return out;
 	};
 
-
 	static multiplyMatrices = function (...m: number[][]): number[] {
-	    let i = m.length - 1;
-	    let res = m[i];
-	    i--;
+		let i = m.length - 1;
+		let res = m[i];
+		i--;
 
-	    for (; i >= 0; i--) {
-	        res = utils.multiplyTwo(m[i], res);
-	    }
+		for (; i >= 0; i--) {
+			res = utils.multiplyTwo(m[i], res);
+		}
 
-	    return res;
-	}
+		return res;
+	};
 
 	static multiplyTwo = function (m1: number[], m2: number[]): number[] {
 		// Perform matrix product  { out = m1 * m2;}
@@ -691,16 +690,11 @@ export class utils {
 	};
 
 	static ComputePosition(m: number[], v: number[]) {
-		if (v.length < 4)
-			v[3] = 1;
+		if (v.length < 4) v[3] = 1;
 
 		const p = utils.multiplyMatrixVector(m, v);
 
-		return [
-			p[0] / p[3],
-			p[1] / p[3],
-			p[2] / p[3]
-		];
+		return [p[0] / p[3], p[1] / p[3], p[2] / p[3]];
 	}
 
 	static Clamp = (value: number, min: number, max: number) => {

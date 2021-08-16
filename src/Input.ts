@@ -1,9 +1,9 @@
 import { utils } from "./utils/utils";
-import * as Engine from "./engine/Core";
 import * as Editor from "./Editor";
 import { CellType } from "./Map";
 import { Camera } from "./Camera";
 import { GetMode } from "./main";
+import { gl } from "./engine/Core";
 
 let editorCamera: Camera;
 
@@ -19,7 +19,7 @@ let alpha = 0, // angle between X-axis and camera (X,Z) position - (0,0)
 	betaRad = 0;
 /* --------------------------------------------------- */
 
-export function Init(gl: WebGL2RenderingContext) {
+export function Init() {
 	document.addEventListener("keydown", HandleInputFromKeyboad);
 	document.addEventListener("keyup", HandleInputReleaseFromKeyboard);
 	gl.canvas.addEventListener("pointerdown", HandleInputFromPointer);

@@ -7,6 +7,7 @@ import { getShader } from "../engine/Shaders";
 import cube_W_OBJ from "../assets/cube/cube_white.obj";
 import cube_Y_OBJ from "../assets/cube/cube_yellow.obj";
 import cubeTextureSrc from "../assets/cube/grass.png";
+import { gl } from "../engine/Core";
 
 // Define common structure for state of these nodes
 interface CubeState extends State {}
@@ -19,7 +20,6 @@ export enum Type {
 const MESHES = [cube_W_OBJ, cube_Y_OBJ];
 
 export function init(
-	gl: WebGL2RenderingContext,
 	type: Type,
 	translateVec: number[],
 	parentNode: Node<State>
@@ -27,18 +27,18 @@ export function init(
 	let blockOBJ = MESHES[type];
 
 	// SHADERS
-	const programInfo = getShader(gl, true /* useTextures */);
+	const programInfo = getShader(true /* useTextures */);
 	gl.useProgram(programInfo.program);
 
 	// CREATE MODEL
-	const vao = MakeVAO(gl, programInfo.program, {
+	const vao = MakeVAO(programInfo.program, {
 		positions: blockOBJ.vertices,
 		normals: blockOBJ.vertexNormals,
 		indices: blockOBJ.indices,
 		uvCoord: blockOBJ.textures,
 	});
 
-	const SetupTextureRender = MakeTexture(gl, programInfo, {
+	const SetupTextureRender = MakeTexture(programInfo, {
 		dataSrc: cubeTextureSrc,
 	});
 

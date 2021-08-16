@@ -39,15 +39,15 @@ async function init() {
 	let editorCamera = Camera.Init("editor");
 	editorCamera.Update();
 
-	Input.Init(gl);
+	Input.Init();
 
-	DebugLine.Setup(gl);
+	DebugLine.Setup();
 
 	// Setup Scenegraph nodes
 	Map.DrawGrid();
 	Map.InitSampleCubes();
-	Map.Init(gl);
-	toad.init(gl);
+	Map.Init();
+	toad.Init();
 
 	// Add some light
 	let sunlightColor = [0.9, 1.0, 1.0, 1.0];
@@ -63,16 +63,7 @@ async function init() {
 	DebugLine.DrawLine([0, 0, 0], [0, 5, 0], 2);
 	DebugLine.DrawLine([0, 0, 0], [0, 0, 5], 3);
 
-	Engine.Start();
-
-	// Engine.EnableRaycast(
-	// 	canvas,
-	// 	{
-	// 		width: canvas.width,
-	// 		height: canvas.height,
-	// 	},
-	// 	cameraWorldCoord
-	// );
+	Engine.Start(); // v-v-vroom
 }
 
 export function GetMode() {

@@ -3,6 +3,7 @@ import { utils } from "../utils/utils";
 import * as Engine from "./Core";
 import { Light } from "./Lights";
 import { WebGLProgramInfo } from "./Shaders";
+import { gl } from "./Core";
 
 // Object containing data useful for rendering
 interface DrawInfo {
@@ -10,7 +11,7 @@ interface DrawInfo {
 	programInfo: WebGLProgramInfo;
 	bufferLength: number;
 	vertexArrayObject: WebGLVertexArrayObject;
-	texture?: () => void
+	texture?: () => void;
 }
 
 // A function that receives the state of the Node and performs actions on it
@@ -100,10 +101,10 @@ export class RenderNode<T extends State> extends Node<T> {
 		worldMatrix?: number[]
 	) {
 		super.Update(deltaTime, VPMatrix, worldMatrix);
-		Engine.QueueRender((gl: WebGL2RenderingContext) => this.Render(gl, VPMatrix));
+		Engine.QueueRender(() => this.Render(VPMatrix));
 	}
 
-	Render(gl: WebGL2RenderingContext, VPMatrix: number[]) {
+	Render(VPMatrix: number[]) {
 		gl.useProgram(this.state.drawInfo.programInfo.program);
 
 		let projectionMatrix = utils.multiplyMatrices(
@@ -130,13 +131,16 @@ export class RenderNode<T extends State> extends Node<T> {
 			utils.transposeMatrix(this.state.worldMatrix)
 		);
 
-		gl.uniform3fv(this.state.drawInfo.programInfo.locations.materialDiffColor, this.state.drawInfo.materialColor);
+		gl.uniform3fv(
+			this.state.drawInfo.programInfo.locations.materialDiffColor,
+			this.state.drawInfo.materialColor
+		);
 
-		Engine.BindAllLightUniforms(gl, this.state.drawInfo.programInfo);
+		Engine.BindAllLightUniforms(this.state.drawInfo.programInfo);
 
 		// Render Texture
 		if (this.state.drawInfo.texture) {
-			this.state.drawInfo.texture()
+			this.state.drawInfo.texture();
 		}
 
 		gl.bindVertexArray(this.state.drawInfo.vertexArrayObject);

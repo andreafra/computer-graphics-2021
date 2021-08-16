@@ -2,6 +2,7 @@ import * as Block from "./models/Block";
 import * as Core from "./engine/Core";
 import * as SceneGraph from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
+import { gl } from "./engine/Core";
 export enum CellType {
 	Empty = 0,
 	BlockWhite = 1,
@@ -32,7 +33,7 @@ for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
 	}
 }
 
-export function Init(gl: WebGL2RenderingContext) {
+export function Init() {
 	let mapRoot = new SceneGraph.Node("map-root");
 	mapRoot.SetParent(Core.ROOT_NODE);
 
@@ -51,10 +52,10 @@ export function Init(gl: WebGL2RenderingContext) {
 					case CellType.Empty:
 						break;
 					case CellType.BlockWhite:
-						Block.init(gl, Block.Type.White, spawnCoord, mapRoot);
+						Block.init(Block.Type.White, spawnCoord, mapRoot);
 						break;
 					case CellType.BlockYellow:
-						Block.init(gl, Block.Type.Yellow, spawnCoord, mapRoot);
+						Block.init(Block.Type.Yellow, spawnCoord, mapRoot);
 						break;
 					default:
 						break;
