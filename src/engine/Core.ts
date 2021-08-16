@@ -7,8 +7,8 @@ import { WebGLProgramInfo } from "./Shaders";
 
 export const ROOT_NODE: Node<State> = new Node("root");
 export let gl: WebGL2RenderingContext;
-let projectionMatrix = utils.identityMatrix();
-let cameraMatrix = utils.identityMatrix();
+export let projectionMatrix = utils.identityMatrix();
+export let cameraMatrix = utils.identityMatrix();
 
 const N_LIGHTS = 16;
 const lights = new Array<Light>(N_LIGHTS);
