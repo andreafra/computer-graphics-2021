@@ -3,7 +3,7 @@ import * as Engine from "./engine/Core";
 import * as Editor from "./Editor";
 import { CellType } from "./Map";
 import { Camera } from "./Camera";
-import { GetEditorMode } from "./main";
+import { GetMode } from "./main";
 
 let editorCamera: Camera;
 
@@ -41,7 +41,7 @@ export var moveDir = [0, 0, 0];
 // to listen for both a key release and a key press
 
 function HandleInputFromKeyboad(ev: KeyboardEvent) {
-	if (GetEditorMode() === "EDITOR") {
+	if (GetMode() === "EDITOR") {
 		let t: number[];
 
 		switch (ev.key) {
@@ -119,7 +119,7 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 				break;
 		}
 	}
-	if (GetEditorMode() === "GAME") {
+	if (GetMode() === "GAME") {
 		switch (ev.key) {
 			// Movement
 			case "w":
@@ -149,7 +149,7 @@ function HandleInputFromKeyboad(ev: KeyboardEvent) {
 }
 
 function HandleInputReleaseFromKeyboard(ev: KeyboardEvent) {
-	if (GetEditorMode() === "GAME") {
+	if (GetMode() === "GAME") {
 		switch (ev.key) {
 			// Movement
 			case "w":

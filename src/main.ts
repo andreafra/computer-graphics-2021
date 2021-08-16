@@ -12,7 +12,7 @@ import * as Map from "./Map";
 
 type Mode = "EDITOR" | "GAME";
 
-let editorMode: Mode = "EDITOR";
+let mode: Mode = "EDITOR";
 
 async function init() {
 	const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
@@ -75,8 +75,8 @@ async function init() {
 	// );
 }
 
-export function GetEditorMode() {
-	return editorMode;
+export function GetMode() {
+	return mode;
 }
 
 window.onload = () => init();
