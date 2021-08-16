@@ -1,12 +1,67 @@
 import { DrawLine, LineColor } from "./debug/Lines";
 import { utils } from "../utils/utils";
-import { cameraMatrix, projectionMatrix, GetCameraPosition } from "./Core";
+import {
+	cameraMatrix,
+	GetSceneRenderNodes,
+	gl,
+	projectionMatrix,
+} from "./Core";
+import { Camera } from "../Camera";
+import { RenderNode, State } from "./SceneGraph";
+import * as Engine from "./Core";
 
-export function RayCast(
-	gl: WebGL2RenderingContext,
-	x: number,
-	y: number
-) {
+interface Ray {
+	origin: number[];
+	dir: number[];
+	invDir: number[];
+	sign: number[];
+}
+type HitNode = [RenderNode<State>, number[]];
+
+export function GetNodeWithRaycast(x: number, y: number, camera: Camera) {
+	let ray = GetRay(x, y, camera);
+
+	let hitNodes: HitNode[] = GetSceneRenderNodes()
+		.map((node) => {
+			// DEBUG: Draw bounding boxes
+			// let b = node.bounds;
+			// let minNx = b[0].slice();
+			// minNx[0] += 1;
+			// let minNy = b[0].slice();
+			// minNy[1] += 1;
+			// let minNz = b[0].slice();
+			// minNz[2] += 1;
+			// let maxNx = b[1].slice();
+			// maxNx[0] -= 1;
+			// let maxNy = b[1].slice();
+			// maxNy[1] -= 1;
+			// let maxNz = b[1].slice();
+			// maxNz[2] -= 1;
+			// DrawLine(b[0], minNx, LineColor.RED);
+			// DrawLine(b[0], minNy, LineColor.RED);
+			// DrawLine(b[0], minNz, LineColor.RED);
+			// DrawLine(b[1], maxNx, LineColor.RED);
+			// DrawLine(b[1], maxNy, LineColor.RED);
+			// DrawLine(b[1], maxNz, LineColor.RED);
+
+			let hit = Intersect(node, ray);
+
+			return hit ? ([node, hit] as HitNode) : null;
+		})
+		.filter((t) => t != undefined)
+		.sort(
+			(
+				a: [RenderNode<State>, number[]],
+				b: [RenderNode<State>, number[]]
+			) =>
+				utils.Distance(a[1], ray.origin) -
+				utils.Distance(b[1], ray.origin)
+		);
+
+	return hitNodes.length > 0 ? hitNodes[0] : null;
+}
+
+function GetRay(x: number, y: number, camera: Camera) {
 	const normX = (2 * x) / gl.canvas.width - 1;
 	const normY = 1 - (2 * y) / gl.canvas.height;
 
@@ -35,19 +90,73 @@ export function RayCast(
 	];
 
 	//We find the direction expressed in world coordinates by multipling with the inverse of the view matrix
-	const rayDir = utils.multiplyMatrixVector(invView, rayEyeCoords);
-	const normalisedRayDir = utils.normalize(rayDir);
-	//The ray starts from the camera in world coordinates
-
-	var rayStartPoint = GetCameraPosition();
-
-	// Draw the ray we're casting
-	DrawLine(
-		rayStartPoint,
-		utils.addVectors(
-			rayStartPoint,
-			utils.multiplyVectorScalar(rayDir, 100)
-		),
-		LineColor.PURPLE
+	const rayDir = utils.normalize(
+		utils.multiplyMatrixVector(invView, rayEyeCoords)
 	);
+
+	var rayStartPoint = Engine.GetCameraPosition();
+
+	const invDir = [1 / rayDir[0], 1 / rayDir[1], 1 / rayDir[2]];
+	const sign = [
+		invDir[0] < 0 ? 1 : 0,
+		invDir[1] < 0 ? 1 : 0,
+		invDir[2] < 0 ? 1 : 0,
+	];
+
+	const ray: Ray = {
+		origin: rayStartPoint,
+		dir: rayDir,
+		invDir: invDir,
+		sign: sign,
+	};
+
+	// DEBUG: Draw the ray we're casting
+	// DrawLine(
+	// 	rayStartPoint,
+	// 	utils.addVectors(
+	// 		rayStartPoint,
+	// 		utils.multiplyVectorScalar(rayDir, 100)
+	// 	),
+	// 	LineColor.PURPLE
+	// );
+
+	return ray;
+}
+
+// For in-depth explaination, refer to https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+function Intersect(
+	node: RenderNode<State>,
+	ray: { origin: number[]; dir: number[]; invDir: number[]; sign: number[] }
+) {
+	let tmin, tmax, tymin, tymax, tzmin, tzmax;
+
+	tmin = (node.bounds[ray.sign[0]][0] - ray.origin[0]) * ray.invDir[0];
+	tmax = (node.bounds[1 - ray.sign[0]][0] - ray.origin[0]) * ray.invDir[0];
+
+	tymin = (node.bounds[ray.sign[1]][1] - ray.origin[1]) * ray.invDir[1];
+	tymax = (node.bounds[1 - ray.sign[1]][1] - ray.origin[1]) * ray.invDir[1];
+
+	if (tmin > tymax || tymin > tmax) return null;
+	if (tymin > tmin) tmin = tymin;
+	if (tymax < tmax) tmax = tymax;
+
+	tzmin = (node.bounds[ray.sign[2]][2] - ray.origin[2]) * ray.invDir[2];
+	tzmax = (node.bounds[1 - ray.sign[2]][2] - ray.origin[2]) * ray.invDir[2];
+
+	if (tmin > tzmax || tzmin > tmax) return null;
+	if (tzmin > tmin) tmin = tzmin;
+	if (tzmax < tmax) tmax = tzmax;
+
+	let minPoint = utils.addVectors(
+		ray.origin,
+		utils.multiplyVectorScalar(ray.dir, tmin)
+	);
+	// What's for?
+	// let maxPoint = utils.addVectors(
+	// 	ray.origin,
+	// 	utils.multiplyVectorScalar(ray.dir, tmax)
+	// );
+	// return { min: minPoint, max: maxPoint };
+
+	return minPoint;
 }

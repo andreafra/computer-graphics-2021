@@ -4,7 +4,7 @@ import { CellType } from "./Map";
 import { Camera } from "./Camera";
 import { GetMode } from "./main";
 import { gl } from "./engine/Core";
-import { RayCast } from "./engine/Raycast";
+import { GetNodeWithRaycast } from "./engine/Raycast";
 
 let editorCamera: Camera;
 
@@ -212,7 +212,9 @@ function HandleInputPointerDown(ev: PointerEvent) {
 	isPointerActive = true;
 
 	// Raycast
-	RayCast(gl, ev.clientX, ev.clientY);
+	let selectedNode = GetNodeWithRaycast(ev.clientX, ev.clientY, editorCamera);
+	if (selectedNode)
+		console.log(`Select ${selectedNode[0].name} at ${selectedNode[1]}`);
 }
 
 function HandleInputScroll(ev: any) {
