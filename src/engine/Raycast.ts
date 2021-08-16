@@ -1,13 +1,11 @@
 import { DrawLine, LineColor } from "./debug/Lines";
 import { utils } from "../utils/utils";
-import { cameraMatrix, projectionMatrix } from "./Core";
-import { Camera } from "../Camera";
+import { cameraMatrix, projectionMatrix, GetCameraPosition } from "./Core";
 
 export function RayCast(
 	gl: WebGL2RenderingContext,
 	x: number,
-	y: number,
-	camera: Camera
+	y: number
 ) {
 	const normX = (2 * x) / gl.canvas.width - 1;
 	const normY = 1 - (2 * y) / gl.canvas.height;
@@ -41,7 +39,7 @@ export function RayCast(
 	const normalisedRayDir = utils.normalize(rayDir);
 	//The ray starts from the camera in world coordinates
 
-	var rayStartPoint = camera.GetPosition();
+	var rayStartPoint = GetCameraPosition();
 
 	// Draw the ray we're casting
 	DrawLine(

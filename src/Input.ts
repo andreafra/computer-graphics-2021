@@ -212,7 +212,7 @@ function HandleInputPointerDown(ev: PointerEvent) {
 	isPointerActive = true;
 
 	// Raycast
-	RayCast(gl, ev.clientX, ev.clientY, editorCamera);
+	RayCast(gl, ev.clientX, ev.clientY);
 }
 
 function HandleInputScroll(ev: any) {
