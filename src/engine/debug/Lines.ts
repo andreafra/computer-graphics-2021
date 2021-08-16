@@ -112,6 +112,6 @@ export function Render(VPMatrix: number[]) {
 			utils.transposeMatrix(projectionMatrix)
 		);
 		gl.uniform3fv(line.colorLoc, COLORS[line.color]);
-		gl.drawArrays(gl.LINES, 0, 6);
+		gl.drawArrays(gl.LINES, 0, 2);
 	}
 }
