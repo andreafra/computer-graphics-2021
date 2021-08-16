@@ -2,16 +2,11 @@ import { utils } from "../utils/utils";
 import { Light } from "./Lights";
 //import { DoRaycast } from "./Raycast";
 import { Node, RenderNode, State } from "./SceneGraph";
-import * as Input from "./Input";
-import * as DebugLine from "../debug/Lines";
+import * as DebugLine from "./debug/Lines";
 import { WebGLProgramInfo } from "./Shaders";
 
-type Mode = "EDITOR" | "GAME";
-
-export var EditorMode: Mode = "EDITOR";
-
 export const ROOT_NODE: Node<State> = new Node("root");
-let gl: WebGL2RenderingContext;
+export let gl: WebGL2RenderingContext;
 let projectionMatrix = utils.identityMatrix();
 let cameraMatrix = utils.identityMatrix();
 
@@ -19,7 +14,7 @@ const N_LIGHTS = 16;
 const lights = new Array<Light>(N_LIGHTS);
 let lightIdx = 0;
 
-let renderQueue: ((gl: WebGL2RenderingContext) => void)[] = [];
+let renderQueue: (() => void)[] = [];
 
 // Entrypoint of the WebGL program
 export function Setup(_gl: WebGL2RenderingContext) {
@@ -28,8 +23,6 @@ export function Setup(_gl: WebGL2RenderingContext) {
 	// ONCE
 	gl.clearColor(1, 1, 1, 1);
 	gl.enable(gl.DEPTH_TEST);
-
-	Input.Init(gl);
 }
 
 let lastUpdate: DOMHighResTimeStamp = 0;
@@ -54,10 +47,10 @@ function Render(time: DOMHighResTimeStamp) {
 	renderQueue = [];
 	ROOT_NODE.Update(deltaTime, viewProjectionMatrix);
 	for (let renderFunction of renderQueue) {
-		renderFunction(gl);
+		renderFunction();
 	}
 
-	DebugLine.Render(gl, viewProjectionMatrix);
+	DebugLine.Render(viewProjectionMatrix);
 
 	// Render next frame
 	requestAnimationFrame(Render);
@@ -88,14 +81,11 @@ export function GetTime() {
 	return lastUpdate;
 }
 
-export function QueueRender(renderAction: (gl: WebGL2RenderingContext) => void) {
+export function QueueRender(renderAction: () => void) {
 	renderQueue.push(renderAction);
 }
 
-export function BindAllLightUniforms(
-	gl: WebGL2RenderingContext,
-	programInfo: WebGLProgramInfo
-) {
+export function BindAllLightUniforms(programInfo: WebGLProgramInfo) {
 	gl.uniform3fv(
 		programInfo.locations.lightType,
 		lights.map((l) => l.EncodeTypeOneHot()).flat(1)

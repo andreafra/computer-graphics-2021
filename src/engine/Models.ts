@@ -1,3 +1,4 @@
+import { gl } from "./Core";
 import { WebGLProgramInfo } from "./Shaders";
 
 interface TextureData {
@@ -6,7 +7,6 @@ interface TextureData {
 
 // Returns a function to call during the rendering step
 export function MakeTexture(
-	gl: WebGL2RenderingContext,
 	programInfo: WebGLProgramInfo,
 	textureData: TextureData
 ) {
@@ -50,11 +50,7 @@ interface VertexArrayObjectData {
 	indices: number[];
 }
 
-export function MakeVAO(
-	gl: WebGL2RenderingContext,
-	program: WebGLProgram,
-	data: VertexArrayObjectData
-) {
+export function MakeVAO(program: WebGLProgram, data: VertexArrayObjectData) {
 	// Setup Attribute Location (requires a shader)
 	// GLSL in vars names are now fixed
 	const positionAttribLoc = gl.getAttribLocation(program, GLSL_POSITION_VAR);

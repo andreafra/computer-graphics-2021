@@ -1,4 +1,5 @@
-import { utils } from "../utils/utils";
+import { utils } from "../../utils/utils";
+import { gl } from "../Core";
 
 // Vertex shader source code
 const vertexShaderSrc = `#version 300 es
@@ -56,12 +57,7 @@ let lines: Line[] = [];
 
 let program: WebGLProgram;
 
-let gl: WebGL2RenderingContext;
-
-export function Setup(_gl: WebGL2RenderingContext) {
-	// gl context
-	gl = _gl;
-
+export function Setup() {
 	// Shaders
 	program = utils.createAndCompileShaders(gl, [
 		vertexShaderSrc,
@@ -70,7 +66,6 @@ export function Setup(_gl: WebGL2RenderingContext) {
 }
 
 export function DrawLine(
-	//gl: WebGL2RenderingContext,
 	start: number[],
 	end: number[],
 	color: LineColor = LineColor.BLACK
@@ -105,7 +100,7 @@ export function DrawLine(
 	});
 }
 
-export function Render(gl: WebGL2RenderingContext, VPMatrix: number[]) {
+export function Render(VPMatrix: number[]) {
 	gl.useProgram(program);
 	for (const line of lines) {
 		let projectionMatrix = utils.multiplyMatrices(VPMatrix, line.matrix);

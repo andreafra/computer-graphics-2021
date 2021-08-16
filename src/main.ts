@@ -2,12 +2,17 @@ import "./style.css";
 import { utils } from "./utils/utils";
 import * as Engine from "./engine/Core";
 import * as toad from "./models/Toad";
-import * as block from "./models/Block";
-import * as Map from "./engine/Map";
 import { Light } from "./engine/Lights";
 import { LightNode } from "./engine/SceneGraph";
-import * as Camera from "./engine/Camera";
-import * as DebugLine from "./debug/Lines";
+import * as DebugLine from "./engine/debug/Lines";
+
+import { Camera } from "./Camera";
+import * as Input from "./Input";
+import * as Map from "./Map";
+
+type Mode = "EDITOR" | "GAME";
+
+let mode: Mode = "EDITOR";
 
 async function init() {
 	const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
@@ -29,15 +34,20 @@ async function init() {
 	);
 
 	Engine.Setup(gl);
-	Camera.Update();
 
-	DebugLine.Setup(gl);
+	// Setup camera for editor
+	let editorCamera = Camera.Init("editor");
+	editorCamera.Update();
+
+	Input.Init();
+
+	DebugLine.Setup();
 
 	// Setup Scenegraph nodes
 	Map.DrawGrid();
 	Map.InitSampleCubes();
-	Map.Init(gl);
-	toad.init(gl);
+	Map.Init();
+	toad.Init();
 
 	// Add some light
 	let sunlightColor = [0.9, 1.0, 1.0, 1.0];
@@ -53,16 +63,11 @@ async function init() {
 	DebugLine.DrawLine([0, 0, 0], [0, 5, 0], 2);
 	DebugLine.DrawLine([0, 0, 0], [0, 0, 5], 3);
 
-	Engine.Start();
+	Engine.Start(); // v-v-vroom
+}
 
-	// Engine.EnableRaycast(
-	// 	canvas,
-	// 	{
-	// 		width: canvas.width,
-	// 		height: canvas.height,
-	// 	},
-	// 	cameraWorldCoord
-	// );
+export function GetMode() {
+	return mode;
 }
 
 window.onload = () => init();
