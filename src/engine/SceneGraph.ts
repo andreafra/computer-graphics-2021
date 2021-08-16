@@ -100,6 +100,36 @@ export class Node<T extends State> {
 }
 
 export class RenderNode<T extends State> extends Node<T> {
+	// [0] is min, [1] is max
+	// Default is a cube 1x1x1 with center at 0.0,0.5,0.0 since our models grow up on the Y axis
+	_bounds: number[][] = [
+		[-0.5, 0, -0.5],
+		[0.5, 1, 0.5],
+	];
+
+	set bounds(value: number[][]) {
+		this._bounds = value;
+	}
+
+	get bounds(): number[][] {
+		let x = this.state.localMatrix[3];
+		let y = this.state.localMatrix[7];
+		let z = this.state.localMatrix[11];
+
+		return [
+			[
+				this._bounds[0][0] + x,
+				this._bounds[0][1] + y,
+				this._bounds[0][2] + z,
+			],
+			[
+				this._bounds[1][0] + x,
+				this._bounds[1][1] + y,
+				this._bounds[1][2] + z,
+			],
+		];
+	}
+
 	override Update(
 		deltaTime: number,
 		VPMatrix: number[],

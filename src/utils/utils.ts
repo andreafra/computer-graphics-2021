@@ -700,4 +700,12 @@ export class utils {
 	static Clamp = (value: number, min: number, max: number) => {
 		return Math.min(max, Math.max(min, value));
 	};
+
+	static Distance = (a: number[], b: number[]) => {
+		let sum = 0;
+		for (let i = 0; i < a.length; i++) {
+			sum += Math.pow(a[i] - b[i], 2);
+		}
+		return Math.sqrt(sum);
+	};
 }
