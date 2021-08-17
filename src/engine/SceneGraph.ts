@@ -104,6 +104,10 @@ export class Node<T extends State> {
 	Remove() {
 		this.SetParent(null);
 	}
+
+	GetLocalCoordinates() {
+		return utils.ComputePosition(this.state.localMatrix, [0, 0, 0]);
+	}
 }
 
 export class RenderNode<T extends State> extends Node<T> {
@@ -135,11 +139,6 @@ export class RenderNode<T extends State> extends Node<T> {
 				this._bounds[1][2] + z,
 			],
 		];
-	}
-
-	GetLocalCoordinates() {
-		let c = this.state.localMatrix;
-		return [c[3], c[7], c[11]];
 	}
 
 	override Update(
