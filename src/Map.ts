@@ -15,6 +15,7 @@ export class Cell {
 
 const MAP_MAX_XZ_SIZE = 8;
 const MAP_MAX_Y_SIZE = 8;
+const HALF_MAP_SIZE = MAP_MAX_XZ_SIZE / 2;
 
 type Map = Cell[][][];
 
@@ -78,25 +79,33 @@ export function ClampMapCoordinates(v: number[]) {
 }
 
 export function DrawGrid() {
-	const halfMapSize = MAP_MAX_XZ_SIZE / 2;
 	const color = DebugLine.LineColor.GREY;
 	const epsilon = -0.00001; // so we can see the axis
 	for (let x = 0; x <= MAP_MAX_XZ_SIZE; x++) {
-		let _x = x - halfMapSize;
+		let _x = x - HALF_MAP_SIZE;
 		DebugLine.DrawLine(
-			[_x, epsilon, -halfMapSize],
-			[_x, epsilon, halfMapSize],
+			[_x, epsilon, -HALF_MAP_SIZE],
+			[_x, epsilon, HALF_MAP_SIZE],
 			color
 		);
 	}
 	for (let z = 0; z <= MAP_MAX_XZ_SIZE; z++) {
-		let _z = z - halfMapSize;
+		let _z = z - HALF_MAP_SIZE;
 		DebugLine.DrawLine(
-			[-halfMapSize, epsilon, _z],
-			[halfMapSize, epsilon, _z],
+			[-HALF_MAP_SIZE, epsilon, _z],
+			[HALF_MAP_SIZE, epsilon, _z],
 			color
 		);
 	}
+}
+
+export function ToMapCoords(n: number[]) {
+	let p = [];
+	p[0] = Math.floor(n[0]) + HALF_MAP_SIZE;
+	let y = Math.floor(n[1]);
+	p[1] = Math.max(y, 0);
+	p[2] = Math.floor(n[2]) + HALF_MAP_SIZE;
+	return p;
 }
 
 export function InitSampleCubes() {

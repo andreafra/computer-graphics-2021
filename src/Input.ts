@@ -1,10 +1,10 @@
 import { utils } from "./utils/utils";
 import * as Editor from "./Editor";
-import { CellType } from "./Map";
+import * as Map from "./Map";
 import { Camera } from "./Camera";
 import { GetMode } from "./main";
 import { gl } from "./engine/Core";
-import { GetNodeWithRaycast } from "./engine/Raycast";
+import * as Raycast from "./engine/Raycast";
 
 let editorCamera: Camera;
 
@@ -97,13 +97,13 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 
 			// Change blocks
 			case "0":
-				Editor.SetActiveBlock(CellType.Empty);
+				Editor.SetActiveBlock(Map.CellType.Empty);
 				break;
 			case "1":
-				Editor.SetActiveBlock(CellType.BlockWhite);
+				Editor.SetActiveBlock(Map.CellType.BlockWhite);
 				break;
 			case "2":
-				Editor.SetActiveBlock(CellType.BlockYellow);
+				Editor.SetActiveBlock(Map.CellType.BlockYellow);
 				break;
 
 			// Select block
@@ -212,9 +212,9 @@ function HandleInputPointerDown(ev: PointerEvent) {
 	isPointerActive = true;
 
 	// Raycast
-	let selectedNode = GetNodeWithRaycast(ev.clientX, ev.clientY, editorCamera);
-	if (selectedNode)
-		console.log(`Select ${selectedNode[0].name} at ${selectedNode[1]}`);
+	let hit = Raycast.Hit(ev.clientX, ev.clientY, editorCamera);
+	if (hit.node) console.log(`Select Node ${hit.node.name}`);
+	else console.log(`Select Cell ${Map.ToMapCoords(hit.position)}`);
 }
 
 function HandleInputScroll(ev: any) {
