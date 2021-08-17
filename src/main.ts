@@ -53,7 +53,8 @@ async function init() {
 	toad.Spawn();
 
 	// Add some light
-	let sunlightColor = [1.0, 1.0, 1.0, 1.0];
+	Engine.SetAmbientLight([0.3, 0.3, 0.4]);
+	let sunlightColor = [1.0, 1.0, 0.9, 1.0];
 	let sunlightNode = new LightNode(
 		"sunlight",
 		Light.MakeDirectional(sunlightColor),

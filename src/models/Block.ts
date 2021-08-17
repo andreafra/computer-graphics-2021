@@ -69,6 +69,7 @@ export function Spawn(
 	var blockNode = new RenderNode<CubeState>(`block-${type + 1}`, tMatrix);
 	blockNode.state.drawInfo = {
 		materialColor: [0, 0, 0],
+		materialAmbColor: [1, 1, 1],
 		materialSpecColor: [0.2, 0.2, 0.2],
 		materialEmitColor: [0, 0, 0],
 		programInfo: programInfo,

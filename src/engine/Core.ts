@@ -13,6 +13,7 @@ export let cameraMatrix = utils.identityMatrix();
 const N_LIGHTS = 16;
 const lights = new Array<Light>(N_LIGHTS);
 let lightIdx = 0;
+let ambientLight = [0, 0, 0];
 
 let renderQueue: (() => void)[] = [];
 
@@ -66,6 +67,10 @@ export function SetProjection(m: number[]) {
 
 export function SetCamera(m: number[]) {
 	cameraMatrix = m;
+}
+
+export function SetAmbientLight(color: number[]) {
+	ambientLight = color;
 }
 
 export function Start() {
@@ -122,6 +127,11 @@ export function BindAllLightUniforms(programInfo: WebGLProgramInfo) {
 	gl.uniform4fv(
 		programInfo.locations.lightColor,
 		lights.map((l) => l.lightColor).flat(1)
+	);
+
+	gl.uniform3fv(
+		programInfo.locations.ambientLight,
+		ambientLight
 	);
 }
 

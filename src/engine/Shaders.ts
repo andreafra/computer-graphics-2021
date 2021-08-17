@@ -17,6 +17,7 @@ export interface WebGLProgramInfo {
 	locations: {
 		matrix: WebGLUniformLocation;
 		materialDiffColor: WebGLUniformLocation;
+		materialAmbColor: WebGLUniformLocation;
 		materialSpecColor: WebGLUniformLocation;
 		materialEmitColor: WebGLUniformLocation;
 		normalMatrix: WebGLUniformLocation;
@@ -34,6 +35,7 @@ export interface WebGLProgramInfo {
 		lightDecay: WebGLUniformLocation;
 		lightTarget: WebGLUniformLocation;
 		lightColor: WebGLUniformLocation;
+		ambientLight: WebGLUniformLocation;
 		eyePos: WebGLUniformLocation;
 	};
 	textureNumber?: number;
@@ -70,6 +72,7 @@ export function getShader(features: number) {
 		locations: {
 			matrix: gl.getUniformLocation(program, "matrix"),
 			materialDiffColor: gl.getUniformLocation(program, "mDiffColor"),
+			materialAmbColor: gl.getUniformLocation(program, "mAmbColor"),
 			materialSpecColor: gl.getUniformLocation(program, "mSpecColor"),
 			materialEmitColor: gl.getUniformLocation(program, "mEmitColor"),
 			normalMatrix: gl.getUniformLocation(program, "nMatrix"),
@@ -98,6 +101,7 @@ export function getShader(features: number) {
 			lightDecay: gl.getUniformLocation(program, "LDecay"),
 			lightTarget: gl.getUniformLocation(program, "LTarget"),
 			lightColor: gl.getUniformLocation(program, "LColor"),
+			ambientLight: gl.getUniformLocation(program, "ambientLight"),
 			eyePos: gl.getUniformLocation(program, "eyePos"),
 		},
 	};

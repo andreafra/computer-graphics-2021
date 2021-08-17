@@ -16,6 +16,7 @@ out vec4 outColor;
 uniform vec3 mDiffColor; //material diffuse color
 uniform vec3 mSpecColor;
 uniform vec3 mEmitColor;
+uniform vec3 mAmbColor;
 uniform vec3 eyePos;
 
 #ifdef USE_TEXTURE
@@ -45,6 +46,8 @@ uniform float LConeIn[N_LIGHTS];
 uniform float LDecay[N_LIGHTS];
 uniform float LTarget[N_LIGHTS];
 uniform vec4 LColor[N_LIGHTS];
+
+uniform vec3 ambientLight;
 
 #define SPEC_SHINE 100.0
 
@@ -135,9 +138,11 @@ void main() {
 
 	vec4 diffColor = vec4(mDiffColor, 1.0);
 	vec4 emitColor = vec4(mEmitColor, 1.0);
+	vec4 ambColor = vec4(mAmbColor, 1.0);
 #ifdef USE_TEXTURE
 	diffColor = texture(baseTexture, uvCoord);
 	emitColor = diffColor * max(max(mEmitColor.r, mEmitColor.g), mEmitColor.b);
+	ambColor = diffColor;
 #endif
 #ifdef USE_EMISSIVE_MAP
 	emitColor = texture(emissiveMap, uvCoord);
@@ -152,5 +157,6 @@ void main() {
 
 	vec4 lambertColor = diffColor * lightsDiffuse;
 	vec4 blinnColor = specColor * lightsSpecular;
-	outColor = clamp(lambertColor + blinnColor + emitColor, 0.00, 1.0);
+	vec4 ambientColor = vec4(ambientLight, 1.0) * ambColor;
+	outColor = clamp(lambertColor + blinnColor + emitColor + ambientColor, 0.0, 1.0);
 }

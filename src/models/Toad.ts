@@ -74,6 +74,7 @@ export function Spawn() {
 	var toadNode = new RenderNode<ToadState>("cpt-toad", tMatrix);
 	toadNode.state.drawInfo = {
 		materialColor: [0.0, 0.0, 0.0],
+		materialAmbColor: [1, 1, 1],
 		materialSpecColor: [0.3, 0.3, 0.3],
 		materialEmitColor: [0, 0, 0], // Use emissive map instead
 		programInfo: programInfo,
