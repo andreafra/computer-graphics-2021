@@ -6,6 +6,7 @@
 :root {
 	--ui-size-height: 100px;
 	--ui-size-img: 45px;
+	--ui-size-gap: 10px;
 	--ui-color-bg: rgba(255, 255, 255, 0.35);
 	--ui-color-play-btn: rgba(255, 217, 0, 0.75);
 	--ui-color-play-btn-hover: rgba(206, 151, 0, 0.75);
@@ -32,9 +33,12 @@ body {
 	display: block;
 	position: absolute;
 	height: var(--ui-size-height);
-	width: 100%;
+	top: var(--ui-size-gap);
+	left: var(--ui-size-gap);
+	right: var(--ui-size-gap);
 	background-color: var(--ui-color-bg);
 	backdrop-filter: blur(5px);
+	border-radius: calc(var(--ui-size-height) / 2);
 }
 
 .ui-flex {
@@ -47,14 +51,14 @@ body {
 .ui-right {
 	flex-grow: 0;
 	height: 100%;
-	padding: 10px;
+	padding: var(--ui-size-gap);
 	width: var(--ui-size-height);
 }
 
 .ui-left {
 	flex-grow: 1;
 	height: 100%;
-	padding: 0 10px;
+	padding: 0 var(--ui-size-gap);
 }
 
 .ui-button {
@@ -62,8 +66,8 @@ body {
 	height: 100%;
 	border: none;
 	font-size: 2rem;
-	padding: 0 10px;
-	margin-right: 10px;
+	padding: 0 var(--ui-size-gap);
+	margin-right: var(--ui-size-gap);
 	background-color: var(--ui-color-btn);
 	vertical-align: top;
 }
