@@ -129,7 +129,7 @@ void main() {
 		vec3 lightDir = compLightDir(LPos[i], LDir[i], LType[i]);
 		vec4 lightCol = compLightColor(LColor[i], LTarget[i], LDecay[i], LPos[i], LDir[i],
 									     LConeOut[i], LConeIn[i], LType[i]);
-		lightsDiffuse += dot(lightDir, normalVec) * lightCol;
+		lightsDiffuse += max(0.0, dot(lightDir, normalVec)) * lightCol;
 		lightsSpecular += compSpecular(lightDir, lightCol, normalVec, eyedirVec);
 	}
 
