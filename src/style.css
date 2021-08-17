@@ -2,10 +2,107 @@
 	/* Since it's a fullscreen application, remove annoying  */
 	overflow: hidden;
 }
+
+:root {
+	--ui-size-height: 100px;
+	--ui-size-img: 45px;
+	--ui-color-bg: rgba(255, 255, 255, 0.35);
+	--ui-color-play-btn: rgba(255, 217, 0, 0.75);
+	--ui-color-play-btn-hover: rgba(206, 151, 0, 0.75);
+	--ui-color-btn: rgba(255, 255, 255, 0);
+	--ui-color-btn-hover: rgba(206, 206, 206, 0.3);
+	--ui-color-separator: #aaa;
+	--ui-color-selected: rgb(125, 255, 205, 0.3);
+}
+
+* {
+	box-sizing: border-box;
+}
+
 body {
 	margin: 0;
 	padding: 0;
 	height: 100vh;
 	width: 100vw;
 	background-color: black;
+	position: relative;
+}
+
+#main-ui {
+	display: block;
+	position: absolute;
+	height: var(--ui-size-height);
+	width: 100%;
+	background-color: var(--ui-color-bg);
+	backdrop-filter: blur(5px);
+}
+
+.ui-flex {
+	position: relative;
+	height: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.ui-right {
+	flex-grow: 0;
+	height: 100%;
+	padding: 10px;
+	width: var(--ui-size-height);
+}
+
+.ui-left {
+	flex-grow: 1;
+	height: 100%;
+	padding: 0 10px;
+}
+
+.ui-button {
+	display: inline-block;
+	height: 100%;
+	border: none;
+	font-size: 2rem;
+	padding: 0 10px;
+	margin-right: 10px;
+	background-color: var(--ui-color-btn);
+	vertical-align: top;
+}
+
+.ui-button:hover {
+	background-color: var(--ui-color-btn-hover);
+}
+
+.ui-button .ui-label {
+	font-size: 1rem;
+}
+
+.ui-button img {
+	height: var(--ui-size-img);
+	width: var(--ui-size-img);
+}
+
+.ui-separator {
+	display: inline-block;
+	height: 100%;
+	width: 0;
+	border-left: 2px dotted var(--ui-color-separator);
+	vertical-align: top;
+}
+
+.selected,
+.selected:hover {
+	background-color: var(--ui-color-selected);
+}
+
+#play-btn {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	border-radius: 100%;
+	background-color: var(--ui-color-play-btn);
+	font-size: 2.5rem;
+}
+
+#play-btn:hover {
+	background-color: var(--ui-color-play-btn-hover);
 }

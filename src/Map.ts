@@ -20,6 +20,7 @@ const HALF_MAP_SIZE = MAP_MAX_XZ_SIZE / 2;
 type Map = Cell[][][];
 
 let map: Map = [];
+let mapRoot: SceneGraph.Node<SceneGraph.State>;
 
 // Init map
 for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
@@ -35,7 +36,7 @@ for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
 }
 
 export function Init() {
-	let mapRoot = new SceneGraph.Node("map-root");
+	mapRoot = new SceneGraph.Node("map-root");
 	mapRoot.SetParent(Core.ROOT_NODE);
 
 	for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
@@ -43,26 +44,30 @@ export function Init() {
 			for (let z = 0; z < MAP_MAX_XZ_SIZE; z++) {
 				const block = map[x][y][z];
 
-				const spawnCoord = [
-					x - MAP_MAX_XZ_SIZE / 2 + 0.5,
-					y,
-					z - MAP_MAX_XZ_SIZE / 2 + 0.5,
-				];
-
-				switch (block.type) {
-					case CellType.Empty:
-						break;
-					case CellType.BlockWhite:
-						Block.init(Block.Type.White, spawnCoord, mapRoot);
-						break;
-					case CellType.BlockYellow:
-						Block.init(Block.Type.Yellow, spawnCoord, mapRoot);
-						break;
-					default:
-						break;
-				}
+				InitCell(x, y, z, block);
 			}
 		}
+	}
+}
+
+function InitCell(x: number, y: number, z: number, block: Cell) {
+	const spawnCoord = [
+		x - MAP_MAX_XZ_SIZE / 2 + 0.5,
+		y,
+		z - MAP_MAX_XZ_SIZE / 2 + 0.5,
+	];
+	console.log(block);
+	switch (block.type) {
+		case CellType.Empty:
+			break;
+		case CellType.BlockWhite:
+			Block.init(Block.Type.White, spawnCoord, mapRoot);
+			break;
+		case CellType.BlockYellow:
+			Block.init(Block.Type.Yellow, spawnCoord, mapRoot);
+			break;
+		default:
+			break;
 	}
 }
 
@@ -106,6 +111,31 @@ export function ToMapCoords(n: number[]) {
 	p[1] = Math.max(y, 0);
 	p[2] = Math.floor(n[2]) + HALF_MAP_SIZE;
 	return p;
+}
+
+export function SetCell(coords: number[], type: CellType) {
+	if (AreValidCoordinates(coords)) {
+		let cell = { type: type };
+		map[coords[0]][coords[1]][coords[2]] = cell;
+		InitCell(coords[0], coords[1], coords[2], cell);
+	}
+}
+
+export function GetCell(coords: number[]) {
+	if (AreValidCoordinates(coords)) {
+		return map[coords[0]][coords[1]][coords[2]];
+	} else return null;
+}
+
+function AreValidCoordinates(coords: number[]) {
+	return (
+		coords[0] >= 0 &&
+		coords[1] >= 0 &&
+		coords[2] >= 0 &&
+		coords[0] < MAP_MAX_XZ_SIZE &&
+		coords[1] < MAP_MAX_XZ_SIZE &&
+		coords[2] < MAP_MAX_XZ_SIZE
+	);
 }
 
 export function InitSampleCubes() {
