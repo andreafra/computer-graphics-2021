@@ -137,6 +137,11 @@ export class RenderNode<T extends State> extends Node<T> {
 		];
 	}
 
+	GetLocalCoordinates() {
+		let c = this.state.localMatrix;
+		return [c[3], c[7], c[11]];
+	}
+
 	override Update(
 		deltaTime: number,
 		VPMatrix: number[],

@@ -1,5 +1,6 @@
 import { HitNode } from "./engine/Raycast";
 import * as Map from "./Map";
+import { utils } from "./utils/utils";
 
 type EditMode = "MOVE" | "ADD" | "REMOVE";
 
@@ -20,15 +21,22 @@ export function SetEditMode(mode: EditMode) {
 }
 
 export function DoActionOnSelectedBlock(hit: HitNode) {
-	console.log(activeBlock);
 	if (hit.node) {
 		if (editMode === "REMOVE") {
+			let mapPos = Map.ToMapCoords(
+				utils.addVectors(
+					hit.node.GetLocalCoordinates(),
+					[-0.5, 0.0, -0.5]
+				)
+			);
 			hit.node.Remove();
+			Map.SetCell(mapPos, Map.CellType.Empty);
 		}
 	} else {
 		let mapPos = Map.ToMapCoords(hit.position);
 		if (editMode === "ADD") {
 			let cell = Map.GetCell(mapPos);
+			console.log(cell);
 			if (cell && cell.type === Map.CellType.Empty) {
 				Map.SetCell(mapPos, activeBlock);
 			}
