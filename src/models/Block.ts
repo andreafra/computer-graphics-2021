@@ -7,6 +7,8 @@ import { getShader, Features } from "../engine/Shaders";
 import cube_W_OBJ from "../assets/cube/cube_white.obj";
 import cube_Y_OBJ from "../assets/cube/cube_yellow.obj";
 import cubeTextureSrc from "../assets/cube/grass.png";
+import cubeNormMapSrc from "../assets/cube/grass_norm.png";
+
 import { gl } from "../engine/Core";
 
 // Define common structure for state of these nodes
@@ -27,7 +29,7 @@ export function init(
 	let blockOBJ = MESHES[type];
 
 	// SHADERS
-	const programInfo = getShader(Features.Texture);
+	const programInfo = getShader(Features.Texture | Features.NormalMap);
 	gl.useProgram(programInfo.program);
 
 	// CREATE MODEL
@@ -38,9 +40,14 @@ export function init(
 		uvCoord: blockOBJ.textures,
 	});
 
-	const SetupTextureRender = MakeTexture(programInfo, {
+	const baseTexture = MakeTexture(programInfo, {
 		dataSrc: cubeTextureSrc,
 		type: TextureType.BaseTexture,
+	});
+
+	const normMap = MakeTexture(programInfo, {
+		dataSrc: cubeNormMapSrc,
+		type: TextureType.NormalMap,
 	});
 
 	// SETUP NODES
@@ -57,7 +64,8 @@ export function init(
 		programInfo: programInfo,
 		bufferLength: blockOBJ.indices.length,
 		vertexArrayObject: vao,
-		texture: SetupTextureRender,
+		texture: baseTexture,
+		normalMap: normMap,
 	};
 
 	// Set relationships between nodes
