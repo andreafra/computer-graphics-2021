@@ -4,6 +4,8 @@ import { RenderNode, State } from "../engine/SceneGraph";
 import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 import { gl } from "../engine/Core";
 import { utils } from "../utils/utils";
+import { Light } from "../engine/Lights";
+import { LightNode } from "../engine/SceneGraph";
 
 // Assets
 import toad_OBJ from "../assets/cpt_toad/toad.obj";
@@ -87,7 +89,23 @@ export function Spawn() {
 		ambientOcclusion: ambientOcclusion,
 	};
 
+	var headLight = new LightNode<State>(
+		"headlight",
+		Light.MakeSpot(
+			[1, 0.9, 0.5, 1.0],	// color
+			120,				// coneOut, deg°
+			0.5,				// coneIn, %
+			0.7,				// targetDistance
+			1,					// decay
+		),
+		utils.multiplyMatrices(
+			utils.MakeTranslateMatrix(0, 0.93, 0.5),
+			utils.MakeRotateYMatrix(90),
+		)
+	);
+
 	// Set relationships between nodes
+	headLight.SetParent(toadNode);
 	toadNode.SetParent(Engine.ROOT_NODE);
 
 	return toadNode;

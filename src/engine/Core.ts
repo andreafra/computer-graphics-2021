@@ -126,7 +126,7 @@ export function BindAllLightUniforms(programInfo: WebGLProgramInfo) {
 	);
 	gl.uniform4fv(
 		programInfo.locations.lightColor,
-		lights.map((l) => l.lightColor).flat(1)
+		lights.map((l) => l.color).flat(1)
 	);
 
 	gl.uniform3fv(
