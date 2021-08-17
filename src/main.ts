@@ -50,6 +50,7 @@ async function init() {
 	Map.InitSampleCubes();
 	Map.Init();
 	toad.Init();
+	toad.Spawn();
 
 	// Add some light
 	let sunlightColor = [1.0, 1.0, 1.0, 1.0];

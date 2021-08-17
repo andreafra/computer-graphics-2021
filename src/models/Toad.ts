@@ -1,7 +1,7 @@
 import * as Engine from "../engine/Core";
 import { MakeTexture, MakeVAO, TextureType } from "../engine/Models";
 import { RenderNode, State } from "../engine/SceneGraph";
-import { getShader, Features } from "../engine/Shaders";
+import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 import { gl } from "../engine/Core";
 import { utils } from "../utils/utils";
 
@@ -16,9 +16,17 @@ import ambientOcclusionSrc from "../assets/cpt_toad/Textures/baked_ao.png";
 // Define common structure for state of these nodes
 interface ToadState extends State {}
 
+let programInfo: WebGLProgramInfo;
+let vao: WebGLVertexArrayObject;
+let baseTexture: () => void;
+let emissiveMap: () => void;
+let normalMap: () => void;
+let specularMap: () => void;
+let ambientOcclusion: () => void;
+
 export function Init() {
 	// SHADERS
-	const programInfo = getShader(
+	programInfo = getShader(
 		Features.Texture |
 			Features.EmissiveMap |
 			Features.NormalMap |
@@ -28,34 +36,36 @@ export function Init() {
 	gl.useProgram(programInfo.program);
 
 	// CREATE MODEL
-	const vao = MakeVAO(programInfo.program, {
+	vao = MakeVAO(programInfo.program, {
 		positions: toad_OBJ.vertices,
 		normals: toad_OBJ.vertexNormals,
 		indices: toad_OBJ.indices,
 		uvCoord: toad_OBJ.textures,
 	});
 
-	const baseTexture = MakeTexture(programInfo, {
+	baseTexture = MakeTexture(programInfo, {
 		dataSrc: bodyTextureSrc,
 		type: TextureType.BaseTexture,
 	});
-	const emissiveMap = MakeTexture(programInfo, {
+	emissiveMap = MakeTexture(programInfo, {
 		dataSrc: emissiveMapSrc,
 		type: TextureType.EmissiveMap,
 	});
-	const normalMap = MakeTexture(programInfo, {
+	normalMap = MakeTexture(programInfo, {
 		dataSrc: normalMapSrc,
 		type: TextureType.NormalMap,
 	});
-	const specularMap = MakeTexture(programInfo, {
+	specularMap = MakeTexture(programInfo, {
 		dataSrc: specularMapSrc,
 		type: TextureType.SpecularMap,
 	});
-	const ambientOcclusion = MakeTexture(programInfo, {
+	ambientOcclusion = MakeTexture(programInfo, {
 		dataSrc: ambientOcclusionSrc,
 		type: TextureType.AmbientOcclusion,
 	});
+}
 
+export function Spawn() {
 	// SETUP NODES
 	let tMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(0, 0, 0),

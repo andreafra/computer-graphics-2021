@@ -36,6 +36,8 @@ for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
 }
 
 export function Init() {
+	Block.Init();
+
 	mapRoot = new SceneGraph.Node("map-root");
 	mapRoot.SetParent(Core.ROOT_NODE);
 
@@ -60,10 +62,10 @@ function InitCell(x: number, y: number, z: number, block: Cell) {
 		case CellType.Empty:
 			break;
 		case CellType.BlockWhite:
-			Block.init(Block.Type.White, spawnCoord, mapRoot);
+			Block.Spawn(Block.Type.White, spawnCoord, mapRoot);
 			break;
 		case CellType.BlockYellow:
-			Block.init(Block.Type.Yellow, spawnCoord, mapRoot);
+			Block.Spawn(Block.Type.Yellow, spawnCoord, mapRoot);
 			break;
 		default:
 			break;
