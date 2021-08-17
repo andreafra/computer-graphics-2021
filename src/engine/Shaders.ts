@@ -8,6 +8,7 @@ export enum Features {
 	Texture = 1 << 0,
 	EmissiveMap = 1 << 1,
 	NormalMap = 1 << 2,
+	SpecularMap = 1 << 3,
 }
 
 export interface WebGLProgramInfo {
@@ -22,6 +23,7 @@ export interface WebGLProgramInfo {
 		texture?: WebGLUniformLocation;
 		emissiveMap?: WebGLUniformLocation;
 		normalMap?: WebGLUniformLocation;
+		specularMap?: WebGLUniformLocation;
 		lightType: WebGLUniformLocation;
 		lightPos: WebGLUniformLocation;
 		lightDir: WebGLUniformLocation;
@@ -49,6 +51,10 @@ export function getShader(features: number) {
 	if (features & Features.NormalMap) {
 		vs = vs.replace("//NO_USE_NORMAL_MAP", "#define USE_NORMAL_MAP");
 		fs = fs.replace("//NO_USE_NORMAL_MAP", "#define USE_NORMAL_MAP");
+	}
+	if (features & Features.SpecularMap) {
+		vs = vs.replace("//NO_USE_SPECULAR_MAP", "#define USE_SPECULAR_MAP");
+		fs = fs.replace("//NO_USE_SPECULAR_MAP", "#define USE_SPECULAR_MAP");
 	}
 
 	let program = utils.createAndCompileShaders(gl, [vs, fs]);

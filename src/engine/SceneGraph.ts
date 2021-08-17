@@ -16,6 +16,7 @@ interface DrawInfo {
 	texture?: () => void;
 	emissiveMap?: () => void;
 	normalMap?: () => void;
+	specularMap?: () => void;
 }
 
 // A function that receives the state of the Node and performs actions on it
@@ -164,6 +165,9 @@ export class RenderNode<T extends State> extends Node<T> {
 		}
 		if (this.state.drawInfo.normalMap) {
 			this.state.drawInfo.normalMap();
+		}
+		if (this.state.drawInfo.specularMap) {
+			this.state.drawInfo.specularMap();
 		}
 
 		gl.bindVertexArray(this.state.drawInfo.vertexArrayObject);

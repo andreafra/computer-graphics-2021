@@ -3,6 +3,7 @@
 //NO_USE_TEXTURE
 //NO_USE_EMISSIVE_MAP
 //NO_USE_NORMAL_MAP
+//NO_USE_SPECULAR_MAP
 
 precision mediump float;
 
@@ -24,6 +25,9 @@ uniform sampler2D emissiveMap;
 #endif
 #ifdef USE_NORMAL_MAP
 uniform sampler2D normalMap;
+#endif
+#ifdef USE_SPECULAR_MAP
+uniform sampler2D specularMap;
 #endif
 
 // 3 configurable lights
@@ -122,7 +126,6 @@ void main() {
 		vec4 lightCol = compLightColor(LColor[i], LTarget[i], LDecay[i], LPos[i], LDir[i],
 									     LConeOut[i], LConeIn[i], LType[i]);
 		lightsDiffuse += dot(lightDir, normalVec) * lightCol;
-
 		lightsSpecular += compSpecular(lightDir, lightCol, normalVec, eyedirVec);
 	}
 
@@ -136,6 +139,9 @@ void main() {
 	emitColor = texture(emissiveMap, uvCoord);
 #endif
 	vec4 specColor = vec4(mSpecColor, 1.0);
+#ifdef USE_SPECULAR_MAP
+	specColor = texture(specularMap, uvCoord);
+#endif
 
 	vec4 lambertColor = diffColor * lightsDiffuse;
 	vec4 blinnColor = specColor * lightsSpecular;

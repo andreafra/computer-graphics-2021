@@ -5,6 +5,7 @@ export enum TextureType {
 	BaseTexture,
 	EmissiveMap,
 	NormalMap,
+	SpecularMap,
 }
 
 interface TextureData {
@@ -20,6 +21,8 @@ function MapTextureToLocator(t: TextureType, programInfo: WebGLProgramInfo) {
 			return programInfo.locations.emissiveMap;
 		case TextureType.NormalMap:
 			return programInfo.locations.normalMap;
+		case TextureType.SpecularMap:
+			return programInfo.locations.specularMap;
 	}
 }
 
