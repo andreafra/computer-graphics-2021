@@ -56,7 +56,6 @@ function InitCell(x: number, y: number, z: number, block: Cell) {
 		y,
 		z - MAP_MAX_XZ_SIZE / 2 + 0.5,
 	];
-	console.log(block);
 	switch (block.type) {
 		case CellType.Empty:
 			break;
