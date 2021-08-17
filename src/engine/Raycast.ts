@@ -9,6 +9,7 @@ import {
 import { Camera } from "../Camera";
 import { RenderNode, State } from "./SceneGraph";
 import * as Engine from "./Core";
+import { ToMapCoords } from "../Map";
 
 interface Ray {
 	origin: number[];
@@ -16,10 +17,15 @@ interface Ray {
 	invDir: number[];
 	sign: number[];
 }
-type HitNode = [RenderNode<State>, number[]];
+interface HitNode {
+	node: RenderNode<State>;
+	position: number[];
+}
 
-export function GetNodeWithRaycast(x: number, y: number, camera: Camera) {
+export function Hit(x: number, y: number, camera: Camera) {
 	let ray = GetRay(x, y, camera);
+
+	let planePoint = IntersectPlane(ray);
 
 	let hitNodes: HitNode[] = GetSceneRenderNodes()
 		.map((node) => {
@@ -44,21 +50,20 @@ export function GetNodeWithRaycast(x: number, y: number, camera: Camera) {
 			// DrawLine(b[1], maxNy, LineColor.RED);
 			// DrawLine(b[1], maxNz, LineColor.RED);
 
-			let hit = Intersect(node, ray);
+			let hit = IntersectNode(node, ray);
 
-			return hit ? ([node, hit] as HitNode) : null;
+			return hit ? ({ node: node, position: hit } as HitNode) : null;
 		})
-		.filter((t) => t != undefined)
+		.filter((t) => t)
 		.sort(
-			(
-				a: [RenderNode<State>, number[]],
-				b: [RenderNode<State>, number[]]
-			) =>
-				utils.Distance(a[1], ray.origin) -
-				utils.Distance(b[1], ray.origin)
+			(a: HitNode, b: HitNode) =>
+				utils.Distance(a.position, ray.origin) -
+				utils.Distance(b.position, ray.origin)
 		);
 
-	return hitNodes.length > 0 ? hitNodes[0] : null;
+	return hitNodes.length > 0
+		? hitNodes[0]
+		: ({ node: null, position: planePoint } as HitNode);
 }
 
 function GetRay(x: number, y: number, camera: Camera) {
@@ -124,10 +129,7 @@ function GetRay(x: number, y: number, camera: Camera) {
 }
 
 // For in-depth explaination, refer to https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
-function Intersect(
-	node: RenderNode<State>,
-	ray: { origin: number[]; dir: number[]; invDir: number[]; sign: number[] }
-) {
+function IntersectNode(node: RenderNode<State>, ray: Ray) {
 	let tmin, tmax, tymin, tymax, tzmin, tzmax;
 
 	tmin = (node.bounds[ray.sign[0]][0] - ray.origin[0]) * ray.invDir[0];
@@ -159,4 +161,17 @@ function Intersect(
 	// return { min: minPoint, max: maxPoint };
 
 	return minPoint;
+}
+
+// Base Plane is defined by a normal vector in the origin
+const basePlaneNorm = [0, 1, 0];
+
+// Ray: P = P0 + tV where t is the distance between
+// the ray.origin and the intersected point
+
+function IntersectPlane(ray: Ray) {
+	let t =
+		-utils.dot(ray.origin, basePlaneNorm) /
+		utils.dot(ray.dir, basePlaneNorm);
+	return utils.addVectors(ray.origin, utils.multiplyVectorScalar(ray.dir, t));
 }
