@@ -32,11 +32,22 @@ export function DoActionOnSelectedBlock(hit: HitNode) {
 			hit.node.Remove();
 			Map.SetCell(mapPos, Map.CellType.Empty);
 		}
+		if (editMode === "ADD") {
+			// Sometimes the coordinates are the one of the block, therefore the block is not placed
+			// Keep clicking around and it will spawn eventually lol
+			// This is probably because of the approximations of AABB intersection checks
+			// and the ToMapCoords flooring of those numbers.
+			let pos = Map.ToMapCoords(hit.position);
+			let cell = Map.GetCell(pos);
+			console.log(cell);
+			if (cell && cell.type === Map.CellType.Empty) {
+				Map.SetCell(pos, activeBlock);
+			}
+		}
 	} else {
 		let mapPos = Map.ToMapCoords(hit.position);
 		if (editMode === "ADD") {
 			let cell = Map.GetCell(mapPos);
-			console.log(cell);
 			if (cell && cell.type === Map.CellType.Empty) {
 				Map.SetCell(mapPos, activeBlock);
 			}
