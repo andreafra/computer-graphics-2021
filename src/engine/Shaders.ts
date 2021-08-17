@@ -61,8 +61,14 @@ export function getShader(features: number) {
 		fs = fs.replace("//NO_USE_SPECULAR_MAP", "#define USE_SPECULAR_MAP");
 	}
 	if (features & Features.AmbientOcclusion) {
-		vs = vs.replace("//NO_USE_AMBIENT_OCCLUSION", "#define USE_AMBIENT_OCCLUSION");
-		fs = fs.replace("//NO_USE_AMBIENT_OCCLUSION", "#define USE_AMBIENT_OCCLUSION");
+		vs = vs.replace(
+			"//NO_USE_AMBIENT_OCCLUSION",
+			"#define USE_AMBIENT_OCCLUSION"
+		);
+		fs = fs.replace(
+			"//NO_USE_AMBIENT_OCCLUSION",
+			"#define USE_AMBIENT_OCCLUSION"
+		);
 	}
 
 	let program = utils.createAndCompileShaders(gl, [vs, fs]);

@@ -129,10 +129,7 @@ export function BindAllLightUniforms(programInfo: WebGLProgramInfo) {
 		lights.map((l) => l.color).flat(1)
 	);
 
-	gl.uniform3fv(
-		programInfo.locations.ambientLight,
-		ambientLight
-	);
+	gl.uniform3fv(programInfo.locations.ambientLight, ambientLight);
 }
 
 export function AddLight(light: Light) {

@@ -92,15 +92,15 @@ export function Spawn() {
 	var headLight = new LightNode<State>(
 		"headlight",
 		Light.MakeSpot(
-			[1, 0.9, 0.5, 1.0],	// color
-			120,				// coneOut, deg°
-			0.5,				// coneIn, %
-			0.7,				// targetDistance
-			1,					// decay
+			[1, 0.9, 0.5, 1.0], // color
+			120, // coneOut, deg°
+			0.5, // coneIn, %
+			0.7, // targetDistance
+			1 // decay
 		),
 		utils.multiplyMatrices(
 			utils.MakeTranslateMatrix(0, 0.93, 0.5),
-			utils.MakeRotateYMatrix(90),
+			utils.MakeRotateYMatrix(90)
 		)
 	);
 

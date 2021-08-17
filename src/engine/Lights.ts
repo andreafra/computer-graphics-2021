@@ -39,7 +39,13 @@ export class Light {
 		return l;
 	}
 
-	static MakeSpot(color: number[], coneOut: number, coneIn: number, targetDistance?: number, decay?: number) {
+	static MakeSpot(
+		color: number[],
+		coneOut: number,
+		coneIn: number,
+		targetDistance?: number,
+		decay?: number
+	) {
 		const l = new Light();
 		l.type = LightType.Spot;
 		l.color = color;
