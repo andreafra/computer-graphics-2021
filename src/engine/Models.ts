@@ -4,6 +4,7 @@ import { WebGLProgramInfo } from "./Shaders";
 export enum TextureType {
 	BaseTexture,
 	EmissiveMap,
+	NormalMap,
 }
 
 interface TextureData {
@@ -17,6 +18,8 @@ function MapTextureToLocator(t: TextureType, programInfo: WebGLProgramInfo) {
 			return programInfo.locations.texture;
 		case TextureType.EmissiveMap:
 			return programInfo.locations.emissiveMap;
+		case TextureType.NormalMap:
+			return programInfo.locations.normalMap;
 	}
 }
 

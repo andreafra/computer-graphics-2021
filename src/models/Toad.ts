@@ -9,13 +9,18 @@ import { utils } from "../utils/utils";
 import toad_OBJ from "../assets/cpt_toad/toad.obj";
 import bodyTextureSrc from "../assets/cpt_toad/Textures/baked_txt.png";
 import emissiveMapSrc from "../assets/cpt_toad/Textures/baked_emm.png";
+import normalMapSrc from "../assets/cpt_toad/Textures/baked_nrm.png";
 
 // Define common structure for state of these nodes
 interface ToadState extends State {}
 
 export function Init() {
 	// SHADERS
-	const programInfo = getShader(Features.Texture | Features.EmissiveMap);
+	const programInfo = getShader(
+		Features.Texture |
+		Features.EmissiveMap |
+		Features.NormalMap
+	);
 	gl.useProgram(programInfo.program);
 
 	// CREATE MODEL
@@ -34,6 +39,10 @@ export function Init() {
 		dataSrc: emissiveMapSrc,
 		type: TextureType.EmissiveMap,
 	});
+	const normalMap = MakeTexture(programInfo, {
+		dataSrc: normalMapSrc,
+		type: TextureType.NormalMap,
+	});
 
 	// SETUP NODES
 	let tMatrix = utils.multiplyMatrices(
@@ -50,6 +59,7 @@ export function Init() {
 		vertexArrayObject: vao,
 		texture: baseTexture,
 		emissiveMap: emissiveMap,
+		normalMap: normalMap,
 	};
 
 	// Set relationships between nodes

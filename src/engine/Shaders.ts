@@ -7,6 +7,7 @@ import { gl } from "./Core";
 export enum Features {
 	Texture = 1 << 0,
 	EmissiveMap = 1 << 1,
+	NormalMap = 1 << 2,
 }
 
 export interface WebGLProgramInfo {
@@ -20,6 +21,7 @@ export interface WebGLProgramInfo {
 		positionMatrix: WebGLUniformLocation;
 		texture?: WebGLUniformLocation;
 		emissiveMap?: WebGLUniformLocation;
+		normalMap?: WebGLUniformLocation;
 		lightType: WebGLUniformLocation;
 		lightPos: WebGLUniformLocation;
 		lightDir: WebGLUniformLocation;
@@ -44,6 +46,10 @@ export function getShader(features: number) {
 		vs = vs.replace("//NO_USE_EMISSIVE_MAP", "#define USE_EMISSIVE_MAP");
 		fs = fs.replace("//NO_USE_EMISSIVE_MAP", "#define USE_EMISSIVE_MAP");
 	}
+	if (features & Features.NormalMap) {
+		vs = vs.replace("//NO_USE_NORMAL_MAP", "#define USE_NORMAL_MAP");
+		fs = fs.replace("//NO_USE_NORMAL_MAP", "#define USE_NORMAL_MAP");
+	}
 
 	let program = utils.createAndCompileShaders(gl, [vs, fs]);
 
@@ -61,6 +67,9 @@ export function getShader(features: number) {
 				: undefined,
 			emissiveMap: features & Features.EmissiveMap
 				? gl.getUniformLocation(program, "emissiveMap")
+				: undefined,
+			normalMap: features & Features.NormalMap
+				? gl.getUniformLocation(program, "normalMap")
 				: undefined,
 			lightType: gl.getUniformLocation(program, "LType"),
 			lightPos: gl.getUniformLocation(program, "LPos"),

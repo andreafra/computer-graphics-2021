@@ -1,7 +1,5 @@
 #version 300 es
 
-//NO_USE_TEXTURES
-
 in vec3 a_Position;
 in vec3 a_Normal;
 in vec2 a_UVCoord;

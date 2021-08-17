@@ -15,6 +15,7 @@ interface DrawInfo {
 	vertexArrayObject: WebGLVertexArrayObject;
 	texture?: () => void;
 	emissiveMap?: () => void;
+	normalMap?: () => void;
 }
 
 // A function that receives the state of the Node and performs actions on it
@@ -158,9 +159,11 @@ export class RenderNode<T extends State> extends Node<T> {
 		if (this.state.drawInfo.texture) {
 			this.state.drawInfo.texture();
 		}
-
 		if (this.state.drawInfo.emissiveMap) {
 			this.state.drawInfo.emissiveMap();
+		}
+		if (this.state.drawInfo.normalMap) {
+			this.state.drawInfo.normalMap();
 		}
 
 		gl.bindVertexArray(this.state.drawInfo.vertexArrayObject);

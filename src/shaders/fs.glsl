@@ -2,6 +2,7 @@
 
 //NO_USE_TEXTURE
 //NO_USE_EMISSIVE_MAP
+//NO_USE_NORMAL_MAP
 
 precision mediump float;
 
@@ -20,6 +21,9 @@ uniform sampler2D baseTexture;
 #endif
 #ifdef USE_EMISSIVE_MAP
 uniform sampler2D emissiveMap;
+#endif
+#ifdef USE_NORMAL_MAP
+uniform sampler2D normalMap;
 #endif
 
 // 3 configurable lights
@@ -82,9 +86,33 @@ vec4 compSpecular(vec3 lightDir, vec4 lightCol, vec3 normalVec, vec3 eyedirVec) 
 	return specularBlinn;
 }
 
+mat3 computeTBN(vec3 n_norm) {
+	//// online computation of tangent and bitangent
+
+	// compute derivations of the world position
+	vec3 p_dx = dFdx(fsPosition);
+	vec3 p_dy = dFdy(fsPosition);
+	// compute derivations of the texture coordinate
+	vec2 tc_dx = dFdx(uvCoord);
+	vec2 tc_dy = dFdy(uvCoord);
+	// compute initial tangent and bi-tangent
+	vec3 t = (tc_dy.y * p_dx - tc_dx.y * p_dy) / (tc_dx.x*tc_dy.y - tc_dy.x*tc_dx.y);
+
+	t = normalize(t - n_norm * dot(n_norm, t));
+	vec3 b = normalize(cross(n_norm,t));
+
+	return mat3(t, b, n_norm);
+}
+
 void main() {
 	vec3 normalVec = normalize(fsNormal);
 	vec3 eyedirVec = normalize(eyePos - fsPosition);
+
+#ifdef USE_NORMAL_MAP
+	mat3 tbn = computeTBN(normalVec);
+	vec4 nMap = texture(normalMap, uvCoord);
+	normalVec = normalize(tbn * (nMap.xyz * 2.0 - 1.0));
+#endif
 
 	//lights
 	vec4 lightsDiffuse;
