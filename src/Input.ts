@@ -208,7 +208,7 @@ function HandleInputPointerDown(ev: PointerEvent) {
 
 	if (ev.button == 0 && !ev.ctrlKey) {
 		// Raycast
-		let hit = Raycast.Hit(ev.clientX, ev.clientY, editorCamera);
+		let hit = Raycast.Hit(ev.clientX, ev.clientY);
 		Editor.DoActionOnSelectedBlock(hit);
 	}
 }

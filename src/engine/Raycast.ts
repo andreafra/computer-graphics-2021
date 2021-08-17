@@ -6,10 +6,8 @@ import {
 	gl,
 	projectionMatrix,
 } from "./Core";
-import { Camera } from "../Camera";
 import { RenderNode, State } from "./SceneGraph";
 import * as Engine from "./Core";
-import { ToMapCoords } from "../Map";
 
 interface Ray {
 	origin: number[];
@@ -22,8 +20,8 @@ export interface HitNode {
 	position: number[];
 }
 
-export function Hit(x: number, y: number, camera: Camera) {
-	let ray = GetRay(x, y, camera);
+export function Hit(x: number, y: number) {
+	let ray = GetRay(x, y);
 
 	let planePoint = IntersectPlane(ray);
 
@@ -66,7 +64,7 @@ export function Hit(x: number, y: number, camera: Camera) {
 		: ({ node: null, position: planePoint } as HitNode);
 }
 
-function GetRay(x: number, y: number, camera: Camera) {
+function GetRay(x: number, y: number) {
 	const normX = (2 * x) / gl.canvas.width - 1;
 	const normY = 1 - (2 * y) / gl.canvas.height;
 
