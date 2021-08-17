@@ -84,6 +84,8 @@ export class Node<T extends State> {
 			newParent.children.push(this);
 		}
 		this.parent = newParent;
+
+		return this;
 	};
 
 	AddAction(action: (state: T) => void) {
@@ -97,6 +99,10 @@ export class Node<T extends State> {
 		this.children.forEach((child) =>
 			child.Update(deltaTime, VPMatrix, this.state.worldMatrix)
 		);
+	}
+
+	Remove() {
+		this.SetParent(null);
 	}
 }
 

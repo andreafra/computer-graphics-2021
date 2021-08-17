@@ -100,15 +100,10 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 				Editor.SetActiveBlock(Map.CellType.Empty);
 				break;
 			case "1":
-				Editor.SetActiveBlock(Map.CellType.BlockWhite);
-				break;
-			case "2":
 				Editor.SetActiveBlock(Map.CellType.BlockYellow);
 				break;
-
-			// Select block
-			case "Enter":
-				Editor.DoActionOnSelectedBlock();
+			case "2":
+				Editor.SetActiveBlock(Map.CellType.BlockWhite);
 				break;
 
 			// Camera controls
@@ -211,10 +206,11 @@ function HandleInputPointerDown(ev: PointerEvent) {
 	};
 	isPointerActive = true;
 
-	// Raycast
-	let hit = Raycast.Hit(ev.clientX, ev.clientY, editorCamera);
-	if (hit.node) console.log(`Select Node ${hit.node.name}`);
-	else console.log(`Select Cell ${Map.ToMapCoords(hit.position)}`);
+	if (ev.button == 0 && !ev.ctrlKey) {
+		// Raycast
+		let hit = Raycast.Hit(ev.clientX, ev.clientY, editorCamera);
+		Editor.DoActionOnSelectedBlock(hit);
+	}
 }
 
 function HandleInputScroll(ev: any) {

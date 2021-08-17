@@ -17,7 +17,7 @@ interface Ray {
 	invDir: number[];
 	sign: number[];
 }
-interface HitNode {
+export interface HitNode {
 	node: RenderNode<State>;
 	position: number[];
 }

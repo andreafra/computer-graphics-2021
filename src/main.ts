@@ -5,6 +5,7 @@ import * as toad from "./models/Toad";
 import { Light } from "./engine/Lights";
 import { LightNode } from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
+import * as UI from "./UI";
 
 import { Camera } from "./Camera";
 import * as Input from "./Input";
@@ -39,6 +40,7 @@ async function init() {
 	let editorCamera = Camera.Init("editor");
 	editorCamera.Update();
 
+	UI.Init();
 	Input.Init();
 
 	DebugLine.Setup();

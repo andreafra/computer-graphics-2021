@@ -56,7 +56,7 @@ export function init(
 		translateVec[1],
 		translateVec[2]
 	);
-	var blockNode = new RenderNode<CubeState>(`block-${type}`, tMatrix);
+	var blockNode = new RenderNode<CubeState>(`block-${type + 1}`, tMatrix);
 	blockNode.state.drawInfo = {
 		materialColor: [0, 0, 0],
 		materialSpecColor: [0.2, 0.2, 0.2],
