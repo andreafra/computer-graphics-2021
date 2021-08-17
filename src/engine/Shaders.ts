@@ -9,6 +9,7 @@ export enum Features {
 	EmissiveMap = 1 << 1,
 	NormalMap = 1 << 2,
 	SpecularMap = 1 << 3,
+	AmbientOcclusion = 1 << 4,
 }
 
 export interface WebGLProgramInfo {
@@ -24,6 +25,7 @@ export interface WebGLProgramInfo {
 		emissiveMap?: WebGLUniformLocation;
 		normalMap?: WebGLUniformLocation;
 		specularMap?: WebGLUniformLocation;
+		ambientOcclusion?: WebGLUniformLocation;
 		lightType: WebGLUniformLocation;
 		lightPos: WebGLUniformLocation;
 		lightDir: WebGLUniformLocation;
@@ -56,6 +58,10 @@ export function getShader(features: number) {
 		vs = vs.replace("//NO_USE_SPECULAR_MAP", "#define USE_SPECULAR_MAP");
 		fs = fs.replace("//NO_USE_SPECULAR_MAP", "#define USE_SPECULAR_MAP");
 	}
+	if (features & Features.AmbientOcclusion) {
+		vs = vs.replace("//NO_USE_AMBIENT_OCCLUSION", "#define USE_AMBIENT_OCCLUSION");
+		fs = fs.replace("//NO_USE_AMBIENT_OCCLUSION", "#define USE_AMBIENT_OCCLUSION");
+	}
 
 	let program = utils.createAndCompileShaders(gl, [vs, fs]);
 
@@ -79,6 +85,10 @@ export function getShader(features: number) {
 			normalMap:
 				features & Features.NormalMap
 					? gl.getUniformLocation(program, "normalMap")
+					: undefined,
+			ambientOcclusion:
+				features & Features.AmbientOcclusion
+					? gl.getUniformLocation(program, "ambientOcclusion")
 					: undefined,
 			lightType: gl.getUniformLocation(program, "LType"),
 			lightPos: gl.getUniformLocation(program, "LPos"),

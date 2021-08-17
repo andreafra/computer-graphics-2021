@@ -17,6 +17,7 @@ interface DrawInfo {
 	emissiveMap?: () => void;
 	normalMap?: () => void;
 	specularMap?: () => void;
+	ambientOcclusion?: () => void;
 }
 
 // A function that receives the state of the Node and performs actions on it
@@ -198,6 +199,9 @@ export class RenderNode<T extends State> extends Node<T> {
 		}
 		if (this.state.drawInfo.specularMap) {
 			this.state.drawInfo.specularMap();
+		}
+		if (this.state.drawInfo.ambientOcclusion) {
+			this.state.drawInfo.ambientOcclusion();
 		}
 
 		gl.bindVertexArray(this.state.drawInfo.vertexArrayObject);

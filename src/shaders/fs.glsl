@@ -4,6 +4,7 @@
 //NO_USE_EMISSIVE_MAP
 //NO_USE_NORMAL_MAP
 //NO_USE_SPECULAR_MAP
+//NO_USE_AMBIENT_OCCLUSION
 
 precision mediump float;
 
@@ -28,6 +29,9 @@ uniform sampler2D normalMap;
 #endif
 #ifdef USE_SPECULAR_MAP
 uniform sampler2D specularMap;
+#endif
+#ifdef USE_AMBIENT_OCCLUSION
+uniform sampler2D ambientOcclusion;
 #endif
 
 // 3 configurable lights
@@ -141,6 +145,9 @@ void main() {
 	vec4 specColor = vec4(mSpecColor, 1.0);
 #ifdef USE_SPECULAR_MAP
 	specColor = texture(specularMap, uvCoord);
+#endif
+#ifdef USE_AMBIENT_OCCLUSION
+	diffColor *= texture(ambientOcclusion, uvCoord);
 #endif
 
 	vec4 lambertColor = diffColor * lightsDiffuse;

@@ -11,6 +11,7 @@ import bodyTextureSrc from "../assets/cpt_toad/Textures/baked_txt.png";
 import emissiveMapSrc from "../assets/cpt_toad/Textures/baked_emm.png";
 import normalMapSrc from "../assets/cpt_toad/Textures/baked_nrm.png";
 import specularMapSrc from "../assets/cpt_toad/Textures/baked_spc.png";
+import ambientOcclusionSrc from "../assets/cpt_toad/Textures/baked_ao.png";
 
 // Define common structure for state of these nodes
 interface ToadState extends State {}
@@ -21,7 +22,8 @@ export function Init() {
 		Features.Texture |
 			Features.EmissiveMap |
 			Features.NormalMap |
-			Features.SpecularMap
+			Features.SpecularMap |
+			Features.AmbientOcclusion
 	);
 	gl.useProgram(programInfo.program);
 
@@ -49,6 +51,10 @@ export function Init() {
 		dataSrc: specularMapSrc,
 		type: TextureType.SpecularMap,
 	});
+	const ambientOcclusion = MakeTexture(programInfo, {
+		dataSrc: ambientOcclusionSrc,
+		type: TextureType.AmbientOcclusion,
+	});
 
 	// SETUP NODES
 	let tMatrix = utils.multiplyMatrices(
@@ -67,6 +73,7 @@ export function Init() {
 		emissiveMap: emissiveMap,
 		normalMap: normalMap,
 		specularMap: specularMap,
+		ambientOcclusion: ambientOcclusion,
 	};
 
 	// Set relationships between nodes
