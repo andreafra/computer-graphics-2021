@@ -68,15 +68,18 @@ export function getShader(features: number) {
 			materialEmitColor: gl.getUniformLocation(program, "mEmitColor"),
 			normalMatrix: gl.getUniformLocation(program, "nMatrix"),
 			positionMatrix: gl.getUniformLocation(program, "pMatrix"),
-			texture: features & Features.Texture
-				? gl.getUniformLocation(program, "baseTexture")
-				: undefined,
-			emissiveMap: features & Features.EmissiveMap
-				? gl.getUniformLocation(program, "emissiveMap")
-				: undefined,
-			normalMap: features & Features.NormalMap
-				? gl.getUniformLocation(program, "normalMap")
-				: undefined,
+			texture:
+				features & Features.Texture
+					? gl.getUniformLocation(program, "baseTexture")
+					: undefined,
+			emissiveMap:
+				features & Features.EmissiveMap
+					? gl.getUniformLocation(program, "emissiveMap")
+					: undefined,
+			normalMap:
+				features & Features.NormalMap
+					? gl.getUniformLocation(program, "normalMap")
+					: undefined,
 			lightType: gl.getUniformLocation(program, "LType"),
 			lightPos: gl.getUniformLocation(program, "LPos"),
 			lightDir: gl.getUniformLocation(program, "LDir"),

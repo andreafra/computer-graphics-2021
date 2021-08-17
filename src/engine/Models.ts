@@ -31,8 +31,7 @@ export function MakeTexture(
 	programInfo: WebGLProgramInfo,
 	textureData: TextureData
 ) {
-	if (!programInfo.textureNumber)
-		programInfo.textureNumber = 0;
+	if (!programInfo.textureNumber) programInfo.textureNumber = 0;
 
 	// Copy the texture number
 	let textureNo = programInfo.textureNumber;

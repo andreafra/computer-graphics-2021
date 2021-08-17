@@ -4,8 +4,8 @@ export enum LightType {
 	None = 0,
 	Direct = 1,
 	Point = 2,
-	Spot = 3
-};
+	Spot = 3,
+}
 
 export class Light {
 	lightType: LightType = LightType.None;
@@ -19,8 +19,7 @@ export class Light {
 
 	EncodeTypeOneHot(): number[] {
 		let arr = [0, 0, 0];
-		if (this.lightType != 0)
-			arr[this.lightType - 1] = 1;
+		if (this.lightType != 0) arr[this.lightType - 1] = 1;
 		return arr;
 	}
 
@@ -35,10 +34,8 @@ export class Light {
 		const l = new Light();
 		l.lightType = LightType.Point;
 		l.lightColor = color;
-		if (targetDistance)
-			l.target = targetDistance;
-		if (decay)
-			l.decay = decay;
+		if (targetDistance) l.target = targetDistance;
+		if (decay) l.decay = decay;
 		return l;
 	}
 }

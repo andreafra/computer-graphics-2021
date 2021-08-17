@@ -19,9 +19,9 @@ export function Init() {
 	// SHADERS
 	const programInfo = getShader(
 		Features.Texture |
-		Features.EmissiveMap |
-		Features.NormalMap |
-		Features.SpecularMap
+			Features.EmissiveMap |
+			Features.NormalMap |
+			Features.SpecularMap
 	);
 	gl.useProgram(programInfo.program);
 
@@ -59,7 +59,7 @@ export function Init() {
 	toadNode.state.drawInfo = {
 		materialColor: [0.0, 0.0, 0.0],
 		materialSpecColor: [0.3, 0.3, 0.3],
-		materialEmitColor: [0, 0, 0],	// Use emissive map instead
+		materialEmitColor: [0, 0, 0], // Use emissive map instead
 		programInfo: programInfo,
 		bufferLength: toad_OBJ.indices.length,
 		vertexArrayObject: vao,
