@@ -693,6 +693,58 @@ export class utils {
 		return perspective;
 	};
 
+	// Orthogonal
+	static MakeOrthogonal = (w: number, a: number, n: number, f: number) => {
+		return [
+			1 / w,
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			a / w,
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			-2 / (f - n),
+			-(f + n) / (f - n),
+			0.0,
+			0.0,
+			0.0,
+			1.0,
+		];
+	};
+
+	// Axonometry
+	static MakeIsometric = (w: number, a: number, n: number, f: number) => {
+		return utils.MakeDimetric(w, a, n, f, 35.26);
+	};
+
+	static MakeDimetric = (
+		w: number,
+		a: number,
+		n: number,
+		f: number,
+		angle: number
+	) => {
+		return utils.MakeTrimetric(w, a, n, f, angle, 45);
+	};
+
+	static MakeTrimetric = (
+		w: number,
+		a: number,
+		n: number,
+		f: number,
+		Xangle: number,
+		Yangle: number
+	) => {
+		return utils.multiplyMatrices(
+			utils.MakeOrthogonal(w, a, n, f),
+			utils.MakeRotateXMatrix(Xangle),
+			utils.MakeRotateYMatrix(Yangle)
+		);
+	};
+
 	static ComputePosition(m: number[], v: number[]) {
 		if (v.length < 4) v[3] = 1;
 
