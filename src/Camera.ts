@@ -23,9 +23,9 @@ export class Camera {
 
 	constructor(
 		name: string,
+		dist = MIN_CAMERA_DISTANCE * 3,
 		alpha = 45,
-		beta = 30,
-		dist = MIN_CAMERA_DISTANCE * 2
+		beta = 30
 	) {
 		this.distance = dist;
 		this.alpha = 0;
