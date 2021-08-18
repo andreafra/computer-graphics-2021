@@ -6,6 +6,7 @@ import { gl } from "../engine/Core";
 import { utils } from "../utils/utils";
 import { Light } from "../engine/Lights";
 import { LightNode } from "../engine/SceneGraph";
+import * as Input from "../Input";
 
 // Assets
 import toad_OBJ from "../assets/cpt_toad/toad.obj";
@@ -14,9 +15,13 @@ import emissiveMapSrc from "../assets/cpt_toad/Textures/baked_emm.png";
 import normalMapSrc from "../assets/cpt_toad/Textures/baked_nrm.png";
 import specularMapSrc from "../assets/cpt_toad/Textures/baked_spc.png";
 import ambientOcclusionSrc from "../assets/cpt_toad/Textures/baked_ao.png";
+import { GetActiveCamera } from "../main";
+import { DrawLine, LineColor } from "../engine/debug/Lines";
 
 // Define common structure for state of these nodes
-interface ToadState extends State {}
+interface ToadState extends State {
+	moveSpeed: number;
+}
 
 let programInfo: WebGLProgramInfo;
 let vao: WebGLVertexArrayObject;
@@ -89,6 +94,8 @@ export function Spawn() {
 		ambientOcclusion: ambientOcclusion,
 	};
 
+	toadNode.state.moveSpeed = 2.0;
+
 	var headLight = new LightNode<State>(
 		"headlight",
 		Light.MakeSpot(
@@ -104,9 +111,41 @@ export function Spawn() {
 		)
 	);
 
+	toadNode.AddAction(MovementAction);
+
 	// Set relationships between nodes
 	headLight.SetParent(toadNode);
 	toadNode.SetParent(Engine.ROOT_NODE);
 
 	return toadNode;
 }
+
+const MovementAction = (deltaTime: number, state: ToadState): void => {
+	let position = utils.ComputePosition(state.localMatrix, [0, 0, 0]);
+
+	let camera = GetActiveCamera();
+
+	let alpha = Math.atan2(camera.normDir[0], camera.normDir[2]);
+
+	let localDir = [
+		-Math.sin(alpha) * Input.moveDir[2] +
+			Math.cos(alpha) * Input.moveDir[0],
+		0,
+		-Math.cos(alpha) * Input.moveDir[2] +
+			-Math.sin(alpha) * Input.moveDir[0],
+	];
+
+	let input = utils.multiplyVectorScalar(
+		localDir,
+		deltaTime * state.moveSpeed
+	);
+
+	state.localMatrix = utils.multiplyMatrices(
+		utils.MakeTranslateMatrix(input[0], input[1], input[2]),
+		state.localMatrix
+	);
+
+	// Camera follow toad
+	camera.translation = position;
+	camera.Update();
+};

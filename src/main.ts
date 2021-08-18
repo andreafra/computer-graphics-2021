@@ -15,6 +15,8 @@ type Mode = "EDITOR" | "GAME";
 
 let mode: Mode = "EDITOR";
 
+let editorCamera: Camera, gameCamera: Camera;
+
 async function init() {
 	const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
 	const gl = canvas.getContext("webgl2");
@@ -37,8 +39,10 @@ async function init() {
 	Engine.Setup(gl);
 
 	// Setup camera for editor
-	let editorCamera = Camera.Init("editor");
+	editorCamera = Camera.Init("editor");
 	editorCamera.Update();
+
+	gameCamera = Camera.Init("game");
 
 	UI.Init();
 	Input.Init();
@@ -72,6 +76,16 @@ async function init() {
 
 export function GetMode() {
 	return mode;
+}
+
+export function ToggleMode() {
+	mode = mode === "EDITOR" ? "GAME" : "EDITOR";
+	GetActiveCamera().Update();
+	return mode;
+}
+
+export function GetActiveCamera() {
+	return mode === "EDITOR" ? editorCamera : gameCamera;
 }
 
 window.onload = () => init();

@@ -5,6 +5,7 @@ import grassYellowIcon from "./assets/icons/grass_yellow.png";
 import grassWhiteIcon from "./assets/icons/grass_white.png";
 
 import * as Core from "./engine/Core";
+import { ToggleMode } from "./main";
 
 const ButtonIcon = (
 	icon: string,
@@ -26,7 +27,10 @@ const ButtonImage = (
 
 const contentHtml = `<!-- HTML Added by UI.ts -->
 <div class="ui-flex">
-	<div class="ui-left">
+	<div class="ui-left ui-game hidden">
+		<div class="ui-lives">❤ ❤ ❤</div>
+	</div>
+	<div class="ui-left ui-editor">
 		<!-- ${ButtonIcon("⏏️", "Close")} -->
 		${ButtonIcon("🔧", "Move")}
 		${ButtonIcon("➕", "Add")}
@@ -47,7 +51,8 @@ let moveBtn: HTMLElement,
 	addBtn: HTMLElement,
 	removeBtn: HTMLElement,
 	blockYBtn: HTMLElement,
-	blockWBtn: HTMLElement;
+	blockWBtn: HTMLElement,
+	playBtn: HTMLElement;
 
 export function Init() {
 	container = document.getElementById("main-ui") as HTMLDivElement;
@@ -60,7 +65,7 @@ export function Init() {
 	removeBtn = document.getElementById("remove-btn");
 	blockYBtn = document.getElementById("block-1-btn");
 	blockWBtn = document.getElementById("block-2-btn");
-
+	playBtn = document.getElementById("play-btn");
 	// closeBtn.addEventListener("click", () => {})
 
 	addBtn.addEventListener("click", HandleAddClick);
@@ -68,7 +73,7 @@ export function Init() {
 	removeBtn.addEventListener("click", HandleRemoveClick);
 	blockYBtn.addEventListener("click", HandleBlockYClick);
 	blockWBtn.addEventListener("click", HandleBlockWClick);
-
+	playBtn.addEventListener("click", HandlePlayClick);
 	HandleAddClick(null);
 }
 
@@ -109,4 +114,15 @@ function HandleBlockWClick(ev?: MouseEvent) {
 		blockYBtn.classList.remove("selected");
 		blockWBtn.classList.add("selected");
 	}
+}
+function HandlePlayClick() {
+	let mode = ToggleMode();
+	playBtn.innerText = mode === "EDITOR" ? "▶️" : "■";
+
+	document
+		.querySelectorAll(".ui-editor")
+		.forEach((e) => e.classList.toggle("hidden"));
+	document
+		.querySelectorAll(".ui-game")
+		.forEach((e) => e.classList.toggle("hidden"));
 }

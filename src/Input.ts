@@ -2,11 +2,9 @@ import { utils } from "./utils/utils";
 import * as Editor from "./Editor";
 import * as Map from "./Map";
 import { Camera } from "./Camera";
-import { GetMode } from "./main";
+import { GetActiveCamera, GetMode } from "./main";
 import { gl } from "./engine/Core";
 import * as Raycast from "./engine/Raycast";
-
-let editorCamera: Camera;
 
 let isPointerActive: boolean;
 let isPointerSecondaryActive: boolean;
@@ -31,9 +29,6 @@ export function Init() {
 	gl.canvas.addEventListener("pointermove", HandleInputPointerDrag);
 	gl.canvas.addEventListener("contextmenu", HandleRightClick);
 	gl.canvas.addEventListener("wheel", HandleInputScroll);
-
-	// Get editor camera
-	editorCamera = Camera.Get("editor");
 }
 
 export var moveDir = [0, 0, 0];
@@ -72,27 +67,27 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 
 			// Camera Movement
 			case "ArrowUp":
-				t = editorCamera.translation;
+				t = GetActiveCamera().translation;
 				t[2] -= 1;
-				editorCamera.translation = t;
+				GetActiveCamera().translation = t;
 				break;
 
 			case "ArrowDown":
-				t = editorCamera.translation;
+				t = GetActiveCamera().translation;
 				t[2] += 1;
-				editorCamera.translation = t;
+				GetActiveCamera().translation = t;
 				break;
 
 			case "ArrowLeft":
-				t = editorCamera.translation;
+				t = GetActiveCamera().translation;
 				t[0] -= 1;
-				editorCamera.translation = t;
+				GetActiveCamera().translation = t;
 				break;
 
 			case "ArrowRight":
-				t = editorCamera.translation;
+				t = GetActiveCamera().translation;
 				t[0] += 1;
-				editorCamera.translation = t;
+				GetActiveCamera().translation = t;
 				break;
 
 			// Change blocks
@@ -108,10 +103,10 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 
 			// Camera controls
 			case "PageUp":
-				editorCamera.IncrementDistance();
+				GetActiveCamera().IncrementDistance();
 				break;
 			case "PageDown":
-				editorCamera.DecrementDistance();
+				GetActiveCamera().DecrementDistance();
 				break;
 		}
 	}
@@ -139,8 +134,6 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 				console.log("jump!");
 				break;
 		}
-
-		console.log(moveDir);
 	}
 }
 
@@ -169,8 +162,6 @@ function HandleInputKeyUp(ev: KeyboardEvent) {
 				console.log("jump!");
 				break;
 		}
-
-		console.log(moveDir);
 	}
 }
 
@@ -217,8 +208,8 @@ function HandleInputScroll(ev: any) {
 	ev.preventDefault();
 	let scrollDir = -Math.sign(ev.wheelDeltaY);
 
-	if (scrollDir > 0) editorCamera.IncrementDistance();
-	else editorCamera.DecrementDistance();
+	if (scrollDir > 0) GetActiveCamera().IncrementDistance();
+	else GetActiveCamera().DecrementDistance();
 }
 
 function RotateCamera(x: number, y: number) {
@@ -231,7 +222,7 @@ function RotateCamera(x: number, y: number) {
 	alphaRad = utils.degToRad(alpha);
 	betaRad = utils.degToRad(beta);
 
-	editorCamera.normDir = [
+	GetActiveCamera().normDir = [
 		Math.cos(alphaRad) * Math.cos(betaRad),
 		Math.sin(betaRad),
 		Math.sin(alphaRad) * Math.cos(betaRad),
