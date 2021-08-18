@@ -121,6 +121,7 @@ export function Spawn() {
 	return toadNode;
 }
 
+let lookAngle = 0;
 const MovementAction = (deltaTime: number, state: ToadState): void => {
 	if (GetMode() != "GAME") return;
 
@@ -144,13 +145,17 @@ const MovementAction = (deltaTime: number, state: ToadState): void => {
 		deltaTime * state.moveSpeed
 	);
 
+	if (Input.moveDir[0] != 0 || Input.moveDir[2] != 0) {
+		lookAngle = -Math.atan2(localDir[0], localDir[2]);
+	}
+
 	state.localMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(
 			localPosition[0] + input[0],
 			localPosition[1] + input[1],
 			localPosition[2] + input[2]
 		),
-		utils.MakeRotateYMatrix(180 - utils.radToDeg(alpha))
+		utils.MakeRotateYMatrix(utils.radToDeg(lookAngle))
 	);
 
 	// Camera follow toad
