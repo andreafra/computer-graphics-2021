@@ -117,6 +117,10 @@ export class utils {
 		return (angle * Math.PI) / 180;
 	};
 
+	static radToDeg = function (angle: number) {
+		return (angle * 180) / Math.PI;
+	};
+
 	static identityMatrix = function () {
 		return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 	};

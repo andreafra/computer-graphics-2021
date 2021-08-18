@@ -39,7 +39,6 @@ export function DoActionOnSelectedBlock(hit: HitNode) {
 			// and the ToMapCoords flooring of those numbers.
 			let pos = Map.ToMapCoords(hit.position);
 			let cell = Map.GetCell(pos);
-			console.log(cell);
 			if (cell && cell.type === Map.CellType.Empty) {
 				Map.SetCell(pos, activeBlock);
 			}

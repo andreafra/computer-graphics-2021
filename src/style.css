@@ -98,6 +98,23 @@ body {
 	background-color: var(--ui-color-selected);
 }
 
+.ui-game {
+	display: flex;
+}
+
+.ui-lives {
+	display: inline-block;
+	border: none;
+	font-size: 2rem;
+	padding: 0 var(--ui-size-gap);
+	margin-right: var(--ui-size-gap);
+	align-self: center;
+}
+
+.hidden {
+	display: none;
+}
+
 #play-btn {
 	margin: 0;
 	padding: 0;

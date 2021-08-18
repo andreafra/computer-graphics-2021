@@ -22,7 +22,7 @@ interface DrawInfo {
 }
 
 // A function that receives the state of the Node and performs actions on it
-export type Action<T> = (state: T) => void;
+export type Action<T> = (deltaTime: number, state: T) => void;
 // A function that receives the state and the view projectection matrix of a Node and renders it
 // by calling `gl.drawElements(...)`
 
@@ -55,8 +55,8 @@ export class Node<T extends State> {
 	}
 
 	// Private:
-	private ExecuteActions = () => {
-		this.actions.forEach((action) => action(this.state));
+	private ExecuteActions = (deltaTime: number) => {
+		this.actions.forEach((action) => action(deltaTime, this.state));
 	};
 
 	private UpdateWorldMatrix = (matrix?: number[]) => {
@@ -89,16 +89,16 @@ export class Node<T extends State> {
 		return this;
 	};
 
-	AddAction(action: (state: T) => void) {
+	AddAction(action: (deltaTime: number, state: T) => void) {
 		this.actions.push(action);
 	}
 
-	Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+	Update(deltaTime: number, worldMatrix?: number[]) {
 		this.UpdateWorldMatrix(worldMatrix);
-		this.ExecuteActions();
+		this.ExecuteActions(deltaTime);
 
 		this.children.forEach((child) =>
-			child.Update(deltaTime, VPMatrix, this.state.worldMatrix)
+			child.Update(deltaTime, this.state.worldMatrix)
 		);
 	}
 
@@ -142,13 +142,9 @@ export class RenderNode<T extends State> extends Node<T> {
 		];
 	}
 
-	override Update(
-		deltaTime: number,
-		VPMatrix: number[],
-		worldMatrix?: number[]
-	) {
-		super.Update(deltaTime, VPMatrix, worldMatrix);
-		Engine.QueueRender(() => this.Render(VPMatrix));
+	override Update(deltaTime: number, worldMatrix?: number[]) {
+		super.Update(deltaTime, worldMatrix);
+		Engine.QueueRender((VPMatrix: number[]) => this.Render(VPMatrix));
 	}
 
 	Render(VPMatrix: number[]) {
@@ -237,12 +233,8 @@ export class LightNode<T extends State> extends Node<T> {
 		this.light = light;
 	}
 
-	override Update(
-		deltaTime: number,
-		VPMatrix: number[],
-		worldMatrix?: number[]
-	) {
-		super.Update(deltaTime, VPMatrix, worldMatrix);
+	override Update(deltaTime: number, worldMatrix?: number[]) {
+		super.Update(deltaTime, worldMatrix);
 		this.light.pos = utils.ComputePosition(
 			this.state.worldMatrix,
 			[0, 0, 0]
@@ -256,11 +248,11 @@ export class LightNode<T extends State> extends Node<T> {
 		this.light.dir = utils.normalize(this.light.dir);
 
 		// Draw a vector to represent the light position
-		DebugLine.DrawLine(
-			this.light.pos,
-			utils.addVectors(this.light.pos, this.light.dir),
-			DebugLine.LineColor.YELLOW
-		);
+		// DebugLine.DrawLine(
+		// 	this.light.pos,
+		// 	utils.addVectors(this.light.pos, this.light.dir),
+		// 	DebugLine.LineColor.YELLOW
+		// );
 
 		Engine.AddLight(this.light);
 	}
