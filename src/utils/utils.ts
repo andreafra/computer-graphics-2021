@@ -764,4 +764,22 @@ export class utils {
 		}
 		return Math.sqrt(sum);
 	};
+
+	static LerpAngle = (a: number, b: number, interp: number) => {
+		// Assuming [-PI,PI]
+		// Which way should we move?
+		let distance = b - a;
+		if (a > 0 && b < 0) {
+			// distance is negative
+			let otherDistance = Math.PI - a + (Math.PI + b); // positive
+			if (otherDistance <= -distance) distance = otherDistance;
+		} else if (a < 0 && b > 0) {
+			// distance is positive
+			let otherDistance = Math.PI + a + (Math.PI - b); // positive
+			if (otherDistance <= distance) {
+				distance = -otherDistance;
+			}
+		}
+		return a + distance * interp;
+	};
 }

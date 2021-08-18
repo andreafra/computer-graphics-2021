@@ -122,6 +122,9 @@ export function Spawn() {
 }
 
 let lookAngle = 0;
+let lerping = { from: lookAngle, to: lookAngle, timeElapsed: 0 };
+const lerpDuration = 0.1;
+
 const MovementAction = (deltaTime: number, state: ToadState): void => {
 	if (GetMode() != "GAME") return;
 
@@ -132,31 +135,49 @@ const MovementAction = (deltaTime: number, state: ToadState): void => {
 
 	let alpha = Math.atan2(camera.normDir[0], camera.normDir[2]);
 
-	let localDir = [
+	let targetDir = [
 		-Math.sin(alpha) * Input.moveDir[2] +
 			Math.cos(alpha) * Input.moveDir[0],
 		0,
 		-Math.cos(alpha) * Input.moveDir[2] +
 			-Math.sin(alpha) * Input.moveDir[0],
 	];
-	if (localDir[0] != 0 || localDir[2] != 0) {
-		localDir = utils.normalize(localDir);
+	if (targetDir[0] != 0 || targetDir[2] != 0) {
+		targetDir = utils.normalize(targetDir);
 	}
 
-	let input = utils.multiplyVectorScalar(
-		localDir,
+	let translation = utils.multiplyVectorScalar(
+		targetDir,
 		deltaTime * state.moveSpeed
 	);
 
 	if (Input.moveDir[0] != 0 || Input.moveDir[2] != 0) {
-		lookAngle = -Math.atan2(localDir[0], localDir[2]);
+		let newAngle = -Math.atan2(targetDir[0], targetDir[2]);
+		if (newAngle != lerping.to) {
+			lerping.from = lookAngle;
+			lerping.to = newAngle;
+			lerping.timeElapsed = 0;
+		}
+		if (lerping.timeElapsed < lerpDuration) {
+			lookAngle = utils.LerpAngle(
+				lerping.from,
+				lerping.to,
+				lerping.timeElapsed / lerpDuration
+			);
+		} else {
+			lookAngle = newAngle;
+		}
+	} else {
+		lerping.from = lookAngle;
+		lerping.timeElapsed = 0;
 	}
+	lerping.timeElapsed += deltaTime;
 
 	state.localMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(
-			localPosition[0] + input[0],
-			localPosition[1] + input[1],
-			localPosition[2] + input[2]
+			localPosition[0] + translation[0],
+			localPosition[1] + translation[1],
+			localPosition[2] + translation[2]
 		),
 		utils.MakeRotateYMatrix(utils.radToDeg(lookAngle))
 	);
