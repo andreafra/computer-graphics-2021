@@ -124,7 +124,8 @@ export function Spawn() {
 const MovementAction = (deltaTime: number, state: ToadState): void => {
 	if (GetMode() != "GAME") return;
 
-	let position = utils.ComputePosition(state.localMatrix, [0, 0, 0]);
+	let worldPosition = utils.ComputePosition(state.worldMatrix, [0, 0, 0]);
+	let localPosition = utils.ComputePosition(state.localMatrix, [0, 0, 0]);
 
 	let camera = GetActiveCamera();
 
@@ -144,11 +145,15 @@ const MovementAction = (deltaTime: number, state: ToadState): void => {
 	);
 
 	state.localMatrix = utils.multiplyMatrices(
-		utils.MakeTranslateMatrix(input[0], input[1], input[2]),
-		state.localMatrix
+		utils.MakeTranslateMatrix(
+			localPosition[0] + input[0],
+			localPosition[1] + input[1],
+			localPosition[2] + input[2]
+		),
+		utils.MakeRotateYMatrix(180 - utils.radToDeg(alpha))
 	);
 
 	// Camera follow toad
-	camera.translation = position;
+	camera.translation = worldPosition;
 	camera.Update();
 };
