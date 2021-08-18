@@ -94,13 +94,13 @@ export class Node<T extends State> {
 		this.actions.push(action);
 	}
 
-	Update(deltaTime: number, VPMatrix: number[], worldMatrix?: number[]) {
+	Update(deltaTime: number, worldMatrix?: number[]) {
 		this.UpdateWorldMatrix(worldMatrix);
 
 		if (GetMode() === "GAME") this.ExecuteActions(deltaTime);
 
 		this.children.forEach((child) =>
-			child.Update(deltaTime, VPMatrix, this.state.worldMatrix)
+			child.Update(deltaTime, this.state.worldMatrix)
 		);
 	}
 
@@ -144,13 +144,9 @@ export class RenderNode<T extends State> extends Node<T> {
 		];
 	}
 
-	override Update(
-		deltaTime: number,
-		VPMatrix: number[],
-		worldMatrix?: number[]
-	) {
-		super.Update(deltaTime, VPMatrix, worldMatrix);
-		Engine.QueueRender(() => this.Render(VPMatrix));
+	override Update(deltaTime: number, worldMatrix?: number[]) {
+		super.Update(deltaTime, worldMatrix);
+		Engine.QueueRender((VPMatrix: number[]) => this.Render(VPMatrix));
 	}
 
 	Render(VPMatrix: number[]) {
@@ -239,12 +235,8 @@ export class LightNode<T extends State> extends Node<T> {
 		this.light = light;
 	}
 
-	override Update(
-		deltaTime: number,
-		VPMatrix: number[],
-		worldMatrix?: number[]
-	) {
-		super.Update(deltaTime, VPMatrix, worldMatrix);
+	override Update(deltaTime: number, worldMatrix?: number[]) {
+		super.Update(deltaTime, worldMatrix);
 		this.light.pos = utils.ComputePosition(
 			this.state.worldMatrix,
 			[0, 0, 0]

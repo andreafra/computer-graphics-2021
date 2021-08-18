@@ -16,7 +16,7 @@ const lights = new Array<Light>(N_LIGHTS);
 let lightIdx = 0;
 let ambientLight = [0, 0, 0];
 
-let renderQueue: (() => void)[] = [];
+let renderQueue: ((VPMatrix: number[]) => void)[] = [];
 
 // Entrypoint of the WebGL program
 export function Setup(_gl: WebGL2RenderingContext) {
@@ -38,18 +38,19 @@ function Render(time: DOMHighResTimeStamp) {
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+	// Navigate the SceneGraph tree to update all elements // O(n)
+	lights.fill(new Light());
+	lightIdx = 0;
+	renderQueue = [];
+	ROOT_NODE.Update(deltaTime);
+
 	const viewProjectionMatrix = utils.multiplyMatrices(
 		projectionMatrix,
 		utils.invertMatrix(cameraMatrix)
 	);
 
-	// Navigate the SceneGraph tree to update all elements // O(n)
-	lights.fill(new Light());
-	lightIdx = 0;
-	renderQueue = [];
-	ROOT_NODE.Update(deltaTime, viewProjectionMatrix);
 	for (let renderFunction of renderQueue) {
-		renderFunction();
+		renderFunction(viewProjectionMatrix);
 	}
 
 	/* if (GetMode() === "EDITOR") */ DebugLine.Render(viewProjectionMatrix);
@@ -92,8 +93,8 @@ export function GetTime() {
 	return lastUpdate;
 }
 
-export function QueueRender(renderAction: () => void) {
-	renderQueue.push(renderAction);
+export function QueueRender(renderFunction: (VPMatrix: number[]) => void) {
+	renderQueue.push(renderFunction);
 }
 
 export function BindAllLightUniforms(programInfo: WebGLProgramInfo) {
