@@ -10,6 +10,8 @@ let isPointerActive: boolean;
 let isPointerSecondaryActive: boolean;
 let lastPointerPos: { x: number; y: number };
 
+let pressedState = { left: false, right: false, up: false, down: false };
+
 const DRAG_SPEED = 0.25;
 
 export function Init() {
@@ -109,18 +111,22 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 			// Movement
 			case "w":
 			case "ArrowUp":
+				pressedState.up = true;
 				moveDir[2] = 1;
 				break;
 			case "a":
 			case "ArrowLeft":
+				pressedState.left = true;
 				moveDir[0] = -1;
 				break;
 			case "s":
 			case "ArrowDown":
+				pressedState.down = true;
 				moveDir[2] = -1;
 				break;
 			case "d":
 			case "ArrowRight":
+				pressedState.right = true;
 				moveDir[0] = 1;
 				break;
 
@@ -137,19 +143,23 @@ function HandleInputKeyUp(ev: KeyboardEvent) {
 			// Movement
 			case "w":
 			case "ArrowUp":
-				moveDir[2] = 0;
+				pressedState.up = false;
+				moveDir[2] = pressedState.down ? -1 : 0;
 				break;
 			case "a":
 			case "ArrowLeft":
-				moveDir[0] = 0;
+				pressedState.left = false;
+				moveDir[0] = pressedState.right ? 1 : 0;
 				break;
 			case "s":
 			case "ArrowDown":
-				moveDir[2] = 0;
+				pressedState.down = false;
+				moveDir[2] = pressedState.up ? 1 : 0;
 				break;
 			case "d":
 			case "ArrowRight":
-				moveDir[0] = 0;
+				pressedState.right = false;
+				moveDir[0] = pressedState.left ? -1 : 0;
 				break;
 
 			case " ":
