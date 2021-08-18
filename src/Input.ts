@@ -33,6 +33,8 @@ export var moveDir = [0, 0, 0];
 // to listen for both a key release and a key press
 
 function HandleInputKeyDown(ev: KeyboardEvent) {
+	if (ev.key == " ") ev.preventDefault();
+
 	if (GetMode() === "EDITOR") {
 		let t: number[];
 
@@ -138,6 +140,8 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 }
 
 function HandleInputKeyUp(ev: KeyboardEvent) {
+	if (ev.key == " ") ev.preventDefault();
+
 	if (GetMode() === "GAME") {
 		switch (ev.key) {
 			// Movement
