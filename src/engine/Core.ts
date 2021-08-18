@@ -4,7 +4,6 @@ import { Light } from "./Lights";
 import { Node, RenderNode, State } from "./SceneGraph";
 import * as DebugLine from "./debug/Lines";
 import { WebGLProgramInfo } from "./Shaders";
-import { GetMode } from "../main";
 
 export const ROOT_NODE: Node<State> = new Node("root");
 export let gl: WebGL2RenderingContext;
@@ -53,7 +52,7 @@ function Render(time: DOMHighResTimeStamp) {
 		renderFunction(viewProjectionMatrix);
 	}
 
-	/* if (GetMode() === "EDITOR") */ DebugLine.Render(viewProjectionMatrix);
+	DebugLine.Render(viewProjectionMatrix);
 
 	// Render next frame
 	requestAnimationFrame(Render);

@@ -4,7 +4,6 @@ import * as Engine from "./Core";
 import { Light } from "./Lights";
 import { WebGLProgramInfo } from "./Shaders";
 import { gl } from "./Core";
-import { GetMode } from "../main";
 
 // Object containing data useful for rendering
 interface DrawInfo {
@@ -96,8 +95,7 @@ export class Node<T extends State> {
 
 	Update(deltaTime: number, worldMatrix?: number[]) {
 		this.UpdateWorldMatrix(worldMatrix);
-
-		if (GetMode() === "GAME") this.ExecuteActions(deltaTime);
+		this.ExecuteActions(deltaTime);
 
 		this.children.forEach((child) =>
 			child.Update(deltaTime, this.state.worldMatrix)

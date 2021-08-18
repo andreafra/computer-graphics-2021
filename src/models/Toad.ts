@@ -7,6 +7,7 @@ import { utils } from "../utils/utils";
 import { Light } from "../engine/Lights";
 import { LightNode } from "../engine/SceneGraph";
 import * as Input from "../Input";
+import { GetMode } from "../main";
 
 // Assets
 import toad_OBJ from "../assets/cpt_toad/toad.obj";
@@ -121,6 +122,8 @@ export function Spawn() {
 }
 
 const MovementAction = (deltaTime: number, state: ToadState): void => {
+	if (GetMode() != "GAME") return;
+
 	let position = utils.ComputePosition(state.localMatrix, [0, 0, 0]);
 
 	let camera = GetActiveCamera();
