@@ -28,7 +28,7 @@ async function init() {
 	utils.resizeCanvasToDisplaySize(canvas, () =>
 		Engine.SetProjection(
 			utils.MakePerspective(
-				60.0,
+				20.0,
 				canvas.width / canvas.height,
 				1.0,
 				2000.0
@@ -39,10 +39,8 @@ async function init() {
 	Engine.Setup(gl);
 
 	// Setup camera for editor
-	editorCamera = Camera.Init("editor");
-	editorCamera.Update();
-
-	gameCamera = Camera.Init("game");
+	editorCamera = new Camera("editor");
+	gameCamera = new Camera("game");
 
 	UI.Init();
 	Input.Init();

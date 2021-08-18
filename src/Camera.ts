@@ -2,23 +2,38 @@ import { utils } from "./utils/utils";
 import * as Engine from "./engine/Core";
 
 export const CAMERA_DISTANCE_INCREMENT = 1;
-export const MIN_CAMERA_DISTANCE = 2;
+export const MIN_CAMERA_DISTANCE = 8;
 export const MAX_CAMERA_DISTANCE = 64;
 
 let cameras: Map<string, Camera> = new Map();
 
 export class Camera {
 	// Camera normal direction
-	private _normDir = [
-		0.9650064789340802, 0.25881904510252074, 0.0042146331262235956,
-	];
+	private _normDir = new Array<number>(3);
+
+	private alpha: number;
+	private beta: number;
 
 	// Camera translation from (0,0,0)
 	// (tx, ty, yz) = target point
 	private _translation = [0, 0, 0];
 
 	// Camera distance from the target point
-	private _distance: number = MIN_CAMERA_DISTANCE * 2;
+	private _distance: number;
+
+	constructor(
+		name: string,
+		alpha = 45,
+		beta = 30,
+		dist = MIN_CAMERA_DISTANCE * 2
+	) {
+		this.distance = dist;
+		this.alpha = 0;
+		this.beta = 0;
+		this.Rotate(alpha, beta);
+
+		cameras.set(name, this);
+	}
 
 	get normDir() {
 		return this._normDir;
@@ -77,13 +92,23 @@ export class Camera {
 		Engine.SetCamera(lookAt);
 	}
 
-	static Get(name: string) {
-		return cameras.get(name);
+	Rotate(dAlpha: number, dBeta: number) {
+		this.alpha += dAlpha;
+		this.beta += dBeta;
+
+		this.beta = utils.Clamp(this.beta, 15, 89.9);
+
+		let alphaRad = utils.degToRad(this.alpha);
+		let betaRad = utils.degToRad(this.beta);
+
+		this.normDir = [
+			Math.cos(alphaRad) * Math.cos(betaRad),
+			Math.sin(betaRad),
+			Math.sin(alphaRad) * Math.cos(betaRad),
+		];
 	}
 
-	static Init(name: string) {
-		let camera = new Camera();
-		cameras.set(name, camera);
-		return camera;
+	static Get(name: string) {
+		return cameras.get(name);
 	}
 }

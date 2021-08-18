@@ -8,15 +8,9 @@ import * as Raycast from "./engine/Raycast";
 
 let isPointerActive: boolean;
 let isPointerSecondaryActive: boolean;
-let mouseDownPos: { x: number; y: number; alpha: number; beta: number };
+let lastPointerPos: { x: number; y: number };
 
 const DRAG_SPEED = 0.25;
-
-let alpha = 0, // angle between X-axis and camera (X,Z) position - (0,0)
-	beta = 0, // angle between XZ plane and camera (X,Y,Z) position - (0,0,0)
-	alphaRad = 0,
-	betaRad = 0;
-/* --------------------------------------------------- */
 
 export function Init() {
 	document.addEventListener("keydown", HandleInputKeyDown);
@@ -178,6 +172,11 @@ function HandleInputPointerDrag(ev: PointerEvent) {
 	if (isPointerSecondaryActive) {
 		RotateCamera(ev.clientX, ev.clientY);
 	}
+
+	lastPointerPos = {
+		x: ev.clientX,
+		y: ev.clientY,
+	};
 }
 
 function HandleRightClick(ev: MouseEvent) {
@@ -189,11 +188,9 @@ function HandleRightClick(ev: MouseEvent) {
 function HandleInputPointerDown(ev: PointerEvent) {
 	ev.preventDefault();
 	// Handle mouse down events
-	mouseDownPos = {
+	lastPointerPos = {
 		x: ev.clientX,
 		y: ev.clientY,
-		alpha: alpha,
-		beta: beta,
 	};
 	isPointerActive = true;
 
@@ -213,18 +210,8 @@ function HandleInputScroll(ev: any) {
 }
 
 function RotateCamera(x: number, y: number) {
-	// ROTATE CAMERA
-	alpha = (x - mouseDownPos.x) * DRAG_SPEED + mouseDownPos.alpha;
-	beta = (y - mouseDownPos.y) * DRAG_SPEED + mouseDownPos.beta;
-
-	beta = utils.Clamp(beta, 15, 89.9);
-
-	alphaRad = utils.degToRad(alpha);
-	betaRad = utils.degToRad(beta);
-
-	GetActiveCamera().normDir = [
-		Math.cos(alphaRad) * Math.cos(betaRad),
-		Math.sin(betaRad),
-		Math.sin(alphaRad) * Math.cos(betaRad),
-	];
+	GetActiveCamera().Rotate(
+		(x - lastPointerPos.x) * DRAG_SPEED,
+		(y - lastPointerPos.y) * DRAG_SPEED
+	);
 }
