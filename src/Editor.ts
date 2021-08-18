@@ -33,11 +33,13 @@ export function DoActionOnSelectedBlock(hit: HitNode) {
 			Map.SetCell(mapPos, Map.CellType.Empty);
 		}
 		if (editMode === "ADD") {
-			// Sometimes the coordinates are the one of the block, therefore the block is not placed
-			// Keep clicking around and it will spawn eventually lol
-			// This is probably because of the approximations of AABB intersection checks
-			// and the ToMapCoords flooring of those numbers.
-			let pos = Map.ToMapCoords(hit.position);
+			// Move the point away from the current node to make sure
+			// that any rounding does not make it fall within its bounds.
+			let newNodePosition = utils.addVectors(
+				hit.position,
+				utils.multiplyVectorScalar(hit.ray.dir, -0.15)
+			);
+			let pos = Map.ToMapCoords(newNodePosition);
 			let cell = Map.GetCell(pos);
 			if (cell && cell.type === Map.CellType.Empty) {
 				Map.SetCell(pos, activeBlock);

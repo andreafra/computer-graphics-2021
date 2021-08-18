@@ -18,6 +18,7 @@ interface Ray {
 export interface HitNode {
 	node: RenderNode<State>;
 	position: number[];
+	ray: Ray;
 }
 
 export function Hit(x: number, y: number) {
@@ -50,7 +51,9 @@ export function Hit(x: number, y: number) {
 
 			let hit = IntersectNode(node, ray);
 
-			return hit ? ({ node: node, position: hit } as HitNode) : null;
+			return hit
+				? ({ node: node, position: hit, ray: ray } as HitNode)
+				: null;
 		})
 		.filter((t) => t)
 		.sort(
