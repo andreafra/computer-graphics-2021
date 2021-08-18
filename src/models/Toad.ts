@@ -139,6 +139,9 @@ const MovementAction = (deltaTime: number, state: ToadState): void => {
 		-Math.cos(alpha) * Input.moveDir[2] +
 			-Math.sin(alpha) * Input.moveDir[0],
 	];
+	if (localDir[0] != 0 || localDir[1] != 0) {
+		localDir = utils.normalize(localDir);
+	}
 
 	let input = utils.multiplyVectorScalar(
 		localDir,
