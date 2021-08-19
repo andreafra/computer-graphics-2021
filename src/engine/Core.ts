@@ -1,9 +1,10 @@
 import { utils } from "../utils/utils";
 import { Light } from "./Lights";
 //import { DoRaycast } from "./Raycast";
-import { Node, RenderNode, State } from "./SceneGraph";
+import { IRenderableState, Node, RenderNode, State } from "./SceneGraph";
 import * as DebugLine from "./debug/Lines";
 import { WebGLProgramInfo } from "./Shaders";
+import { IBoxBounds, PhysicsNode, PhysicsState } from "./Physics";
 
 export const ROOT_NODE: Node<State> = new Node("root");
 export let gl: WebGL2RenderingContext;
@@ -139,13 +140,14 @@ export function AddLight(light: Light) {
 	lightIdx++;
 }
 
-export function GetSceneRenderNodes() {
-	let nodes: RenderNode<State>[] = [];
+export function GetAllNodesWithBoxBounds() {
+	let nodes: Node<IBoxBounds>[] = [];
 	type X = Node<State>;
 
 	function GetRenderNodes(_nodes: X[]) {
 		_nodes.forEach((node) => {
-			if (node instanceof RenderNode) nodes.push(node);
+			if ((<IBoxBounds>node.state).bounds)
+				nodes.push(node as Node<IBoxBounds>);
 			GetRenderNodes(node.children);
 		});
 	}
@@ -155,18 +157,19 @@ export function GetSceneRenderNodes() {
 	return nodes;
 }
 
-// export function EnableRaycast(
-// 	canvas: HTMLCanvasElement,
-// 	viewport: { width: number; height: number },
-// 	cameraOrigin: number[]
-// ) {
-// 	canvas.addEventListener("mousedown", (ev: MouseEvent) => {
-// 		DoRaycast(
-// 			{ x: ev.x, y: ev.y },
-// 			viewport,
-// 			projectionMatrix,
-// 			cameraMatrix,
-// 			cameraOrigin
-// 		);
-// 	});
-// }
+export function GetAllPhysicsNodes() {
+	let nodes: PhysicsNode<PhysicsState>[] = [];
+	type X = Node<State>;
+
+	function GetRenderNodes(_nodes: X[]) {
+		_nodes.forEach((node) => {
+			if (node instanceof PhysicsNode)
+				nodes.push(node as PhysicsNode<PhysicsState>);
+			GetRenderNodes(node.children);
+		});
+	}
+
+	GetRenderNodes(ROOT_NODE.children);
+
+	return nodes;
+}

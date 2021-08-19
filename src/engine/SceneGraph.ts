@@ -5,8 +5,23 @@ import { Light } from "./Lights";
 import { WebGLProgramInfo } from "./Shaders";
 import { gl } from "./Core";
 
-// Object containing data useful for rendering
-interface DrawInfo {
+// A function that receives the state of the Node and performs actions on it
+export type Action<T extends State> = (
+	deltaTime: number,
+	node: Node<T>
+) => void;
+// A function that receives the state and the view projectection matrix of a Node and renders it
+// by calling `gl.drawElements(...)`
+
+// The state of a node. Extend it if you need other variables for that node
+export class State {
+	localMatrix: number[];
+	worldMatrix: number[];
+}
+
+export type IRenderableState = IRenderable & State;
+
+export interface IRenderable {
 	materialColor: number[];
 	materialAmbColor: number[];
 	materialSpecColor: number[];
@@ -20,19 +35,6 @@ interface DrawInfo {
 	specularMap?: () => void;
 	ambientOcclusion?: () => void;
 }
-
-// A function that receives the state of the Node and performs actions on it
-export type Action<T> = (deltaTime: number, state: T) => void;
-// A function that receives the state and the view projectection matrix of a Node and renders it
-// by calling `gl.drawElements(...)`
-
-// The state of a node. Extend it if you need other variables for that node
-export interface State {
-	localMatrix: number[];
-	worldMatrix: number[];
-	drawInfo: DrawInfo;
-}
-
 // A simple node of a tree. It has a state (object containing data)
 // and an array of Actions (functions) that are called each update
 export class Node<T extends State> {
@@ -54,11 +56,6 @@ export class Node<T extends State> {
 		};
 	}
 
-	// Private:
-	private ExecuteActions = (deltaTime: number) => {
-		this.actions.forEach((action) => action(deltaTime, this.state));
-	};
-
 	private UpdateWorldMatrix = (matrix?: number[]) => {
 		if (matrix) {
 			this.state.worldMatrix = utils.multiplyMatrices(
@@ -68,6 +65,11 @@ export class Node<T extends State> {
 		} else {
 			utils.copy(this.state.localMatrix, this.state.worldMatrix);
 		}
+	};
+
+	// Private:
+	private ExecuteActions = (deltaTime: number) => {
+		this.actions.forEach((action) => action(deltaTime, this));
 	};
 
 	// Public:
@@ -89,7 +91,7 @@ export class Node<T extends State> {
 		return this;
 	};
 
-	AddAction(action: (deltaTime: number, state: T) => void) {
+	AddAction(action: (deltaTime: number, node: Node<T>) => void) {
 		this.actions.push(action);
 	}
 
@@ -111,66 +113,14 @@ export class Node<T extends State> {
 	}
 }
 
-export class RenderNode<T extends State> extends Node<T> {
-	// [0] is min, [1] is max
-	// Default is a cube 1x1x1 with center at 0.0,0.5,0.0 since our models grow up on the Y axis
-	_bounds: number[][] = [
-		[-0.5, 0, -0.5],
-		[0.5, 1, 0.5],
-	];
-
-	set bounds(value: number[][]) {
-		this._bounds = value;
-	}
-
-	get bounds(): number[][] {
-		let x = this.state.worldMatrix[3] / this.state.worldMatrix[15];
-		let y = this.state.worldMatrix[7] / this.state.worldMatrix[15];
-		let z = this.state.worldMatrix[11] / this.state.worldMatrix[15];
-
-		return [
-			[
-				this._bounds[0][0] + x,
-				this._bounds[0][1] + y,
-				this._bounds[0][2] + z,
-			],
-			[
-				this._bounds[1][0] + x,
-				this._bounds[1][1] + y,
-				this._bounds[1][2] + z,
-			],
-		];
-	}
-
-	Intersects(otherNode: RenderNode<State>) {
-		let me = this.bounds;
-		let other = otherNode.bounds;
-
-		return (
-			me[0][0] < other[1][0] &&
-			me[1][0] > other[0][0] &&
-			me[0][1] < other[1][1] &&
-			me[1][1] > other[0][1] &&
-			me[0][2] < other[1][2] &&
-			me[1][2] > other[0][2]
-		);
-	}
-
-	IntersectsAny(otherNodes = Engine.GetSceneRenderNodes()) {
-		otherNodes = otherNodes.filter((n) => n != this);
-		for (let otherNode of otherNodes) {
-			if (this.Intersects(otherNode)) return true;
-		}
-		return false;
-	}
-
+export class RenderNode<T extends IRenderableState> extends Node<T> {
 	override Update(deltaTime: number, worldMatrix?: number[]) {
 		super.Update(deltaTime, worldMatrix);
 		Engine.QueueRender((VPMatrix: number[]) => this.Render(VPMatrix));
 	}
 
 	Render(VPMatrix: number[]) {
-		gl.useProgram(this.state.drawInfo.programInfo.program);
+		gl.useProgram(this.state.programInfo.program);
 
 		let projectionMatrix = utils.multiplyMatrices(
 			VPMatrix,
@@ -181,66 +131,66 @@ export class RenderNode<T extends State> extends Node<T> {
 		);
 
 		gl.uniformMatrix4fv(
-			this.state.drawInfo.programInfo.locations.matrix,
+			this.state.programInfo.locations.matrix,
 			false,
 			utils.transposeMatrix(projectionMatrix)
 		);
 		gl.uniformMatrix4fv(
-			this.state.drawInfo.programInfo.locations.normalMatrix,
+			this.state.programInfo.locations.normalMatrix,
 			false,
 			utils.transposeMatrix(normalMatrix)
 		);
 		gl.uniformMatrix4fv(
-			this.state.drawInfo.programInfo.locations.positionMatrix,
+			this.state.programInfo.locations.positionMatrix,
 			false,
 			utils.transposeMatrix(this.state.worldMatrix)
 		);
 
 		gl.uniform3fv(
-			this.state.drawInfo.programInfo.locations.materialDiffColor,
-			this.state.drawInfo.materialColor
+			this.state.programInfo.locations.materialDiffColor,
+			this.state.materialColor
 		);
 		gl.uniform3fv(
-			this.state.drawInfo.programInfo.locations.materialAmbColor,
-			this.state.drawInfo.materialAmbColor
+			this.state.programInfo.locations.materialAmbColor,
+			this.state.materialAmbColor
 		);
 		gl.uniform3fv(
-			this.state.drawInfo.programInfo.locations.materialSpecColor,
-			this.state.drawInfo.materialSpecColor
+			this.state.programInfo.locations.materialSpecColor,
+			this.state.materialSpecColor
 		);
 		gl.uniform3fv(
-			this.state.drawInfo.programInfo.locations.materialEmitColor,
-			this.state.drawInfo.materialEmitColor
+			this.state.programInfo.locations.materialEmitColor,
+			this.state.materialEmitColor
 		);
 
 		gl.uniform3fv(
-			this.state.drawInfo.programInfo.locations.eyePos,
+			this.state.programInfo.locations.eyePos,
 			Engine.GetCameraPosition()
 		);
 
-		Engine.BindAllLightUniforms(this.state.drawInfo.programInfo);
+		Engine.BindAllLightUniforms(this.state.programInfo);
 
 		// Render Texture
-		if (this.state.drawInfo.texture) {
-			this.state.drawInfo.texture();
+		if (this.state.texture) {
+			this.state.texture();
 		}
-		if (this.state.drawInfo.emissiveMap) {
-			this.state.drawInfo.emissiveMap();
+		if (this.state.emissiveMap) {
+			this.state.emissiveMap();
 		}
-		if (this.state.drawInfo.normalMap) {
-			this.state.drawInfo.normalMap();
+		if (this.state.normalMap) {
+			this.state.normalMap();
 		}
-		if (this.state.drawInfo.specularMap) {
-			this.state.drawInfo.specularMap();
+		if (this.state.specularMap) {
+			this.state.specularMap();
 		}
-		if (this.state.drawInfo.ambientOcclusion) {
-			this.state.drawInfo.ambientOcclusion();
+		if (this.state.ambientOcclusion) {
+			this.state.ambientOcclusion();
 		}
 
-		gl.bindVertexArray(this.state.drawInfo.vertexArrayObject);
+		gl.bindVertexArray(this.state.vertexArrayObject);
 		gl.drawElements(
 			gl.TRIANGLES,
-			this.state.drawInfo.bufferLength,
+			this.state.bufferLength,
 			gl.UNSIGNED_SHORT,
 			0
 		);

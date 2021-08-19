@@ -1,6 +1,6 @@
 import * as Engine from "../engine/Core";
 import { MakeTexture, MakeVAO, TextureType } from "../engine/Models";
-import { RenderNode, State } from "../engine/SceneGraph";
+import { IRenderableState, RenderNode, State } from "../engine/SceneGraph";
 import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 import { gl } from "../engine/Core";
 import { utils } from "../utils/utils";
@@ -18,9 +18,14 @@ import specularMapSrc from "../assets/cpt_toad/Textures/baked_spc.png";
 import ambientOcclusionSrc from "../assets/cpt_toad/Textures/baked_ao.png";
 import { GetActiveCamera } from "../main";
 import { DrawLine, LineColor } from "../engine/debug/Lines";
+import {
+	BOX_DEFAULT_BOUNDS,
+	PhysicsNode,
+	PhysicsState,
+} from "../engine/Physics";
 
 // Define common structure for state of these nodes
-interface ToadState extends State {
+interface ToadState extends PhysicsState {
 	moveSpeed: number;
 }
 
@@ -79,8 +84,13 @@ export function Spawn() {
 		utils.MakeTranslateMatrix(0, 0, 0),
 		utils.MakeScaleMatrix(1)
 	);
-	var toadNode = new RenderNode<ToadState>("cpt-toad", tMatrix);
-	toadNode.state.drawInfo = {
+	var toadNode = new PhysicsNode<ToadState>("cpt-toad", tMatrix);
+	toadNode.state = {
+		// Box bounds
+		bounds: BOX_DEFAULT_BOUNDS,
+		radius: 0.5,
+		height: 1,
+		// Render
 		materialColor: [0.0, 0.0, 0.0],
 		materialAmbColor: [1, 1, 1],
 		materialSpecColor: [0.3, 0.3, 0.3],
@@ -93,6 +103,7 @@ export function Spawn() {
 		normalMap: normalMap,
 		specularMap: specularMap,
 		ambientOcclusion: ambientOcclusion,
+		...toadNode.state,
 	};
 
 	toadNode.state.moveSpeed = 2.0;
@@ -112,9 +123,7 @@ export function Spawn() {
 		)
 	);
 
-	toadNode.AddAction((deltaTime: DOMHighResTimeStamp, state: ToadState) =>
-		MovementAction(toadNode, deltaTime, state)
-	);
+	toadNode.AddAction(MovementAction);
 
 	// Set relationships between nodes
 	headLight.SetParent(toadNode);
@@ -128,10 +137,11 @@ let lerping = { from: lookAngle, to: lookAngle, timeElapsed: 0 };
 const lerpDuration = 0.1;
 
 const MovementAction = (
-	node: RenderNode<ToadState>,
-	deltaTime: number,
-	state: ToadState
+	deltaTime: DOMHighResTimeStamp,
+	node: PhysicsNode<ToadState>
 ): void => {
+	let state = node.state as ToadState;
+
 	if (GetMode() != "GAME") return;
 
 	let worldPosition = utils.ComputePosition(state.worldMatrix, [0, 0, 0]);
@@ -180,7 +190,9 @@ const MovementAction = (
 	lerping.timeElapsed += deltaTime;
 
 	// Test all directions for a collision
-	if (node.IntersectsAny()) console.log("collision");
+	let collisions = node.Intersects(true);
+	if (collisions.length > 0)
+		console.log(`collision with ${collisions.map((i) => i.name)}`);
 
 	state.localMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(
