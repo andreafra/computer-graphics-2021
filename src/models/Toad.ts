@@ -8,6 +8,7 @@ import { Light } from "../engine/Lights";
 import { LightNode } from "../engine/SceneGraph";
 import * as Input from "../Input";
 import { GetMode } from "../main";
+import * as Map from "../Map";
 
 // Assets
 import toad_OBJ from "../assets/cpt_toad/toad.obj";
@@ -162,12 +163,30 @@ const MovementAction = (
 		targetDir = utils.normalize(targetDir);
 	}
 
+	// Test all directions for a collision
+	let collisions = node.Intersects(true);
+	for (let otherNode of collisions) {
+		let collisionNormal = utils.normalize(
+			utils.subtractVectors(
+				Map.ToMapCoords(otherNode.GetWorldCoordinates()),
+				Map.ToMapCoords(node.GetWorldCoordinates())
+			)
+		);
+		let velocityToScrub = utils.dot(targetDir, collisionNormal);
+		if (velocityToScrub > 0) {
+			targetDir = utils.subtractVectors(
+				targetDir,
+				utils.multiplyVectorScalar(collisionNormal, velocityToScrub)
+			);
+		}
+	}
+
 	let translation = utils.multiplyVectorScalar(
 		targetDir,
 		deltaTime * state.moveSpeed
 	);
 
-	if (Input.moveDir[0] != 0 || Input.moveDir[2] != 0) {
+	if (translation[0] != 0 || translation[2] != 0) {
 		let newAngle = -Math.atan2(targetDir[0], targetDir[2]);
 		if (newAngle != lerping.to) {
 			lerping.from = lookAngle;
@@ -188,11 +207,6 @@ const MovementAction = (
 		lerping.timeElapsed = 0;
 	}
 	lerping.timeElapsed += deltaTime;
-
-	// Test all directions for a collision
-	let collisions = node.Intersects(true);
-	if (collisions.length > 0)
-		console.log(`collision with ${collisions.map((i) => i.name)}`);
 
 	state.localMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(
