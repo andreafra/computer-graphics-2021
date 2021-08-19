@@ -112,7 +112,9 @@ export function Spawn() {
 		)
 	);
 
-	toadNode.AddAction(MovementAction);
+	toadNode.AddAction((deltaTime: DOMHighResTimeStamp, state: ToadState) =>
+		MovementAction(toadNode, deltaTime, state)
+	);
 
 	// Set relationships between nodes
 	headLight.SetParent(toadNode);
@@ -125,7 +127,11 @@ let lookAngle = 0;
 let lerping = { from: lookAngle, to: lookAngle, timeElapsed: 0 };
 const lerpDuration = 0.1;
 
-const MovementAction = (deltaTime: number, state: ToadState): void => {
+const MovementAction = (
+	node: RenderNode<ToadState>,
+	deltaTime: number,
+	state: ToadState
+): void => {
 	if (GetMode() != "GAME") return;
 
 	let worldPosition = utils.ComputePosition(state.worldMatrix, [0, 0, 0]);
@@ -172,6 +178,9 @@ const MovementAction = (deltaTime: number, state: ToadState): void => {
 		lerping.timeElapsed = 0;
 	}
 	lerping.timeElapsed += deltaTime;
+
+	// Test all directions for a collision
+	if (node.IntersectsAny()) console.log("collision");
 
 	state.localMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(

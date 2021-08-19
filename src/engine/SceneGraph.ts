@@ -124,9 +124,9 @@ export class RenderNode<T extends State> extends Node<T> {
 	}
 
 	get bounds(): number[][] {
-		let x = this.state.localMatrix[3];
-		let y = this.state.localMatrix[7];
-		let z = this.state.localMatrix[11];
+		let x = this.state.worldMatrix[3] / this.state.worldMatrix[15];
+		let y = this.state.worldMatrix[7] / this.state.worldMatrix[15];
+		let z = this.state.worldMatrix[11] / this.state.worldMatrix[15];
 
 		return [
 			[
@@ -140,6 +140,28 @@ export class RenderNode<T extends State> extends Node<T> {
 				this._bounds[1][2] + z,
 			],
 		];
+	}
+
+	Intersects(otherNode: RenderNode<State>) {
+		let me = this.bounds;
+		let other = otherNode.bounds;
+
+		return (
+			me[0][0] < other[1][0] &&
+			me[1][0] > other[0][0] &&
+			me[0][1] < other[1][1] &&
+			me[1][1] > other[0][1] &&
+			me[0][2] < other[1][2] &&
+			me[1][2] > other[0][2]
+		);
+	}
+
+	IntersectsAny(otherNodes = Engine.GetSceneRenderNodes()) {
+		otherNodes = otherNodes.filter((n) => n != this);
+		for (let otherNode of otherNodes) {
+			if (this.Intersects(otherNode)) return true;
+		}
+		return false;
 	}
 
 	override Update(deltaTime: number, worldMatrix?: number[]) {
