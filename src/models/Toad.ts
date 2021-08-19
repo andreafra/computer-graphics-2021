@@ -161,7 +161,7 @@ const MovementAction = (
 	];
 	targetDir = utils.normalize(targetDir);
 
-	let collisions = node.Intersects(true);
+	let collisions = node.Intersects();
 	for (let otherNode of collisions) {
 		let toadPos = node.GetWorldCoordinates();
 		let otherPos = otherNode.GetWorldCoordinates();

@@ -7,15 +7,12 @@ export type IBounds = IBoxBounds & ICylindricBounds;
 export type PhysicsState = IRenderableState & IBounds;
 
 export class PhysicsNode<T extends PhysicsState> extends RenderNode<T> {
-	Intersects(
-		useCylinder: boolean,
-		otherNodes = Engine.GetAllNodesWithBoxBounds()
-	) {
+	Intersects(otherNodes = Engine.GetAllNodesWithBoxBounds()) {
 		let collisions = [];
 		otherNodes = otherNodes.filter((n) => n != this);
 		for (let otherNode of otherNodes) {
 			if (otherNode.state.bounds) {
-				if (useCylinder && this.state.radius && this.state.height) {
+				if (this.state.radius && this.state.height) {
 					if (TestCylinderVsBoxCollision(this, otherNode)) {
 						collisions.push(otherNode);
 					}
