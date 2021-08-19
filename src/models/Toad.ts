@@ -250,7 +250,12 @@ const MovementAction = (
 	if (
 		state.yVelocity < 0 &&
 		Map.IsGrounded(
-			utils.addVectors(worldPosition, [0, state.yVelocity * deltaTime, 0])
+			utils.addVectors(worldPosition, [
+				0,
+				state.yVelocity * deltaTime,
+				0,
+			]),
+			state.radius / 2
 		)
 	) {
 		state.yVelocity = 0;
@@ -282,7 +287,8 @@ const JumpAction = (
 		let pos = node.GetWorldCoordinates();
 		if (
 			Map.IsGrounded(
-				utils.addVectors(pos, [0, -node.state.jumpTrigger, 0])
+				utils.addVectors(pos, [0, -node.state.jumpTrigger, 0]),
+				node.state.radius / 2
 			)
 		) {
 			node.state.yVelocity = node.state.jumpVelocity;

@@ -6,6 +6,7 @@ import * as Enemy from "./models/Enemy";
 import * as Core from "./engine/Core";
 import * as SceneGraph from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
+import { utils } from "./utils/utils";
 
 export enum CellType {
 	Empty = 0,
@@ -171,9 +172,19 @@ function AreValidCoordinates(coords: number[]) {
 	);
 }
 
-export function IsGrounded(pos: number[]) {
+export function IsGrounded(pos: number[], radius?: number) {
 	let cellBelow = GetCell(ToMapCoords(pos));
-	return cellBelow?.node?.name.startsWith("block-");
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
+	if (!radius) return false;
+
+	cellBelow = GetCell(ToMapCoords(utils.addVectors(pos, [radius, 0, 0])));
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
+	cellBelow = GetCell(ToMapCoords(utils.addVectors(pos, [-radius, 0, 0])));
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
+	cellBelow = GetCell(ToMapCoords(utils.addVectors(pos, [0, 0, radius])));
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
+	cellBelow = GetCell(ToMapCoords(utils.addVectors(pos, [0, 0, -radius])));
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
 }
 
 export function InitSampleCubes() {
