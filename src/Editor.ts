@@ -29,7 +29,7 @@ export function DoActionOnSelectedBlock(hit: HitNode) {
 					[-0.5, 0.0, -0.5]
 				)
 			);
-			if (hit.node.name.startsWith("block-")) hit.node.Remove();
+			if (!hit.node.name.startsWith("cpt-toad")) hit.node.Remove();
 			Map.SetCell(mapPos, Map.CellType.Empty);
 		}
 		if (editMode === "ADD") {

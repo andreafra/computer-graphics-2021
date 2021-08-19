@@ -3,8 +3,11 @@ import * as Map from "./Map";
 
 import grassYellowIcon from "./assets/icons/grass_yellow.png";
 import grassWhiteIcon from "./assets/icons/grass_white.png";
+import brickIcon from "./assets/icons/brick.png";
+import moonIcon from "./assets/icons/moon.png";
+import coinIcon from "./assets/icons/coin.png";
+import enemyIcon from "./assets/icons/enemy.png";
 
-import * as Core from "./engine/Core";
 import { ToggleMode } from "./main";
 
 const ButtonIcon = (
@@ -38,6 +41,10 @@ const contentHtml = `<!-- HTML Added by UI.ts -->
 		<div class="ui-separator"></div>
 		${ButtonImage(grassYellowIcon, "Block 1")}
 		${ButtonImage(grassWhiteIcon, "Block 2")}
+		${ButtonImage(brickIcon, "Brick")}
+		${ButtonImage(moonIcon, "Moon")}
+		${ButtonImage(coinIcon, "Coin")}
+		${ButtonImage(enemyIcon, "Enemy")}
 	</div>
 	<div class="ui-right">
 		<button class="ui-button" id="play-btn">▶️</button>
@@ -52,7 +59,21 @@ let moveBtn: HTMLElement,
 	removeBtn: HTMLElement,
 	blockYBtn: HTMLElement,
 	blockWBtn: HTMLElement,
+	brickBtn: HTMLElement,
+	moonBtn: HTMLElement,
+	coinBtn: HTMLElement,
+	enemyBtn: HTMLElement,
 	playBtn: HTMLElement;
+
+let elementBtns: HTMLElement[] = [];
+const elementCallbacks = [
+	HandleBlockWClick,
+	HandleBlockYClick,
+	HandleBrickClick,
+	HandleMoonClick,
+	HandleCoinClick,
+	HandleEnemyClick,
+];
 
 export function Init() {
 	container = document.getElementById("main-ui") as HTMLDivElement;
@@ -65,16 +86,29 @@ export function Init() {
 	removeBtn = document.getElementById("remove-btn");
 	blockYBtn = document.getElementById("block-1-btn");
 	blockWBtn = document.getElementById("block-2-btn");
+	brickBtn = document.getElementById("brick-btn");
+	moonBtn = document.getElementById("moon-btn");
+	coinBtn = document.getElementById("coin-btn");
+	enemyBtn = document.getElementById("enemy-btn");
 	playBtn = document.getElementById("play-btn");
 	// closeBtn.addEventListener("click", () => {})
+
+	elementBtns = [blockWBtn, blockYBtn, brickBtn, moonBtn, coinBtn, enemyBtn];
 
 	addBtn.addEventListener("click", HandleAddClick);
 	moveBtn.addEventListener("click", HandleMoveClick);
 	removeBtn.addEventListener("click", HandleRemoveClick);
-	blockYBtn.addEventListener("click", HandleBlockYClick);
-	blockWBtn.addEventListener("click", HandleBlockWClick);
 	playBtn.addEventListener("click", HandlePlayClick);
+
+	for (let i = 0; i < elementBtns.length; i++) {
+		elementBtns[i].addEventListener("click", elementCallbacks[i]);
+	}
+
 	HandleAddClick(null);
+}
+
+function DeselectAllElements() {
+	elementBtns.forEach((e) => e.classList.remove("selected"));
 }
 
 function HandleMoveClick(ev?: MouseEvent) {
@@ -104,15 +138,43 @@ function HandleRemoveClick(ev?: MouseEvent) {
 function HandleBlockYClick(ev?: MouseEvent) {
 	if (Editor.GetActiveBlock() != Map.CellType.BlockYellow) {
 		Editor.SetActiveBlock(Map.CellType.BlockYellow);
+		DeselectAllElements();
 		blockYBtn.classList.add("selected");
-		blockWBtn.classList.remove("selected");
 	}
 }
 function HandleBlockWClick(ev?: MouseEvent) {
 	if (Editor.GetActiveBlock() != Map.CellType.BlockWhite) {
 		Editor.SetActiveBlock(Map.CellType.BlockWhite);
-		blockYBtn.classList.remove("selected");
+		DeselectAllElements();
 		blockWBtn.classList.add("selected");
+	}
+}
+function HandleBrickClick(ev?: MouseEvent) {
+	if (Editor.GetActiveBlock() != Map.CellType.Brick) {
+		Editor.SetActiveBlock(Map.CellType.Brick);
+		DeselectAllElements();
+		brickBtn.classList.add("selected");
+	}
+}
+function HandleMoonClick(ev?: MouseEvent) {
+	if (Editor.GetActiveBlock() != Map.CellType.Moon) {
+		Editor.SetActiveBlock(Map.CellType.Moon);
+		DeselectAllElements();
+		moonBtn.classList.add("selected");
+	}
+}
+function HandleCoinClick(ev?: MouseEvent) {
+	if (Editor.GetActiveBlock() != Map.CellType.Coin) {
+		Editor.SetActiveBlock(Map.CellType.Coin);
+		DeselectAllElements();
+		coinBtn.classList.add("selected");
+	}
+}
+function HandleEnemyClick(ev?: MouseEvent) {
+	if (Editor.GetActiveBlock() != Map.CellType.Enemy) {
+		Editor.SetActiveBlock(Map.CellType.Enemy);
+		DeselectAllElements();
+		enemyBtn.classList.add("selected");
 	}
 }
 function HandlePlayClick() {
