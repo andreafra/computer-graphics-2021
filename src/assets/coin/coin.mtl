@@ -1,0 +1,15 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl BodyMT.001
+Ns 225.000000
+Ka 0.495455 0.495455 0.495455
+Kd 0.698133 0.801924 0.020082
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump Textures/coinbody00_nrm.png
+map_Kd Textures/coinbody00_alb.png
+refl Textures/coinbody00_rgh.png
