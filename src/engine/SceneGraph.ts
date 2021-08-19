@@ -108,8 +108,8 @@ export class Node<T extends State> {
 		this.SetParent(null);
 	}
 
-	GetLocalCoordinates() {
-		return utils.ComputePosition(this.state.localMatrix, [0, 0, 0]);
+	GetWorldCoordinates() {
+		return utils.ComputePosition(this.state.worldMatrix, [0, 0, 0]);
 	}
 }
 

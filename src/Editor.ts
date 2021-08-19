@@ -25,7 +25,7 @@ export function DoActionOnSelectedBlock(hit: HitNode) {
 		if (editMode === "REMOVE") {
 			let mapPos = Map.ToMapCoords(
 				utils.addVectors(
-					hit.node.GetLocalCoordinates(),
+					hit.node.GetWorldCoordinates(),
 					[-0.5, 0.0, -0.5]
 				)
 			);
