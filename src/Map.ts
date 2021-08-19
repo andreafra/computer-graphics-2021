@@ -171,6 +171,11 @@ function AreValidCoordinates(coords: number[]) {
 	);
 }
 
+export function IsGrounded(pos: number[]) {
+	let cellBelow = GetCell(ToMapCoords(pos));
+	return cellBelow?.node?.name.startsWith("block-");
+}
+
 export function InitSampleCubes() {
 	// EXAMPLE: Place some blocks
 	map[0][1][0] = { type: CellType.BlockWhite };

@@ -247,12 +247,12 @@ const MovementAction = (
 	// Handle gravity differently
 	// Don't ever let toad collide with the ground or bad things happen above
 	state.yVelocity -= state.gravity * deltaTime;
-	let cellBelow = Map.GetCell(
-		Map.ToMapCoords(
+	if (
+		state.yVelocity < 0 &&
+		Map.IsGrounded(
 			utils.addVectors(worldPosition, [0, state.yVelocity * deltaTime, 0])
 		)
-	);
-	if (state.yVelocity < 0 && cellBelow?.node?.name.startsWith("block-")) {
+	) {
 		state.yVelocity = 0;
 		localPosition[1] = Math.floor(localPosition[1]) + 0.0001;
 		translation[1] = 0;
@@ -279,16 +279,12 @@ const JumpAction = (
 	node: PhysicsNode<ToadState>
 ): void => {
 	if (Input.moveDir[1] == 1) {
-		let cellBelow = Map.GetCell(
-			Map.ToMapCoords(
-				utils.addVectors(node.GetWorldCoordinates(), [
-					0,
-					-node.state.jumpTrigger,
-					0,
-				])
+		let pos = node.GetWorldCoordinates();
+		if (
+			Map.IsGrounded(
+				utils.addVectors(pos, [0, -node.state.jumpTrigger, 0])
 			)
-		);
-		if (cellBelow?.node?.name.startsWith("block-")) {
+		) {
 			node.state.yVelocity = node.state.jumpVelocity;
 		}
 	}
