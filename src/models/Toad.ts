@@ -111,8 +111,8 @@ export function Spawn() {
 	toadNode.state.moveSpeed = 2.0;
 	toadNode.state.yVelocity = 0;
 	toadNode.state.gravity = 8;
-	toadNode.state.jumpVelocity = 4.0;
-	toadNode.state.jumpTrigger = 0.2;
+	toadNode.state.jumpVelocity = 4.5;
+	toadNode.state.jumpTrigger = 0.1;
 
 	var headLight = new LightNode<State>(
 		"headlight",
