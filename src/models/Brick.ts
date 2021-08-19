@@ -26,9 +26,7 @@ let normalMap: () => void;
 
 export function Init() {
 	// SHADERS
-	programInfo = getShader(
-		Features.Texture | Features.EmissiveMap | Features.NormalMap
-	);
+	programInfo = getShader(Features.Texture | Features.NormalMap);
 	gl.useProgram(programInfo.program);
 
 	// CREATE MODEL
@@ -63,7 +61,7 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 		materialColor: [0.0, 0.0, 0.0],
 		materialAmbColor: [1, 1, 1],
 		materialSpecColor: [0.3, 0.3, 0.3],
-		materialEmitColor: [0, 0, 0], // Use emissive map instead
+		materialEmitColor: [0.1, 0.1, 0.1], // clay should probably not emit, but this looks nice ^^
 		programInfo: programInfo,
 		bufferLength: brick_OBJ.indices.length,
 		vertexArrayObject: vao,
