@@ -28,6 +28,10 @@ import {
 // Define common structure for state of these nodes
 interface ToadState extends PhysicsState {
 	moveSpeed: number;
+	yVelocity: number;
+	gravity: number;
+	jumpVelocity: number;
+	jumpTrigger: number;
 }
 
 let programInfo: WebGLProgramInfo;
@@ -87,7 +91,7 @@ export function Spawn() {
 		// Box bounds
 		bounds: BOX_DEFAULT_BOUNDS,
 		radius: 0.5,
-		height: 1,
+		height: 0.95, // sneak under a block
 		// Render
 		materialColor: [0.0, 0.0, 0.0],
 		materialAmbColor: [1, 1, 1],
@@ -105,6 +109,10 @@ export function Spawn() {
 	};
 
 	toadNode.state.moveSpeed = 2.0;
+	toadNode.state.yVelocity = 0;
+	toadNode.state.gravity = 0.2;
+	toadNode.state.jumpVelocity = 4.0;
+	toadNode.state.jumpTrigger = 0.2;
 
 	var headLight = new LightNode<State>(
 		"headlight",
@@ -121,6 +129,7 @@ export function Spawn() {
 		)
 	);
 
+	toadNode.AddAction(JumpAction);
 	toadNode.AddAction(MovementAction);
 
 	// Set relationships between nodes
@@ -146,9 +155,7 @@ const MovementAction = (
 	let localPosition = utils.ComputePosition(state.localMatrix, [0, 0, 0]);
 
 	let camera = GetActiveCamera();
-
 	let alpha = Math.atan2(camera.normDir[0], camera.normDir[2]);
-
 	let targetDir = [
 		-Math.sin(alpha) * Input.moveDir[2] +
 			Math.cos(alpha) * Input.moveDir[0],
@@ -157,6 +164,7 @@ const MovementAction = (
 			-Math.sin(alpha) * Input.moveDir[0],
 	];
 	targetDir = utils.normalize(targetDir);
+	if (state.yVelocity > 0) targetDir[1] = state.yVelocity;
 
 	let blockCollisions = node.Intersects(
 		Engine.GetAllNodesWithBoxBounds().filter((n) =>
@@ -173,11 +181,16 @@ const MovementAction = (
 
 		// This is definitely not the fastest nor best way to do this...
 		while (utils.ManhattanDistance(toadMapPosition, otherMapPosition) > 1) {
-			toadPos = utils.addVectors(
-				toadPos,
-				utils.multiplyVectorScalar(collisionTrueDirection, 0.1)
-			);
-			toadMapPosition = Map.ToMapCoords(toadPos);
+			if (toadMapPosition[1] < otherMapPosition[1]) {
+				// Let me jump man...
+				toadMapPosition[1] = otherMapPosition[1];
+			} else {
+				toadPos = utils.addVectors(
+					toadPos,
+					utils.multiplyVectorScalar(collisionTrueDirection, 0.1)
+				);
+				toadMapPosition = Map.ToMapCoords(toadPos);
+			}
 		}
 		if (utils.ManhattanDistance(toadMapPosition, otherMapPosition) == 0) {
 			// If we went down to zero, we were exactly diagonal. Revert back.
@@ -195,6 +208,10 @@ const MovementAction = (
 				utils.multiplyVectorScalar(collisionNormal, velocityToScrub)
 			);
 		}
+	}
+	if (state.yVelocity > 0) {
+		state.yVelocity = targetDir[1];
+		targetDir[1] = 0;
 	}
 
 	let translation = utils.multiplyVectorScalar(
@@ -227,6 +244,26 @@ const MovementAction = (
 	}
 	lerping.timeElapsed += deltaTime;
 
+	// Handle gravity differently
+	// Don't ever let toad collide with the ground or bad things happen above
+	state.yVelocity -= state.gravity;
+	let cellBelow = Map.GetCell(
+		Map.ToMapCoords(
+			utils.addVectors(worldPosition, [0, state.yVelocity * deltaTime, 0])
+		)
+	);
+	if (
+		state.yVelocity < 0 &&
+		cellBelow &&
+		cellBelow.type != Map.CellType.Empty
+	) {
+		state.yVelocity = 0;
+		localPosition[1] = Math.floor(localPosition[1]) + 0.0001;
+		translation[1] = 0;
+	} else {
+		translation[1] = state.yVelocity * deltaTime;
+	}
+
 	state.localMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(
 			localPosition[0] + translation[0],
@@ -239,4 +276,24 @@ const MovementAction = (
 	// Camera follow toad
 	camera.translation = worldPosition;
 	camera.Update();
+};
+
+const JumpAction = (
+	deltaTime: DOMHighResTimeStamp,
+	node: PhysicsNode<ToadState>
+): void => {
+	if (Input.moveDir[1] == 1) {
+		let cellBelow = Map.GetCell(
+			Map.ToMapCoords(
+				utils.addVectors(node.GetWorldCoordinates(), [
+					0,
+					-node.state.jumpTrigger,
+					0,
+				])
+			)
+		);
+		if (cellBelow && cellBelow.type != Map.CellType.Empty) {
+			node.state.yVelocity = node.state.jumpVelocity;
+		}
+	}
 };

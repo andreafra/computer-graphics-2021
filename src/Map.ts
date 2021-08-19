@@ -131,8 +131,7 @@ export function DrawGrid() {
 export function ToMapCoords(n: number[]) {
 	let p = [];
 	p[0] = Math.floor(n[0]) + HALF_MAP_SIZE;
-	let y = Math.floor(n[1]);
-	p[1] = Math.max(y, 0);
+	p[1] = Math.floor(n[1]);
 	p[2] = Math.floor(n[2]) + HALF_MAP_SIZE;
 	return p;
 }
