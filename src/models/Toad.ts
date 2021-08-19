@@ -161,14 +161,31 @@ const MovementAction = (
 	];
 	targetDir = utils.normalize(targetDir);
 
-	// Test all directions for a collision
 	let collisions = node.Intersects(true);
 	for (let otherNode of collisions) {
+		let toadPos = node.GetWorldCoordinates();
+		let otherPos = otherNode.GetWorldCoordinates();
+		let collisionTrueDirection = utils.subtractVectors(otherPos, toadPos);
+
+		let toadMapPosition = Map.ToMapCoords(toadPos);
+		let otherMapPosition = Map.ToMapCoords(otherPos);
+
+		// This is definitely not the fastest nor best way to do this...
+		while (utils.ManhattanDistance(toadMapPosition, otherMapPosition) > 1) {
+			toadPos = utils.addVectors(
+				toadPos,
+				utils.multiplyVectorScalar(collisionTrueDirection, 0.1)
+			);
+			toadMapPosition = Map.ToMapCoords(toadPos);
+		}
+		if (utils.ManhattanDistance(toadMapPosition, otherMapPosition) == 0) {
+			// If we went down to zero, we were exactly diagonal. Revert back.
+			toadPos = node.GetWorldCoordinates();
+			toadMapPosition = Map.ToMapCoords(toadPos);
+		}
+
 		let collisionNormal = utils.normalize(
-			utils.subtractVectors(
-				Map.ToMapCoords(otherNode.GetWorldCoordinates()),
-				Map.ToMapCoords(node.GetWorldCoordinates())
-			)
+			utils.subtractVectors(otherMapPosition, toadMapPosition)
 		);
 		let velocityToScrub = utils.dot(targetDir, collisionNormal);
 		if (velocityToScrub > 0) {

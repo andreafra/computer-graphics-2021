@@ -769,6 +769,14 @@ export class utils {
 		return Math.sqrt(sum);
 	};
 
+	static ManhattanDistance = (a: number[], b: number[]) => {
+		let sum = 0;
+		for (let i = 0; i < a.length; i++) {
+			sum += Math.abs(a[i] - b[i]);
+		}
+		return sum;
+	};
+
 	static LerpAngle = (a: number, b: number, interp: number) => {
 		// Assuming [-PI,PI]
 		// Which way should we move?
