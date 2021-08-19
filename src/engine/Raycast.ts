@@ -2,12 +2,14 @@ import { DrawLine, LineColor } from "./debug/Lines";
 import { utils } from "../utils/utils";
 import {
 	cameraMatrix,
-	GetSceneRenderNodes,
+	GetAllNodesWithBoxBounds,
 	gl,
 	projectionMatrix,
 } from "./Core";
-import { RenderNode, State } from "./SceneGraph";
+import { RenderNode, State, Node, IRenderableState } from "./SceneGraph";
 import * as Engine from "./Core";
+import { IBoxBounds } from "./Physics";
+import * as Physics from "./Physics";
 
 interface Ray {
 	origin: number[];
@@ -16,7 +18,7 @@ interface Ray {
 	sign: number[];
 }
 export interface HitNode {
-	node: RenderNode<State>;
+	node: Node<IBoxBounds>;
 	position: number[];
 	ray: Ray;
 }
@@ -26,29 +28,8 @@ export function Hit(x: number, y: number) {
 
 	let planePoint = IntersectPlane(ray);
 
-	let hitNodes: HitNode[] = GetSceneRenderNodes()
+	let hitNodes: HitNode[] = GetAllNodesWithBoxBounds()
 		.map((node) => {
-			// DEBUG: Draw bounding boxes
-			// let b = node.bounds;
-			// let minNx = b[0].slice();
-			// minNx[0] += 1;
-			// let minNy = b[0].slice();
-			// minNy[1] += 1;
-			// let minNz = b[0].slice();
-			// minNz[2] += 1;
-			// let maxNx = b[1].slice();
-			// maxNx[0] -= 1;
-			// let maxNy = b[1].slice();
-			// maxNy[1] -= 1;
-			// let maxNz = b[1].slice();
-			// maxNz[2] -= 1;
-			// DrawLine(b[0], minNx, LineColor.RED);
-			// DrawLine(b[0], minNy, LineColor.RED);
-			// DrawLine(b[0], minNz, LineColor.RED);
-			// DrawLine(b[1], maxNx, LineColor.RED);
-			// DrawLine(b[1], maxNy, LineColor.RED);
-			// DrawLine(b[1], maxNz, LineColor.RED);
-
 			let hit = IntersectNode(node, ray);
 
 			return hit
@@ -130,21 +111,26 @@ function GetRay(x: number, y: number) {
 }
 
 // For in-depth explaination, refer to https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
-function IntersectNode(node: RenderNode<State>, ray: Ray) {
+function IntersectNode(node: Node<IBoxBounds>, ray: Ray) {
+	let bounds = Physics.BoxBoundsToWorldCoordinates(
+		node.state.bounds,
+		node.state.worldMatrix
+	);
+
 	let tmin, tmax, tymin, tymax, tzmin, tzmax;
 
-	tmin = (node.bounds[ray.sign[0]][0] - ray.origin[0]) * ray.invDir[0];
-	tmax = (node.bounds[1 - ray.sign[0]][0] - ray.origin[0]) * ray.invDir[0];
+	tmin = (bounds[ray.sign[0]][0] - ray.origin[0]) * ray.invDir[0];
+	tmax = (bounds[1 - ray.sign[0]][0] - ray.origin[0]) * ray.invDir[0];
 
-	tymin = (node.bounds[ray.sign[1]][1] - ray.origin[1]) * ray.invDir[1];
-	tymax = (node.bounds[1 - ray.sign[1]][1] - ray.origin[1]) * ray.invDir[1];
+	tymin = (bounds[ray.sign[1]][1] - ray.origin[1]) * ray.invDir[1];
+	tymax = (bounds[1 - ray.sign[1]][1] - ray.origin[1]) * ray.invDir[1];
 
 	if (tmin > tymax || tymin > tmax) return null;
 	if (tymin > tmin) tmin = tymin;
 	if (tymax < tmax) tmax = tymax;
 
-	tzmin = (node.bounds[ray.sign[2]][2] - ray.origin[2]) * ray.invDir[2];
-	tzmax = (node.bounds[1 - ray.sign[2]][2] - ray.origin[2]) * ray.invDir[2];
+	tzmin = (bounds[ray.sign[2]][2] - ray.origin[2]) * ray.invDir[2];
+	tzmax = (bounds[1 - ray.sign[2]][2] - ray.origin[2]) * ray.invDir[2];
 
 	if (tmin > tzmax || tzmin > tmax) return null;
 	if (tzmin > tmin) tmin = tzmin;

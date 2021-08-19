@@ -1,6 +1,6 @@
 import * as Engine from "../engine/Core";
 import { MakeTexture, MakeVAO, TextureType } from "../engine/Models";
-import { RenderNode, State } from "../engine/SceneGraph";
+import { IRenderableState, RenderNode, State } from "../engine/SceneGraph";
 import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 import { gl } from "../engine/Core";
 import { utils } from "../utils/utils";
@@ -8,6 +8,7 @@ import { Light } from "../engine/Lights";
 import { LightNode } from "../engine/SceneGraph";
 import * as Input from "../Input";
 import { GetMode } from "../main";
+import * as Map from "../Map";
 
 // Assets
 import toad_OBJ from "../assets/cpt_toad/toad.obj";
@@ -18,9 +19,14 @@ import specularMapSrc from "../assets/cpt_toad/Textures/baked_spc.png";
 import ambientOcclusionSrc from "../assets/cpt_toad/Textures/baked_ao.png";
 import { GetActiveCamera } from "../main";
 import { DrawLine, LineColor } from "../engine/debug/Lines";
+import {
+	BOX_DEFAULT_BOUNDS,
+	PhysicsNode,
+	PhysicsState,
+} from "../engine/Physics";
 
 // Define common structure for state of these nodes
-interface ToadState extends State {
+interface ToadState extends PhysicsState {
 	moveSpeed: number;
 }
 
@@ -79,8 +85,13 @@ export function Spawn() {
 		utils.MakeTranslateMatrix(0, 0, 0),
 		utils.MakeScaleMatrix(1)
 	);
-	var toadNode = new RenderNode<ToadState>("cpt-toad", tMatrix);
-	toadNode.state.drawInfo = {
+	var toadNode = new PhysicsNode<ToadState>("cpt-toad", tMatrix);
+	toadNode.state = {
+		// Box bounds
+		bounds: BOX_DEFAULT_BOUNDS,
+		radius: 0.5,
+		height: 1,
+		// Render
 		materialColor: [0.0, 0.0, 0.0],
 		materialAmbColor: [1, 1, 1],
 		materialSpecColor: [0.3, 0.3, 0.3],
@@ -93,6 +104,7 @@ export function Spawn() {
 		normalMap: normalMap,
 		specularMap: specularMap,
 		ambientOcclusion: ambientOcclusion,
+		...toadNode.state,
 	};
 
 	toadNode.state.moveSpeed = 2.0;
@@ -125,7 +137,12 @@ let lookAngle = 0;
 let lerping = { from: lookAngle, to: lookAngle, timeElapsed: 0 };
 const lerpDuration = 0.1;
 
-const MovementAction = (deltaTime: number, state: ToadState): void => {
+const MovementAction = (
+	deltaTime: DOMHighResTimeStamp,
+	node: PhysicsNode<ToadState>
+): void => {
+	let state = node.state as ToadState;
+
 	if (GetMode() != "GAME") return;
 
 	let worldPosition = utils.ComputePosition(state.worldMatrix, [0, 0, 0]);
@@ -142,8 +159,45 @@ const MovementAction = (deltaTime: number, state: ToadState): void => {
 		-Math.cos(alpha) * Input.moveDir[2] +
 			-Math.sin(alpha) * Input.moveDir[0],
 	];
-	if (targetDir[0] != 0 || targetDir[2] != 0) {
-		targetDir = utils.normalize(targetDir);
+	targetDir = utils.normalize(targetDir);
+
+	let blockCollisions = node.Intersects(
+		Engine.GetAllNodesWithBoxBounds().filter((n) =>
+			n.name.startsWith("block-")
+		)
+	);
+	for (let otherNode of blockCollisions) {
+		let toadPos = node.GetWorldCoordinates();
+		let otherPos = otherNode.GetWorldCoordinates();
+		let collisionTrueDirection = utils.subtractVectors(otherPos, toadPos);
+
+		let toadMapPosition = Map.ToMapCoords(toadPos);
+		let otherMapPosition = Map.ToMapCoords(otherPos);
+
+		// This is definitely not the fastest nor best way to do this...
+		while (utils.ManhattanDistance(toadMapPosition, otherMapPosition) > 1) {
+			toadPos = utils.addVectors(
+				toadPos,
+				utils.multiplyVectorScalar(collisionTrueDirection, 0.1)
+			);
+			toadMapPosition = Map.ToMapCoords(toadPos);
+		}
+		if (utils.ManhattanDistance(toadMapPosition, otherMapPosition) == 0) {
+			// If we went down to zero, we were exactly diagonal. Revert back.
+			toadPos = node.GetWorldCoordinates();
+			toadMapPosition = Map.ToMapCoords(toadPos);
+		}
+
+		let collisionNormal = utils.normalize(
+			utils.subtractVectors(otherMapPosition, toadMapPosition)
+		);
+		let velocityToScrub = utils.dot(targetDir, collisionNormal);
+		if (velocityToScrub > 0) {
+			targetDir = utils.subtractVectors(
+				targetDir,
+				utils.multiplyVectorScalar(collisionNormal, velocityToScrub)
+			);
+		}
 	}
 
 	let translation = utils.multiplyVectorScalar(
@@ -151,7 +205,7 @@ const MovementAction = (deltaTime: number, state: ToadState): void => {
 		deltaTime * state.moveSpeed
 	);
 
-	if (Input.moveDir[0] != 0 || Input.moveDir[2] != 0) {
+	if (translation[0] != 0 || translation[2] != 0) {
 		let newAngle = -Math.atan2(targetDir[0], targetDir[2]);
 		if (newAngle != lerping.to) {
 			lerping.from = lookAngle;

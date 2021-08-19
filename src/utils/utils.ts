@@ -607,6 +607,10 @@ export class utils {
 			dst[0] = v[0] / length;
 			dst[1] = v[1] / length;
 			dst[2] = v[2] / length;
+		} else {
+			dst[0] = 0;
+			dst[1] = 0;
+			dst[2] = 0;
 		}
 		return dst;
 	};
@@ -763,6 +767,14 @@ export class utils {
 			sum += Math.pow(a[i] - b[i], 2);
 		}
 		return Math.sqrt(sum);
+	};
+
+	static ManhattanDistance = (a: number[], b: number[]) => {
+		let sum = 0;
+		for (let i = 0; i < a.length; i++) {
+			sum += Math.abs(a[i] - b[i]);
+		}
+		return sum;
 	};
 
 	static LerpAngle = (a: number, b: number, interp: number) => {
