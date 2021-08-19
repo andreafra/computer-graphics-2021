@@ -607,6 +607,10 @@ export class utils {
 			dst[0] = v[0] / length;
 			dst[1] = v[1] / length;
 			dst[2] = v[2] / length;
+		} else {
+			dst[0] = 0;
+			dst[1] = 0;
+			dst[2] = 0;
 		}
 		return dst;
 	};

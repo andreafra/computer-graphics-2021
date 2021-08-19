@@ -159,9 +159,7 @@ const MovementAction = (
 		-Math.cos(alpha) * Input.moveDir[2] +
 			-Math.sin(alpha) * Input.moveDir[0],
 	];
-	if (targetDir[0] != 0 || targetDir[2] != 0) {
-		targetDir = utils.normalize(targetDir);
-	}
+	targetDir = utils.normalize(targetDir);
 
 	// Test all directions for a collision
 	let collisions = node.Intersects(true);
