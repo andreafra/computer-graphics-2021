@@ -1,12 +1,20 @@
 import * as Block from "./models/Block";
+import * as Brick from "./models/Brick";
+import * as Moon from "./models/Moon";
+import * as Coin from "./models/Coin";
+import * as Enemy from "./models/Enemy";
 import * as Core from "./engine/Core";
 import * as SceneGraph from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
-import { gl } from "./engine/Core";
+
 export enum CellType {
 	Empty = 0,
 	BlockWhite = 1,
 	BlockYellow = 2,
+	Brick = 3,
+	Moon = 4,
+	Coin = 5,
+	Enemy = 6,
 }
 
 export class Cell {
@@ -37,6 +45,10 @@ for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
 
 export function Init() {
 	Block.Init();
+	Brick.Init();
+	Moon.Init();
+	Coin.Init();
+	Enemy.Init();
 
 	mapRoot = new SceneGraph.Node("map-root");
 	mapRoot.SetParent(Core.ROOT_NODE);
@@ -67,6 +79,17 @@ function InitCell(x: number, y: number, z: number, block: Cell) {
 		case CellType.BlockYellow:
 			Block.Spawn(Block.Type.Yellow, spawnCoord, mapRoot);
 			break;
+		case CellType.Brick:
+			Brick.Spawn(spawnCoord, mapRoot);
+			break;
+		case CellType.Moon:
+			Moon.Spawn(spawnCoord, mapRoot);
+			break;
+		case CellType.Coin:
+			Coin.Spawn(spawnCoord, mapRoot);
+			break;
+		case CellType.Enemy:
+			Enemy.Spawn(spawnCoord, mapRoot);
 		default:
 			break;
 	}
