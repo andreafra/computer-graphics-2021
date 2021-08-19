@@ -110,7 +110,7 @@ export function Spawn() {
 
 	toadNode.state.moveSpeed = 2.0;
 	toadNode.state.yVelocity = 0;
-	toadNode.state.gravity = 0.2;
+	toadNode.state.gravity = 8;
 	toadNode.state.jumpVelocity = 4.0;
 	toadNode.state.jumpTrigger = 0.2;
 
@@ -246,7 +246,7 @@ const MovementAction = (
 
 	// Handle gravity differently
 	// Don't ever let toad collide with the ground or bad things happen above
-	state.yVelocity -= state.gravity;
+	state.yVelocity -= state.gravity * deltaTime;
 	let cellBelow = Map.GetCell(
 		Map.ToMapCoords(
 			utils.addVectors(worldPosition, [0, state.yVelocity * deltaTime, 0])
