@@ -124,21 +124,9 @@ export class RenderNode<T extends State> extends Node<T> {
 	}
 
 	get bounds(): number[][] {
-		let x = this.state.localMatrix[3];
-		let y = this.state.localMatrix[7];
-		let z = this.state.localMatrix[11];
-
 		return [
-			[
-				this._bounds[0][0] + x,
-				this._bounds[0][1] + y,
-				this._bounds[0][2] + z,
-			],
-			[
-				this._bounds[1][0] + x,
-				this._bounds[1][1] + y,
-				this._bounds[1][2] + z,
-			],
+			utils.ComputePosition(this.state.worldMatrix, this._bounds[0]),
+			utils.ComputePosition(this.state.worldMatrix, this._bounds[1]),
 		];
 	}
 
