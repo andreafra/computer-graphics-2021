@@ -16,7 +16,7 @@ export class Camera {
 
 	// Camera translation from (0,0,0)
 	// (tx, ty, yz) = target point
-	private _translation = [0, 0, 0];
+	private _translation = [0, 1, 0];
 
 	// Camera distance from the target point
 	private _distance: number;

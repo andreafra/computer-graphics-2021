@@ -164,8 +164,15 @@ function AreValidCoordinates(coords: number[]) {
 
 export function InitSampleCubes() {
 	// EXAMPLE: Place some blocks
-	map[0][0][0] = { type: CellType.BlockWhite };
-	map[0][0][1] = { type: CellType.BlockYellow };
-	map[1][0][0] = { type: CellType.BlockWhite };
-	map[0][1][0] = { type: CellType.BlockYellow };
+	map[0][1][0] = { type: CellType.BlockWhite };
+	map[0][1][1] = { type: CellType.BlockYellow };
+	map[1][1][0] = { type: CellType.BlockWhite };
+	map[0][2][0] = { type: CellType.BlockYellow };
+
+	// Also place a floor
+	for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
+		for (let z = 0; z < MAP_MAX_XZ_SIZE; z++) {
+			map[x][0][z] = { type: Math.floor(Math.random() * 2 + 1) };
+		}
+	}
 }

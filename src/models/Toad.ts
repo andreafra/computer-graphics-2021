@@ -81,10 +81,7 @@ export function Init() {
 
 export function Spawn() {
 	// SETUP NODES
-	let tMatrix = utils.multiplyMatrices(
-		utils.MakeTranslateMatrix(0, 0, 0),
-		utils.MakeScaleMatrix(1)
-	);
+	let tMatrix = utils.MakeTranslateMatrix(0, 1, 0);
 	var toadNode = new PhysicsNode<ToadState>("cpt-toad", tMatrix);
 	toadNode.state = {
 		// Box bounds
