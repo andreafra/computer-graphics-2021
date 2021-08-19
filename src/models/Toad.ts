@@ -252,11 +252,7 @@ const MovementAction = (
 			utils.addVectors(worldPosition, [0, state.yVelocity * deltaTime, 0])
 		)
 	);
-	if (
-		state.yVelocity < 0 &&
-		cellBelow &&
-		cellBelow.type != Map.CellType.Empty
-	) {
+	if (state.yVelocity < 0 && cellBelow?.node?.name.startsWith("block-")) {
 		state.yVelocity = 0;
 		localPosition[1] = Math.floor(localPosition[1]) + 0.0001;
 		translation[1] = 0;
@@ -292,7 +288,7 @@ const JumpAction = (
 				])
 			)
 		);
-		if (cellBelow && cellBelow.type != Map.CellType.Empty) {
+		if (cellBelow?.node?.name.startsWith("block-")) {
 			node.state.yVelocity = node.state.jumpVelocity;
 		}
 	}

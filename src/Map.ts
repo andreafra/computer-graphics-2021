@@ -17,8 +17,9 @@ export enum CellType {
 	Enemy = 6,
 }
 
-export class Cell {
+export interface Cell {
 	type: CellType;
+	node?: SceneGraph.RenderNode<SceneGraph.IRenderableState>;
 }
 
 const MAP_MAX_XZ_SIZE = 8;
@@ -72,24 +73,33 @@ function InitCell(x: number, y: number, z: number, block: Cell) {
 	];
 	switch (block.type) {
 		case CellType.Empty:
+			map[x][y][z].node = null;
 			break;
 		case CellType.BlockWhite:
-			Block.Spawn(Block.Type.White, spawnCoord, mapRoot);
+			map[x][y][z].node = Block.Spawn(
+				Block.Type.White,
+				spawnCoord,
+				mapRoot
+			);
 			break;
 		case CellType.BlockYellow:
-			Block.Spawn(Block.Type.Yellow, spawnCoord, mapRoot);
+			map[x][y][z].node = Block.Spawn(
+				Block.Type.Yellow,
+				spawnCoord,
+				mapRoot
+			);
 			break;
 		case CellType.Brick:
-			Brick.Spawn(spawnCoord, mapRoot);
+			map[x][y][z].node = Brick.Spawn(spawnCoord, mapRoot);
 			break;
 		case CellType.Moon:
-			Moon.Spawn(spawnCoord, mapRoot);
+			map[x][y][z].node = Moon.Spawn(spawnCoord, mapRoot);
 			break;
 		case CellType.Coin:
-			Coin.Spawn(spawnCoord, mapRoot);
+			map[x][y][z].node = Coin.Spawn(spawnCoord, mapRoot);
 			break;
 		case CellType.Enemy:
-			Enemy.Spawn(spawnCoord, mapRoot);
+			map[x][y][z].node = Enemy.Spawn(spawnCoord, mapRoot);
 		default:
 			break;
 	}
