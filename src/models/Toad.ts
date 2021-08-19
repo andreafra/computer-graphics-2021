@@ -205,7 +205,10 @@ const MovementAction = (
 		deltaTime * state.moveSpeed
 	);
 
-	if (translation[0] != 0 || translation[2] != 0) {
+	if (
+		Math.abs(translation[0]) > 0.00001 ||
+		Math.abs(translation[2]) > 0.00001
+	) {
 		let newAngle = -Math.atan2(targetDir[0], targetDir[2]);
 		if (newAngle != lerping.to) {
 			lerping.from = lookAngle;
