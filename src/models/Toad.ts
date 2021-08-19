@@ -161,8 +161,12 @@ const MovementAction = (
 	];
 	targetDir = utils.normalize(targetDir);
 
-	let collisions = node.Intersects();
-	for (let otherNode of collisions) {
+	let blockCollisions = node.Intersects(
+		Engine.GetAllNodesWithBoxBounds().filter((n) =>
+			n.name.startsWith("block-")
+		)
+	);
+	for (let otherNode of blockCollisions) {
 		let toadPos = node.GetWorldCoordinates();
 		let otherPos = otherNode.GetWorldCoordinates();
 		let collisionTrueDirection = utils.subtractVectors(otherPos, toadPos);
