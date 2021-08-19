@@ -1,0 +1,16 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl BodyMT00
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump Textures/chorobonbody00_nrm.png
+map_Kd Textures/chorobonbody00_alb.png
+map_Ke Textures/chorobonbody00_emm.png
+refl Textures/chorobonbody00_rgh.png
