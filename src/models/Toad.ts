@@ -271,14 +271,14 @@ const MovementAction = (
 		Map.IsGrounded(
 			utils.addVectors(worldPosition, [
 				0,
-				state.yVelocity * deltaTime,
+				Math.max(-0.99, state.yVelocity * deltaTime),
 				0,
 			]),
 			state.radius / 2
 		)
 	) {
 		state.yVelocity = 0;
-		localPosition[1] = Math.floor(localPosition[1]) + 0.0001;
+		localPosition[1] = Math.floor(localPosition[1]) + 0.001;
 		translation[1] = 0;
 	} else {
 		translation[1] = state.yVelocity * deltaTime;
