@@ -1,16 +1,9 @@
-import pxBaseSrc from "./assets/skybox/texture/px.png";
-import nxBaseSrc from "./assets/skybox/texture/nx.png";
+import pxBaseSrc from "./assets/skybox/texture/sideClouds.png";
+import nxBaseSrc from "./assets/skybox/texture/sideClouds.png";
 import pyBaseSrc from "./assets/skybox/texture/py.png";
 import nyBaseSrc from "./assets/skybox/texture/ny.png";
-import pzBaseSrc from "./assets/skybox/texture/pz.png";
-import nzBaseSrc from "./assets/skybox/texture/nz.png";
-
-import pxEmissiveSrc from "./assets/skybox/emission/px.png";
-import nxEmissiveSrc from "./assets/skybox/emission/nx.png";
-import pyEmissiveSrc from "./assets/skybox/emission/py.png";
-import nyEmissiveSrc from "./assets/skybox/emission/ny.png";
-import pzEmissiveSrc from "./assets/skybox/emission/pz.png";
-import nzEmissiveSrc from "./assets/skybox/emission/nz.png";
+import pzBaseSrc from "./assets/skybox/texture/sideClouds.png";
+import nzBaseSrc from "./assets/skybox/texture/sideClouds.png";
 
 import cube_obj from "./assets/skybox/cube.obj";
 
@@ -28,7 +21,6 @@ interface ShaderProgramInfo {
 	locations: {
 		matrix: WebGLUniformLocation;
 		texture: WebGLUniformLocation;
-		emissiveMap: WebGLUniformLocation;
 	};
 }
 
@@ -37,7 +29,6 @@ interface ShaderState extends State {
 	programInfo: ShaderProgramInfo;
 	bufferLength: number;
 	baseTexture: () => void;
-	emissiveMap: () => void;
 }
 
 const BASE_TEX_SRC = [
@@ -48,19 +39,10 @@ const BASE_TEX_SRC = [
 	pzBaseSrc,
 	nzBaseSrc,
 ];
-const EMISSIVE_TEX_SRC = [
-	pxEmissiveSrc,
-	nxEmissiveSrc,
-	pyEmissiveSrc,
-	nyEmissiveSrc,
-	pzEmissiveSrc,
-	nzEmissiveSrc,
-];
 
 let programInfo: ShaderProgramInfo;
 let vao: WebGLVertexArrayObject;
 let baseTex: () => void;
-let emissiveMap: () => void;
 
 export function Init() {
 	const program = utils.createAndCompileShaders(gl, [
@@ -71,7 +53,6 @@ export function Init() {
 	gl.useProgram(program);
 
 	const textureImg: HTMLImageElement[] = [];
-	const emissiveImg: HTMLImageElement[] = [];
 	const target = [
 		gl.TEXTURE_CUBE_MAP_POSITIVE_X,
 		gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -133,7 +114,6 @@ export function Init() {
 	}
 
 	baseTex = Load(textureImg, BASE_TEX_SRC, gl.TEXTURE0);
-	emissiveMap = Load(emissiveImg, EMISSIVE_TEX_SRC, gl.TEXTURE8);
 
 	vao = MakeVAO(program, {
 		positions: cube_obj.vertices,
@@ -146,7 +126,6 @@ export function Init() {
 		locations: {
 			matrix: gl.getUniformLocation(program, "matrix"),
 			texture: gl.getUniformLocation(program, "baseTexture"),
-			emissiveMap: gl.getUniformLocation(program, "emissiveMap"),
 		},
 	};
 }
@@ -165,7 +144,6 @@ export function Spawn() {
 		...skyboxNode.state,
 		vao: vao,
 		baseTexture: baseTex,
-		emissiveMap: emissiveMap,
 		programInfo: programInfo,
 		bufferLength: cube_obj.indices.length,
 	};
@@ -194,7 +172,6 @@ class SkyboxNode<T extends ShaderState> extends Node<T> {
 		);
 
 		this.state.baseTexture();
-		this.state.emissiveMap();
 
 		gl.bindVertexArray(this.state.vao);
 		gl.drawElements(
