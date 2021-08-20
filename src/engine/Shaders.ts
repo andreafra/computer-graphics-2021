@@ -27,6 +27,7 @@ export interface WebGLProgramInfo {
 		normalMap?: WebGLUniformLocation;
 		specularMap?: WebGLUniformLocation;
 		ambientOcclusion?: WebGLUniformLocation;
+		// lights
 		lightType: WebGLUniformLocation;
 		lightPos: WebGLUniformLocation;
 		lightDir: WebGLUniformLocation;
@@ -35,6 +36,15 @@ export interface WebGLProgramInfo {
 		lightDecay: WebGLUniformLocation;
 		lightTarget: WebGLUniformLocation;
 		lightColor: WebGLUniformLocation;
+		// shadows
+		shadowPos: WebGLUniformLocation;
+		shadowDir: WebGLUniformLocation;
+		shadowConeOut: WebGLUniformLocation;
+		shadowConeIn: WebGLUniformLocation;
+		shadowDecay: WebGLUniformLocation;
+		shadowTarget: WebGLUniformLocation;
+		shadowColor: WebGLUniformLocation;
+
 		ambientLight: WebGLUniformLocation;
 		eyePos: WebGLUniformLocation;
 	};
@@ -107,6 +117,13 @@ export function getShader(features: number) {
 			lightDecay: gl.getUniformLocation(program, "LDecay"),
 			lightTarget: gl.getUniformLocation(program, "LTarget"),
 			lightColor: gl.getUniformLocation(program, "LColor"),
+			shadowPos: gl.getUniformLocation(program, "SdwPos"),
+			shadowDir: gl.getUniformLocation(program, "SdwDir"),
+			shadowConeOut: gl.getUniformLocation(program, "SdwConeOut"),
+			shadowConeIn: gl.getUniformLocation(program, "SdwConeIn"),
+			shadowDecay: gl.getUniformLocation(program, "SdwDecay"),
+			shadowTarget: gl.getUniformLocation(program, "SdwTarget"),
+			shadowColor: gl.getUniformLocation(program, "SdwColor"),
 			ambientLight: gl.getUniformLocation(program, "ambientLight"),
 			eyePos: gl.getUniformLocation(program, "eyePos"),
 		},

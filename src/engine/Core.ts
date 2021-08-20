@@ -5,6 +5,7 @@ import { IRenderableState, Node, RenderNode, State } from "./SceneGraph";
 import * as DebugLine from "./debug/Lines";
 import { WebGLProgramInfo } from "./Shaders";
 import { IBoxBounds, PhysicsNode, PhysicsState } from "./Physics";
+import { Shadow } from "./Shadows";
 
 export const ROOT_NODE: Node<State> = new Node("root");
 export let gl: WebGL2RenderingContext;
@@ -12,8 +13,11 @@ export let projectionMatrix = utils.identityMatrix();
 export let cameraMatrix = utils.identityMatrix();
 
 const N_LIGHTS = 16;
+const N_SHADOWS = 16;
 const lights = new Array<Light>(N_LIGHTS);
+const shadows = new Array<Shadow>(N_SHADOWS);
 let lightIdx = 0;
+let shadowIdx = 0;
 let ambientLight = [0, 0, 0];
 
 let renderQueue: ((VPMatrix: number[]) => void)[] = [];
@@ -41,6 +45,8 @@ function Render(time: DOMHighResTimeStamp) {
 	// Navigate the SceneGraph tree to update all elements // O(n)
 	lights.fill(new Light());
 	lightIdx = 0;
+	shadows.fill(new Shadow());
+	shadowIdx = 0;
 	renderQueue = [];
 	ROOT_NODE.Update(deltaTime);
 
@@ -138,6 +144,43 @@ export function AddLight(light: Light) {
 	if (lightIdx >= N_LIGHTS) throw "Cannot add any more lights";
 	lights[lightIdx] = light;
 	lightIdx++;
+}
+
+export function AddShadow(shadow: Shadow) {
+	if (shadowIdx >= N_SHADOWS) throw "Cannot add any more shadows";
+	shadows[shadowIdx] = shadow;
+	shadowIdx++;
+}
+
+export function BindAllShadowUniforms(programInfo: WebGLProgramInfo) {
+	gl.uniform3fv(
+		programInfo.locations.shadowPos,
+		shadows.map((s) => s.pos).flat(1)
+	);
+	gl.uniform3fv(
+		programInfo.locations.shadowDir,
+		shadows.map((s) => s.dir.map((d) => -d)).flat(1)
+	);
+	gl.uniform1fv(
+		programInfo.locations.shadowConeOut,
+		shadows.map((s) => s.coneOut)
+	);
+	gl.uniform1fv(
+		programInfo.locations.shadowConeIn,
+		shadows.map((s) => s.coneIn)
+	);
+	gl.uniform1fv(
+		programInfo.locations.shadowDecay,
+		shadows.map((s) => s.decay)
+	);
+	gl.uniform1fv(
+		programInfo.locations.shadowTarget,
+		shadows.map((s) => s.target)
+	);
+	gl.uniform4fv(
+		programInfo.locations.shadowColor,
+		shadows.map((s) => s.color).flat(1)
+	);
 }
 
 export function GetAllNodesWithBoxBounds() {

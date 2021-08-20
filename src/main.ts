@@ -3,13 +3,14 @@ import { utils } from "./utils/utils";
 import * as Engine from "./engine/Core";
 import * as toad from "./models/Toad";
 import { Light } from "./engine/Lights";
-import { LightNode } from "./engine/SceneGraph";
+import { LightNode, ShadowNode } from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
 import * as UI from "./UI";
 import * as Skybox from "./Skybox";
 import { Camera } from "./Camera";
 import * as Input from "./Input";
 import * as Map from "./Map";
+import { Shadow } from "./engine/Shadows";
 
 type Mode = "EDITOR" | "GAME";
 

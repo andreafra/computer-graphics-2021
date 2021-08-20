@@ -47,6 +47,15 @@ uniform float LDecay[N_LIGHTS];
 uniform float LTarget[N_LIGHTS];
 uniform vec4 LColor[N_LIGHTS];
 
+#define N_SHADOWS 16
+uniform vec3 SdwPos[N_SHADOWS];
+uniform vec3 SdwDir[N_SHADOWS];
+uniform float SdwConeOut[N_SHADOWS];
+uniform float SdwConeIn[N_SHADOWS];
+uniform float SdwDecay[N_SHADOWS];
+uniform float SdwTarget[N_SHADOWS];
+uniform vec4 SdwColor[N_SHADOWS];
+
 uniform vec3 ambientLight;
 
 #define SPEC_SHINE 100.0
@@ -84,6 +93,25 @@ vec4 compLightColor(vec4 lightColor, float LTarget, float LDecay, vec3 LPos, vec
 	return directLightCol * lightType.x +
 		   pointLightCol * lightType.y +
 		   spotLightCol * lightType.z;
+}
+
+vec3 compShadowDir(vec3 LPos, vec3 LDir) {
+	return normalize(LPos - fsPosition);
+}
+
+vec4 compShadowColor(vec4 shadowColor, float SdwTarget, float SdwDecay, vec3 SdwPos, vec3 SdwDir, float SdwConeOut, float SdwConeIn) {
+	// Calc the distance between the ShadowSource and the "ground"
+	// (since fake shadows are always vertical)
+	// Then divide the angle in radians by it to shrink the shadow angle
+	float invHeight = 1.0 / max(SdwPos.y - fsPosition.y, 1.0);
+	float SdwCosOut = cos(radians(SdwConeOut / 2.0) * invHeight);
+	float SdwCosIn = cos(radians(SdwConeOut * SdwConeIn / 2.0) * invHeight);
+
+	// -> Spot
+	vec3 shadowDir = normalize(SdwPos - fsPosition);
+	float CosAngle = dot(shadowDir, SdwDir);
+	return shadowColor * pow(SdwTarget / length(SdwPos - fsPosition), SdwDecay) *
+						clamp((CosAngle - SdwCosOut) / (SdwCosIn - SdwCosOut), 0.0, 1.0);
 }
 
 vec4 compSpecular(vec3 lightDir, vec4 lightCol, vec3 normalVec, vec3 eyedirVec) {
@@ -136,6 +164,14 @@ void main() {
 		lightsSpecular += compSpecular(lightDir, lightCol, normalVec, eyedirVec);
 	}
 
+	//shadows
+	vec4 shadowsDiffuse;
+	for (int i = 0; i < N_SHADOWS; i++) {
+		vec3 shadowDir = compShadowDir(SdwPos[i], SdwDir[i]);
+		vec4 shadowCol = compShadowColor(SdwColor[i], SdwTarget[i], SdwDecay[i], SdwPos[i], SdwDir[i], SdwConeOut[i], SdwConeIn[i]);
+		shadowsDiffuse += max(0.0, dot(shadowDir, normalVec)) * shadowCol;
+	}
+
 	vec4 diffColor = vec4(mDiffColor, 1.0);
 	vec4 emitColor = vec4(mEmitColor, 1.0);
 	vec4 ambColor = vec4(mAmbColor, 1.0);
@@ -155,7 +191,7 @@ void main() {
 	diffColor *= texture(ambientOcclusion, uvCoord);
 #endif
 
-	vec4 lambertColor = diffColor * lightsDiffuse;
+	vec4 lambertColor = diffColor * lightsDiffuse * (1.0 - shadowsDiffuse);
 	vec4 blinnColor = specColor * lightsSpecular;
 	vec4 ambientColor = vec4(ambientLight, 1.0) * ambColor;
 	outColor = clamp(lambertColor + blinnColor + emitColor + ambientColor, 0.0, 1.0);
