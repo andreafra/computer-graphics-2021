@@ -46,6 +46,13 @@ const contentHtml = `<!-- HTML Added by UI.ts -->
 		${ButtonImage(coinIcon, "Coin")}
 		${ButtonImage(enemyIcon, "Enemy")}
 	</div>
+	<div class="ui-left ui-editor">
+		<div class="ui-separator"></div>
+		<input id="file-input" type="file" name="name" style="display: none;" />
+		${ButtonIcon("📥", "Save")}
+		${ButtonIcon("📤", "Load")}
+		<div class="ui-separator"></div>
+	</div>
 	<div class="ui-right">
 		<button class="ui-button" id="play-btn">▶️</button>
 	</div>
@@ -63,7 +70,10 @@ let moveBtn: HTMLElement,
 	moonBtn: HTMLElement,
 	coinBtn: HTMLElement,
 	enemyBtn: HTMLElement,
-	playBtn: HTMLElement;
+	playBtn: HTMLElement,
+	saveBtn: HTMLElement,
+	filePicker: HTMLElement,
+	loadBtn: HTMLElement;
 
 let elementBtns: HTMLElement[] = [];
 const elementCallbacks = [
@@ -91,6 +101,9 @@ export function Init() {
 	coinBtn = document.getElementById("coin-btn");
 	enemyBtn = document.getElementById("enemy-btn");
 	playBtn = document.getElementById("play-btn");
+	loadBtn = document.getElementById("load-btn");
+	saveBtn = document.getElementById("save-btn");
+	filePicker = document.getElementById("file-input");
 	// closeBtn.addEventListener("click", () => {})
 
 	elementBtns = [blockWBtn, blockYBtn, brickBtn, moonBtn, coinBtn, enemyBtn];
@@ -98,7 +111,10 @@ export function Init() {
 	addBtn.addEventListener("click", HandleAddClick);
 	moveBtn.addEventListener("click", HandleMoveClick);
 	removeBtn.addEventListener("click", HandleRemoveClick);
+	saveBtn.addEventListener("click", HandleSaveClick);
+	loadBtn.addEventListener("click", HandleLoadClick);
 	playBtn.addEventListener("click", HandlePlayClick);
+	filePicker.addEventListener("change", HandleFileChosen);
 
 	for (let i = 0; i < elementBtns.length; i++) {
 		elementBtns[i].addEventListener("click", elementCallbacks[i]);
@@ -187,4 +203,15 @@ function HandlePlayClick() {
 	document
 		.querySelectorAll(".ui-game")
 		.forEach((e) => e.classList.toggle("hidden"));
+}
+
+function HandleSaveClick() {
+	Editor.ExportMap();
+}
+function HandleLoadClick() {
+	filePicker.click();
+}
+async function HandleFileChosen(event: Event) {
+	const fileList = (<HTMLInputElement>event.target).files;
+	fileList[0].text().then(Editor.ImportMap);
 }

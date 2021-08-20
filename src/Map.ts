@@ -55,6 +55,10 @@ export function Init() {
 	mapRoot = new SceneGraph.Node("map-root");
 	mapRoot.SetParent(Core.ROOT_NODE);
 
+	LoadMap();
+}
+
+export function LoadMap() {
 	for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
 		for (let y = 0; y < MAP_MAX_Y_SIZE; y++) {
 			for (let z = 0; z < MAP_MAX_XZ_SIZE; z++) {
@@ -200,4 +204,24 @@ export function InitSampleCubes() {
 			map[x][0][z] = { type: Math.floor(Math.random() * 2 + 1) };
 		}
 	}
+}
+
+export function Clear() {
+	for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
+		for (let y = 0; y < MAP_MAX_Y_SIZE; y++) {
+			for (let z = 0; z < MAP_MAX_XZ_SIZE; z++) {
+				map[x][y][z].node?.Remove();
+			}
+		}
+	}
+}
+
+export function Serialize() {
+	return JSON.stringify(map.map((a) => a.map((b) => b.map((c) => c.type))));
+}
+
+export function Deserialize(s: string) {
+	map = (JSON.parse(s) as number[][][]).map((a) =>
+		a.map((b) => b.map((c) => ({ type: c })))
+	);
 }

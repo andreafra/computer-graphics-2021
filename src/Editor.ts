@@ -1,6 +1,7 @@
 import { HitNode } from "./engine/Raycast";
 import * as Map from "./Map";
 import { utils } from "./utils/utils";
+import { saveAs } from "file-saver";
 
 type EditMode = "MOVE" | "ADD" | "REMOVE";
 
@@ -54,6 +55,18 @@ export function DoActionOnSelectedBlock(hit: HitNode) {
 			}
 		}
 	}
+}
+
+export function ExportMap() {
+	let file = new Blob([Map.Serialize()], {
+		type: "text/plain;charset=utf-8",
+	});
+	saveAs(file, "map.json");
+}
+export function ImportMap(s: string) {
+	Map.Clear();
+	Map.Deserialize(s);
+	Map.LoadMap();
 }
 
 export var selectedBlockCoord = [0, 0, 0];

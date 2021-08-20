@@ -16,6 +16,7 @@
 	"author": "Andrea Franchini <hello@andreafranchini.com>",
 	"license": "MIT",
 	"devDependencies": {
+		"@types/file-saver": "^2.0.3",
 		"css-loader": "^5.2.4",
 		"fbx-parser": "^2.1.3",
 		"gltf-loader-ts": "^0.3.1",
@@ -35,6 +36,7 @@
 		"webpack-obj-loader": "^1.0.4"
 	},
 	"dependencies": {
+		"file-saver": "^2.0.5",
 		"remove": "^0.1.5"
 	},
 	"lint-staged": {
