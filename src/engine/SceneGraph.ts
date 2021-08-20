@@ -4,6 +4,7 @@ import * as Engine from "./Core";
 import { Light } from "./Lights";
 import { WebGLProgramInfo } from "./Shaders";
 import { gl } from "./Core";
+import { Shadow } from "./Shadows";
 
 // A function that receives the state of the Node and performs actions on it
 export type Action<T extends State> = (
@@ -169,6 +170,7 @@ export class RenderNode<T extends IRenderableState> extends Node<T> {
 		);
 
 		Engine.BindAllLightUniforms(this.state.programInfo);
+		Engine.BindAllShadowUniforms(this.state.programInfo);
 
 		// Render Texture
 		if (this.state.texture) {
@@ -227,5 +229,30 @@ export class LightNode<T extends State> extends Node<T> {
 		// );
 
 		Engine.AddLight(this.light);
+	}
+}
+
+export class ShadowNode<T extends State> extends Node<T> {
+	shadow: Shadow = new Shadow();
+
+	constructor(name: string, shadow: Shadow, localMatrix?: number[]) {
+		super(name, localMatrix);
+		this.shadow = shadow;
+	}
+
+	override Update(deltaTime: number, worldMatrix?: number[]) {
+		super.Update(deltaTime, worldMatrix);
+		this.shadow.pos = utils.ComputePosition(
+			this.state.worldMatrix,
+			[0, 0, 0]
+		);
+		const down = [0, -1, 0]; // default direction
+		const p2 = utils.ComputePosition(this.state.worldMatrix, down);
+
+		this.shadow.dir = utils.subtractVectors(p2, this.shadow.pos);
+
+		this.shadow.dir = utils.normalize(this.shadow.dir);
+
+		Engine.AddShadow(this.shadow);
 	}
 }

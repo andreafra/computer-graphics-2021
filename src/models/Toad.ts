@@ -1,6 +1,11 @@
 import * as Engine from "../engine/Core";
 import { MakeTexture, MakeVAO, TextureType } from "../engine/Models";
-import { IRenderableState, RenderNode, State } from "../engine/SceneGraph";
+import {
+	IRenderableState,
+	RenderNode,
+	ShadowNode,
+	State,
+} from "../engine/SceneGraph";
 import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 import { gl } from "../engine/Core";
 import { utils } from "../utils/utils";
@@ -24,6 +29,7 @@ import {
 	PhysicsNode,
 	PhysicsState,
 } from "../engine/Physics";
+import { Shadow } from "../engine/Shadows";
 
 // Define common structure for state of these nodes
 interface ToadState extends PhysicsState {
@@ -129,11 +135,24 @@ export function Spawn() {
 		)
 	);
 
+	var shadowBelow = new ShadowNode(
+		"shadow-toad",
+		Shadow.Make(
+			[1, 1, 1, 1.0], // color
+			40, // coneOut, deg°
+			0.5, // coneIn, %
+			2, // targetDistance
+			1 // decay)
+		),
+		utils.MakeTranslateMatrix(0, 1, 0)
+	);
+
 	toadNode.AddAction(JumpAction);
 	toadNode.AddAction(MovementAction);
 
 	// Set relationships between nodes
 	headLight.SetParent(toadNode);
+	shadowBelow.SetParent(toadNode);
 	toadNode.SetParent(Engine.ROOT_NODE);
 
 	return toadNode;
