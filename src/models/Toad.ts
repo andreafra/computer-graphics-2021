@@ -5,12 +5,12 @@ import {
 	RenderNode,
 	ShadowNode,
 	State,
+	LightNode,
 } from "../engine/SceneGraph";
 import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 import { gl } from "../engine/Core";
 import { utils } from "../utils/utils";
 import { Light } from "../engine/Lights";
-import { LightNode } from "../engine/SceneGraph";
 import * as Input from "../Input";
 import { GetMode } from "../main";
 import * as Map from "../Map";

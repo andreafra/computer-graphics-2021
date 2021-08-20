@@ -4,10 +4,12 @@ import {
 	Node,
 	State,
 	IRenderableState,
+	LightNode,
 } from "../engine/SceneGraph";
 import { utils } from "../utils/utils";
 import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 import * as Engine from "../engine/Core";
+import { Light } from "../engine/Lights";
 
 // Assets
 import moon_OBJ from "../assets/moon/moon.obj";
@@ -77,6 +79,16 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 		emissiveMap: emissiveMap,
 		...moonNode.state,
 	};
+
+	let moonLight = new LightNode<State>(
+		"moon-light",
+		Light.MakePoint(
+			[0.29, 1.0, 0.57, 1.0], // color
+			0.5, // target distance
+			2 // decay
+		)
+	);
+	moonLight.SetParent(moonNode);
 
 	// Set relationships between nodes
 	moonNode.SetParent(mapRoot);
