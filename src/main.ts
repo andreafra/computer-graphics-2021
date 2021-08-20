@@ -6,7 +6,7 @@ import { Light } from "./engine/Lights";
 import { LightNode } from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
 import * as UI from "./UI";
-
+import * as Skybox from "./Skybox";
 import { Camera } from "./Camera";
 import * as Input from "./Input";
 import * as Map from "./Map";
@@ -53,6 +53,9 @@ async function init() {
 	Map.Init();
 	toad.Init();
 	toad.Spawn();
+
+	Skybox.Init();
+	Skybox.Spawn();
 
 	// Add some light
 	Engine.SetAmbientLight([0.3, 0.3, 0.4]);
