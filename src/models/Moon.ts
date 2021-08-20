@@ -84,9 +84,10 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 		"moon-light",
 		Light.MakePoint(
 			[0.29, 1.0, 0.57, 1.0], // color
-			0.5, // target distance
+			0.4, // target distance
 			2 // decay
-		)
+		),
+		utils.MakeTranslateMatrix(0, 0.6, 0)
 	);
 	moonLight.SetParent(moonNode);
 
