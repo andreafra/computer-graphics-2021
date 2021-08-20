@@ -100,8 +100,12 @@ vec3 compShadowDir(vec3 LPos, vec3 LDir) {
 }
 
 vec4 compShadowColor(vec4 shadowColor, float SdwTarget, float SdwDecay, vec3 SdwPos, vec3 SdwDir, float SdwConeOut, float SdwConeIn) {
-	float SdwCosOut = cos(radians(SdwConeOut / 2.0));
-	float SdwCosIn = cos(radians(SdwConeOut * SdwConeIn / 2.0));
+	// Calc the distance between the ShadowSource and the "ground"
+	// (since fake shadows are always vertical)
+	// Then divide the angle in radians by it to shrink the shadow angle
+	float invHeight = 1.0 / max(SdwPos.y - fsPosition.y, 1.0);
+	float SdwCosOut = cos(radians(SdwConeOut / 2.0) * invHeight);
+	float SdwCosIn = cos(radians(SdwConeOut * SdwConeIn / 2.0) * invHeight);
 
 	// -> Spot
 	vec3 shadowDir = normalize(SdwPos - fsPosition);
