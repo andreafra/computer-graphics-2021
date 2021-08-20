@@ -135,7 +135,7 @@ export function BindAllLightUniforms(programInfo: WebGLProgramInfo) {
 }
 
 export function AddLight(light: Light) {
-	if (lightIdx > 2) throw "Cannot add any more lights";
+	if (lightIdx >= N_LIGHTS) throw "Cannot add any more lights";
 	lights[lightIdx] = light;
 	lightIdx++;
 }
