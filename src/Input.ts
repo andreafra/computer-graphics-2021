@@ -133,7 +133,7 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 				break;
 
 			case " ":
-				console.log("jump!");
+				moveDir[1] = 1;
 				break;
 		}
 	}
@@ -167,7 +167,7 @@ function HandleInputKeyUp(ev: KeyboardEvent) {
 				break;
 
 			case " ":
-				console.log("jump!");
+				moveDir[1] = 0;
 				break;
 		}
 	}

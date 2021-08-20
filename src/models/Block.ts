@@ -90,4 +90,6 @@ export function Spawn(
 
 	// Set relationships between nodes
 	blockNode.SetParent(parentNode);
+
+	return blockNode;
 }

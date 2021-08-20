@@ -6,6 +6,7 @@ import * as Enemy from "./models/Enemy";
 import * as Core from "./engine/Core";
 import * as SceneGraph from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
+import { utils } from "./utils/utils";
 
 export enum CellType {
 	Empty = 0,
@@ -17,8 +18,9 @@ export enum CellType {
 	Enemy = 6,
 }
 
-export class Cell {
+export interface Cell {
 	type: CellType;
+	node?: SceneGraph.RenderNode<SceneGraph.IRenderableState>;
 }
 
 const MAP_MAX_XZ_SIZE = 8;
@@ -72,24 +74,33 @@ function InitCell(x: number, y: number, z: number, block: Cell) {
 	];
 	switch (block.type) {
 		case CellType.Empty:
+			map[x][y][z].node = null;
 			break;
 		case CellType.BlockWhite:
-			Block.Spawn(Block.Type.White, spawnCoord, mapRoot);
+			map[x][y][z].node = Block.Spawn(
+				Block.Type.White,
+				spawnCoord,
+				mapRoot
+			);
 			break;
 		case CellType.BlockYellow:
-			Block.Spawn(Block.Type.Yellow, spawnCoord, mapRoot);
+			map[x][y][z].node = Block.Spawn(
+				Block.Type.Yellow,
+				spawnCoord,
+				mapRoot
+			);
 			break;
 		case CellType.Brick:
-			Brick.Spawn(spawnCoord, mapRoot);
+			map[x][y][z].node = Brick.Spawn(spawnCoord, mapRoot);
 			break;
 		case CellType.Moon:
-			Moon.Spawn(spawnCoord, mapRoot);
+			map[x][y][z].node = Moon.Spawn(spawnCoord, mapRoot);
 			break;
 		case CellType.Coin:
-			Coin.Spawn(spawnCoord, mapRoot);
+			map[x][y][z].node = Coin.Spawn(spawnCoord, mapRoot);
 			break;
 		case CellType.Enemy:
-			Enemy.Spawn(spawnCoord, mapRoot);
+			map[x][y][z].node = Enemy.Spawn(spawnCoord, mapRoot);
 		default:
 			break;
 	}
@@ -131,8 +142,7 @@ export function DrawGrid() {
 export function ToMapCoords(n: number[]) {
 	let p = [];
 	p[0] = Math.floor(n[0]) + HALF_MAP_SIZE;
-	let y = Math.floor(n[1]);
-	p[1] = Math.max(y, 0);
+	p[1] = Math.floor(n[1]);
 	p[2] = Math.floor(n[2]) + HALF_MAP_SIZE;
 	return p;
 }
@@ -162,10 +172,32 @@ function AreValidCoordinates(coords: number[]) {
 	);
 }
 
+export function IsGrounded(pos: number[], radius?: number) {
+	let cellBelow = GetCell(ToMapCoords(pos));
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
+	if (!radius) return false;
+
+	cellBelow = GetCell(ToMapCoords(utils.addVectors(pos, [radius, 0, 0])));
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
+	cellBelow = GetCell(ToMapCoords(utils.addVectors(pos, [-radius, 0, 0])));
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
+	cellBelow = GetCell(ToMapCoords(utils.addVectors(pos, [0, 0, radius])));
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
+	cellBelow = GetCell(ToMapCoords(utils.addVectors(pos, [0, 0, -radius])));
+	if (cellBelow?.node?.name.startsWith("block-")) return true;
+}
+
 export function InitSampleCubes() {
 	// EXAMPLE: Place some blocks
-	map[0][0][0] = { type: CellType.BlockWhite };
-	map[0][0][1] = { type: CellType.BlockYellow };
-	map[1][0][0] = { type: CellType.BlockWhite };
-	map[0][1][0] = { type: CellType.BlockYellow };
+	map[0][1][0] = { type: CellType.BlockWhite };
+	map[0][1][1] = { type: CellType.BlockYellow };
+	map[1][1][0] = { type: CellType.BlockWhite };
+	map[0][2][0] = { type: CellType.BlockYellow };
+
+	// Also place a floor
+	for (let x = 0; x < MAP_MAX_XZ_SIZE; x++) {
+		for (let z = 0; z < MAP_MAX_XZ_SIZE; z++) {
+			map[x][0][z] = { type: Math.floor(Math.random() * 2 + 1) };
+		}
+	}
 }
