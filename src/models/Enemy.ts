@@ -7,6 +7,7 @@ import {
 } from "../engine/SceneGraph";
 import { utils } from "../utils/utils";
 import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
+import * as Engine from "../engine/Core";
 
 // Assets
 import enemy_OBJ from "../assets/enemy/enemy.obj";
@@ -18,7 +19,13 @@ import { gl } from "../engine/Core";
 import { BOX_DEFAULT_BOUNDS, IBoxBounds } from "../engine/Physics";
 
 // Define common structure for state of these nodes
-interface EnemyState extends IRenderableState, IBoxBounds {}
+interface EnemyState extends IRenderableState, IBoxBounds {
+	spawnCoord: number[];
+	spawnScale: number;
+	spawnTime: DOMHighResTimeStamp;
+	scaleIntensity: number;
+	scaleSpeed: number;
+}
 
 let programInfo: WebGLProgramInfo;
 let vao: WebGLVertexArrayObject;
@@ -63,15 +70,41 @@ export function Init() {
 	});
 }
 
+function ScaleAction(
+	deltaTime: DOMHighResTimeStamp,
+	node: RenderNode<EnemyState>
+) {
+	let state = node.state;
+	let currScale = state.localMatrix[0];
+	let yPos = utils.ComputePosition(state.localMatrix, [0, 0, 0])[1];
+
+	let timeOffset = Engine.GetTime() - state.spawnTime;
+	let scaleOffset =
+		state.scaleIntensity *
+		Math.sqrt(Math.abs(Math.sin(state.scaleSpeed * timeOffset)));
+	state.localMatrix = utils.multiplyMatrices(
+		state.localMatrix,
+		utils.MakeScaleMatrix((state.spawnScale + scaleOffset) / currScale),
+		utils.MakeTranslateMatrix(
+			0,
+			state.spawnCoord[1] - yPos - scaleOffset / 2, // model is centered at the bottom
+			0
+		)
+	);
+}
+
 export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	// SETUP NODES
+	let scale = 0.7;
+	spawnCoord[1] += (1 - scale) / 2;
+
 	let tMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(spawnCoord[0], spawnCoord[1], spawnCoord[2]),
-		utils.MakeScaleMatrix(1)
+		utils.MakeScaleMatrix(scale)
 	);
-	var coinNode = new RenderNode<EnemyState>("enemy", tMatrix);
-	coinNode.state = {
-		bounds: BOX_DEFAULT_BOUNDS,
+	var enemyNode = new RenderNode<EnemyState>("enemy", tMatrix);
+	enemyNode.state = {
+		bounds: BOX_DEFAULT_BOUNDS.map((pos) => pos.map((x) => x * scale)),
 		// render
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],
@@ -84,11 +117,18 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 		normalMap: normalMap,
 		emissiveMap: emissiveMap,
 		ambientOcclusion: aoMap,
-		...coinNode.state,
+		...enemyNode.state,
 	};
+	enemyNode.state.spawnCoord = spawnCoord;
+	enemyNode.state.spawnScale = scale;
+	enemyNode.state.scaleIntensity = 0.1;
+	enemyNode.state.scaleSpeed = 3;
+	enemyNode.state.spawnTime = Engine.GetTime();
+
+	enemyNode.AddAction(ScaleAction);
 
 	// Set relationships between nodes
-	coinNode.SetParent(mapRoot);
+	enemyNode.SetParent(mapRoot);
 
-	return coinNode;
+	return enemyNode;
 }
