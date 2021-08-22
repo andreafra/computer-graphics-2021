@@ -246,7 +246,7 @@ const MovementAction = (
 		if (newAngle != lerping.to) {
 			lerping.from = lookAngle;
 			lerping.to = newAngle;
-			lerping.timeElapsed = 0;
+			lerping.timeElapsed = deltaTime;
 		}
 		if (lerping.timeElapsed < lerpDuration) {
 			lookAngle = utils.LerpAngle(
