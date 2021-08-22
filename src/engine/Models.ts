@@ -56,7 +56,17 @@ export function MakeTexture(
 			textureImage
 		);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(
+			gl.TEXTURE_2D,
+			gl.TEXTURE_MIN_FILTER,
+			gl.LINEAR_MIPMAP_LINEAR
+		);
+		gl.texParameterf(
+			gl.TEXTURE_2D,
+			gl.getExtension("EXT_texture_filter_anisotropic")
+				.TEXTURE_MAX_ANISOTROPY_EXT,
+			16.0
+		);
 		gl.generateMipmap(gl.TEXTURE_2D);
 	};
 	const locator = MapTextureToLocator(textureData.type, programInfo);
