@@ -151,6 +151,7 @@ function HandleRemoveClick(ev?: MouseEvent) {
 	}
 }
 function HandleBlockYClick(ev?: MouseEvent) {
+	HandleAddClick(null);
 	if (Editor.GetActiveBlock() != Map.CellType.BlockYellow) {
 		Editor.SetActiveBlock(Map.CellType.BlockYellow);
 		DeselectAllElements();
@@ -158,6 +159,7 @@ function HandleBlockYClick(ev?: MouseEvent) {
 	}
 }
 function HandleBlockWClick(ev?: MouseEvent) {
+	HandleAddClick(null);
 	if (Editor.GetActiveBlock() != Map.CellType.BlockWhite) {
 		Editor.SetActiveBlock(Map.CellType.BlockWhite);
 		DeselectAllElements();
@@ -165,6 +167,7 @@ function HandleBlockWClick(ev?: MouseEvent) {
 	}
 }
 function HandleBrickClick(ev?: MouseEvent) {
+	HandleAddClick(null);
 	if (Editor.GetActiveBlock() != Map.CellType.Brick) {
 		Editor.SetActiveBlock(Map.CellType.Brick);
 		DeselectAllElements();
@@ -172,6 +175,7 @@ function HandleBrickClick(ev?: MouseEvent) {
 	}
 }
 function HandleMoonClick(ev?: MouseEvent) {
+	HandleAddClick(null);
 	if (Editor.GetActiveBlock() != Map.CellType.Moon) {
 		Editor.SetActiveBlock(Map.CellType.Moon);
 		DeselectAllElements();
@@ -179,6 +183,7 @@ function HandleMoonClick(ev?: MouseEvent) {
 	}
 }
 function HandleCoinClick(ev?: MouseEvent) {
+	HandleAddClick(null);
 	if (Editor.GetActiveBlock() != Map.CellType.Coin) {
 		Editor.SetActiveBlock(Map.CellType.Coin);
 		DeselectAllElements();
@@ -186,6 +191,7 @@ function HandleCoinClick(ev?: MouseEvent) {
 	}
 }
 function HandleEnemyClick(ev?: MouseEvent) {
+	HandleAddClick(null);
 	if (Editor.GetActiveBlock() != Map.CellType.Enemy) {
 		Editor.SetActiveBlock(Map.CellType.Enemy);
 		DeselectAllElements();
@@ -193,6 +199,7 @@ function HandleEnemyClick(ev?: MouseEvent) {
 	}
 }
 function HandleSpawnClick(ev?: MouseEvent) {
+	HandleAddClick(null);
 	if (Editor.GetActiveBlock() != Map.CellType.Spawn) {
 		Editor.SetActiveBlock(Map.CellType.Spawn);
 		DeselectAllElements();
