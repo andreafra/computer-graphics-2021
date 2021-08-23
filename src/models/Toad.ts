@@ -38,6 +38,9 @@ interface ToadState extends PhysicsState {
 	gravity: number;
 	jumpVelocity: number;
 	jumpTrigger: number;
+
+	coinCount: number;
+	moonCount: number;
 }
 
 let programInfo: WebGLProgramInfo;
@@ -119,6 +122,9 @@ export function Spawn(localMatrix: number[]) {
 	toadNode.state.jumpVelocity = 4.5;
 	toadNode.state.jumpTrigger = 0.1;
 
+	toadNode.state.coinCount = 0;
+	toadNode.state.moonCount = 0;
+
 	var headLight = new LightNode<State>(
 		"headlight",
 		Light.MakeSpot(
@@ -149,6 +155,8 @@ export function Spawn(localMatrix: number[]) {
 	toadNode.AddAction(JumpAction);
 	toadNode.AddAction(MovementAction);
 	toadNode.AddAction(DestroyBrick); // Run after MovementAction otherwise we miss a roof-hit
+	toadNode.AddAction(CollectCoin);
+	toadNode.AddAction(CollectMoon);
 
 	// Set relationships between nodes
 	headLight.SetParent(toadNode);
@@ -339,5 +347,37 @@ const DestroyBrick = (
 			Map.RemoveNode(b);
 			return; // only remove one if for whatever reason we matched more
 		}
+	}
+};
+
+const CollectCoin = (
+	deltaTime: DOMHighResTimeStamp,
+	node: PhysicsNode<ToadState>
+): void => {
+	if (GetMode() != "GAME") return;
+
+	let coins = node.Intersects(
+		Engine.GetAllNodesWithBoxBounds().filter((n) => n.name == "coin")
+	);
+
+	for (let c of coins) {
+		Map.RemoveNode(c);
+		node.state.coinCount++;
+	}
+};
+
+const CollectMoon = (
+	deltaTime: DOMHighResTimeStamp,
+	node: PhysicsNode<ToadState>
+): void => {
+	if (GetMode() != "GAME") return;
+
+	let moons = node.Intersects(
+		Engine.GetAllNodesWithBoxBounds().filter((n) => n.name == "moon")
+	);
+
+	for (let c of moons) {
+		Map.RemoveNode(c);
+		node.state.moonCount++;
 	}
 };
