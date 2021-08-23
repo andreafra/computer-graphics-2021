@@ -3,11 +3,11 @@ import * as Map from "./Map";
 import { utils } from "./utils/utils";
 import { saveAs } from "file-saver";
 
-type EditMode = "MOVE" | "ADD" | "REMOVE";
+type EditMode = "ADD" | "REMOVE";
 
 let activeBlock: Map.CellType = Map.CellType.Empty;
 
-export let editMode: EditMode = "MOVE";
+export let editMode: EditMode; // Initialized elsewhere
 
 export function SetActiveBlock(type: Map.CellType) {
 	activeBlock = type;
@@ -67,31 +67,4 @@ export function ImportMap(s: string) {
 	Map.Clear();
 	Map.Deserialize(s);
 	Map.LoadMap();
-}
-
-export var selectedBlockCoord = [0, 0, 0];
-
-export function MoveSelectionForward() {
-	selectedBlockCoord[2] += 1;
-	selectedBlockCoord = Map.ClampMapCoordinates(selectedBlockCoord);
-}
-export function MoveSelectionBackward() {
-	selectedBlockCoord[2] -= 1;
-	selectedBlockCoord = Map.ClampMapCoordinates(selectedBlockCoord);
-}
-export function MoveSelectionLeft() {
-	selectedBlockCoord[0] -= 1;
-	selectedBlockCoord = Map.ClampMapCoordinates(selectedBlockCoord);
-}
-export function MoveSelectionRight() {
-	selectedBlockCoord[0] += 1;
-	selectedBlockCoord = Map.ClampMapCoordinates(selectedBlockCoord);
-}
-export function MoveSelectionUp() {
-	selectedBlockCoord[1] += 1;
-	selectedBlockCoord = Map.ClampMapCoordinates(selectedBlockCoord);
-}
-export function MoveSelectionDown() {
-	selectedBlockCoord[1] -= 1;
-	selectedBlockCoord = Map.ClampMapCoordinates(selectedBlockCoord);
 }

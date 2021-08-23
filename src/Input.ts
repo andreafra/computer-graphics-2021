@@ -39,30 +39,6 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 		let t: number[];
 
 		switch (ev.key) {
-			// Movement
-			case "w":
-				Editor.MoveSelectionForward();
-				break;
-			case "a":
-				Editor.MoveSelectionLeft();
-				break;
-
-			case "s":
-				Editor.MoveSelectionBackward();
-				break;
-
-			case "d":
-				Editor.MoveSelectionRight();
-				break;
-
-			case "e":
-				Editor.MoveSelectionUp();
-				break;
-
-			case "q":
-				Editor.MoveSelectionDown();
-				break;
-
 			// Camera Movement
 			case "ArrowUp":
 				t = GetActiveCamera().translation;
@@ -88,18 +64,6 @@ function HandleInputKeyDown(ev: KeyboardEvent) {
 				GetActiveCamera().translation = t;
 				break;
 
-			// Change blocks
-			case "0":
-				Editor.SetActiveBlock(Map.CellType.Empty);
-				break;
-			case "1":
-				Editor.SetActiveBlock(Map.CellType.BlockYellow);
-				break;
-			case "2":
-				Editor.SetActiveBlock(Map.CellType.BlockWhite);
-				break;
-
-			// Camera controls
 			case "PageUp":
 				GetActiveCamera().IncrementDistance();
 				break;

@@ -36,7 +36,6 @@ const contentHtml = `<!-- HTML Added by UI.ts -->
 	</div>
 	<div class="ui-left ui-editor">
 		<!-- ${ButtonIcon("⏏️", "Close")} -->
-		${ButtonIcon("🔧", "Move")}
 		${ButtonIcon("➕", "Add")}
 		${ButtonIcon("➖", "Remove")}
 		<div class="ui-separator"></div>
@@ -63,8 +62,7 @@ const contentHtml = `<!-- HTML Added by UI.ts -->
 
 let container: HTMLDivElement;
 
-let moveBtn: HTMLElement,
-	addBtn: HTMLElement,
+let addBtn: HTMLElement,
 	removeBtn: HTMLElement,
 	blockYBtn: HTMLElement,
 	blockWBtn: HTMLElement,
@@ -95,7 +93,6 @@ export function Init() {
 
 	// Event listeners
 	// const closeBtn = document.getElementById("close-btn");
-	moveBtn = document.getElementById("move-btn");
 	addBtn = document.getElementById("add-btn");
 	removeBtn = document.getElementById("remove-btn");
 	blockYBtn = document.getElementById("block-1-btn");
@@ -122,7 +119,6 @@ export function Init() {
 	];
 
 	addBtn.addEventListener("click", HandleAddClick);
-	moveBtn.addEventListener("click", HandleMoveClick);
 	removeBtn.addEventListener("click", HandleRemoveClick);
 	saveBtn.addEventListener("click", HandleSaveClick);
 	loadBtn.addEventListener("click", HandleLoadClick);
@@ -140,18 +136,9 @@ function DeselectAllElements() {
 	elementBtns.forEach((e) => e.classList.remove("selected"));
 }
 
-function HandleMoveClick(ev?: MouseEvent) {
-	if (Editor.editMode != "MOVE") {
-		Editor.SetEditMode("MOVE");
-		moveBtn.classList.add("selected");
-		addBtn.classList.remove("selected");
-		removeBtn.classList.remove("selected");
-	}
-}
 function HandleAddClick(ev?: MouseEvent) {
 	if (Editor.editMode != "ADD") {
 		Editor.SetEditMode("ADD");
-		moveBtn.classList.remove("selected");
 		addBtn.classList.add("selected");
 		removeBtn.classList.remove("selected");
 	}
@@ -159,7 +146,6 @@ function HandleAddClick(ev?: MouseEvent) {
 function HandleRemoveClick(ev?: MouseEvent) {
 	if (Editor.editMode != "REMOVE") {
 		Editor.SetEditMode("REMOVE");
-		moveBtn.classList.remove("selected");
 		addBtn.classList.remove("selected");
 		removeBtn.classList.add("selected");
 	}

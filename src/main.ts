@@ -74,11 +74,6 @@ async function init() {
 	);
 	sunlightNode.SetParent(Engine.ROOT_NODE);
 
-	// Draw axis in origin
-	DebugLine.DrawLine([0, 0, 0], [5, 0, 0], 1);
-	DebugLine.DrawLine([0, 0, 0], [0, 5, 0], 2);
-	DebugLine.DrawLine([0, 0, 0], [0, 0, 5], 3);
-
 	Engine.Start(); // v-v-vroom
 }
 
