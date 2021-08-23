@@ -89,10 +89,9 @@ export function Init() {
 	});
 }
 
-export function Spawn() {
+export function Spawn(localMatrix: number[]) {
 	// SETUP NODES
-	let tMatrix = utils.MakeTranslateMatrix(0, 1, 0);
-	var toadNode = new PhysicsNode<ToadState>("cpt-toad", tMatrix);
+	var toadNode = new PhysicsNode<ToadState>("cpt-toad", localMatrix);
 	toadNode.state = {
 		// Box bounds
 		bounds: BOX_DEFAULT_BOUNDS,

@@ -114,6 +114,18 @@ export class Node<T extends State> {
 	}
 }
 
+export function FindNode(
+	matchFn: (n: Node<State>) => boolean,
+	root = Engine.ROOT_NODE
+) {
+	let found = new Array<Node<State>>();
+	root.children.forEach((n) => {
+		if (matchFn(n)) found.push(n);
+		found = found.concat(FindNode(matchFn, n));
+	});
+	return found;
+}
+
 export class RenderNode<T extends IRenderableState> extends Node<T> {
 	override Update(deltaTime: number, worldMatrix?: number[]) {
 		super.Update(deltaTime, worldMatrix);

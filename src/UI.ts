@@ -7,6 +7,7 @@ import brickIcon from "./assets/icons/brick.png";
 import moonIcon from "./assets/icons/moon.png";
 import coinIcon from "./assets/icons/coin.png";
 import enemyIcon from "./assets/icons/enemy.png";
+import spawnIcon from "./assets/icons/spawn_point.png";
 
 import { ToggleMode } from "./main";
 
@@ -45,6 +46,7 @@ const contentHtml = `<!-- HTML Added by UI.ts -->
 		${ButtonImage(moonIcon, "Moon")}
 		${ButtonImage(coinIcon, "Coin")}
 		${ButtonImage(enemyIcon, "Enemy")}
+		${ButtonImage(spawnIcon, "Spawn")}
 	</div>
 	<div class="ui-left ui-editor">
 		<div class="ui-separator"></div>
@@ -70,6 +72,7 @@ let moveBtn: HTMLElement,
 	moonBtn: HTMLElement,
 	coinBtn: HTMLElement,
 	enemyBtn: HTMLElement,
+	spawnBtn: HTMLElement,
 	playBtn: HTMLElement,
 	saveBtn: HTMLElement,
 	filePicker: HTMLElement,
@@ -83,6 +86,7 @@ const elementCallbacks = [
 	HandleMoonClick,
 	HandleCoinClick,
 	HandleEnemyClick,
+	HandleSpawnClick,
 ];
 
 export function Init() {
@@ -100,13 +104,22 @@ export function Init() {
 	moonBtn = document.getElementById("moon-btn");
 	coinBtn = document.getElementById("coin-btn");
 	enemyBtn = document.getElementById("enemy-btn");
+	spawnBtn = document.getElementById("spawn-btn");
 	playBtn = document.getElementById("play-btn");
 	loadBtn = document.getElementById("load-btn");
 	saveBtn = document.getElementById("save-btn");
 	filePicker = document.getElementById("file-input");
 	// closeBtn.addEventListener("click", () => {})
 
-	elementBtns = [blockWBtn, blockYBtn, brickBtn, moonBtn, coinBtn, enemyBtn];
+	elementBtns = [
+		blockWBtn,
+		blockYBtn,
+		brickBtn,
+		moonBtn,
+		coinBtn,
+		enemyBtn,
+		spawnBtn,
+	];
 
 	addBtn.addEventListener("click", HandleAddClick);
 	moveBtn.addEventListener("click", HandleMoveClick);
@@ -193,6 +206,14 @@ function HandleEnemyClick(ev?: MouseEvent) {
 		enemyBtn.classList.add("selected");
 	}
 }
+function HandleSpawnClick(ev?: MouseEvent) {
+	if (Editor.GetActiveBlock() != Map.CellType.Spawn) {
+		Editor.SetActiveBlock(Map.CellType.Spawn);
+		DeselectAllElements();
+		spawnBtn.classList.add("selected");
+	}
+}
+
 function HandlePlayClick() {
 	let mode = ToggleMode();
 	playBtn.innerText = mode === "EDITOR" ? "▶️" : "■";

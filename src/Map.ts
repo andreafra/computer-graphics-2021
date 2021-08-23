@@ -3,6 +3,7 @@ import * as Brick from "./models/Brick";
 import * as Moon from "./models/Moon";
 import * as Coin from "./models/Coin";
 import * as Enemy from "./models/Enemy";
+import * as Flag from "./models/Flag";
 import * as Core from "./engine/Core";
 import * as SceneGraph from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
@@ -10,12 +11,13 @@ import { utils } from "./utils/utils";
 
 export enum CellType {
 	Empty = 0,
-	BlockWhite = 1,
-	BlockYellow = 2,
-	Brick = 3,
-	Moon = 4,
-	Coin = 5,
-	Enemy = 6,
+	BlockWhite,
+	BlockYellow,
+	Brick,
+	Moon,
+	Coin,
+	Enemy,
+	Spawn,
 }
 
 export interface Cell {
@@ -51,11 +53,14 @@ export function Init() {
 	Moon.Init();
 	Coin.Init();
 	Enemy.Init();
+	Flag.Init();
 
 	mapRoot = new SceneGraph.Node("map-root");
 	mapRoot.SetParent(Core.ROOT_NODE);
 
 	LoadMap();
+
+	return mapRoot;
 }
 
 export function LoadMap() {
@@ -105,9 +110,32 @@ function InitCell(x: number, y: number, z: number, block: Cell) {
 			break;
 		case CellType.Enemy:
 			map[x][y][z].node = Enemy.Spawn(spawnCoord, mapRoot);
+			break;
+		case CellType.Spawn:
+			map.forEach((a) =>
+				a.forEach((b) =>
+					b.forEach((c) => {
+						if (map[x][y][z] != c && c.type == CellType.Spawn) {
+							Remove(c);
+						}
+					})
+				)
+			);
+			map[x][y][z].node = Flag.Spawn(
+				Flag.Type.Start,
+				spawnCoord,
+				mapRoot
+			);
+			break;
 		default:
 			break;
 	}
+}
+
+function Remove(c: Cell) {
+	c.type = CellType.Empty;
+	c.node.Remove();
+	c.node = null;
 }
 
 export function ClampMapCoordinates(v: number[]) {

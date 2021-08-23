@@ -1,9 +1,15 @@
 import "./style.css";
 import { utils } from "./utils/utils";
 import * as Engine from "./engine/Core";
-import * as toad from "./models/Toad";
+import * as Toad from "./models/Toad";
 import { Light } from "./engine/Lights";
-import { LightNode, ShadowNode } from "./engine/SceneGraph";
+import {
+	LightNode,
+	ShadowNode,
+	Node,
+	State,
+	FindNode,
+} from "./engine/SceneGraph";
 import * as DebugLine from "./engine/debug/Lines";
 import * as UI from "./UI";
 import * as Skybox from "./Skybox";
@@ -17,6 +23,7 @@ type Mode = "EDITOR" | "GAME";
 let mode: Mode = "EDITOR";
 
 let editorCamera: Camera, gameCamera: Camera;
+let mapRoot: Node<State>;
 
 async function init() {
 	const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
@@ -51,9 +58,8 @@ async function init() {
 	// Setup Scenegraph nodes
 	Map.DrawGrid();
 	Map.InitSampleCubes();
-	Map.Init();
-	toad.Init();
-	toad.Spawn();
+	let mapRoot = Map.Init();
+	Toad.Init();
 
 	Skybox.Init();
 	Skybox.Spawn();
@@ -82,6 +88,13 @@ export function GetMode() {
 
 export function ToggleMode() {
 	mode = mode === "EDITOR" ? "GAME" : "EDITOR";
+
+	FindNode((n) => n.name == "cpt-toad").forEach((n) => n.Remove());
+	if (mode == "GAME") {
+		let spawnPoint = FindNode((n) => n.name == "flag-start")[0];
+		if (spawnPoint) Toad.Spawn(spawnPoint.state.worldMatrix);
+	}
+
 	GetActiveCamera().Update();
 	return mode;
 }
