@@ -135,8 +135,8 @@ export function Spawn(localMatrix: number[]) {
 
 	toadNode.state.moveSpeed = 2.0;
 	toadNode.state.yVelocity = 0;
-	toadNode.state.gravity = 8;
-	toadNode.state.jumpVelocity = 4.5;
+	toadNode.state.gravity = 12;
+	toadNode.state.jumpVelocity = 5.5;
 	toadNode.state.jumpTrigger = 0.1;
 
 	toadNode.state.coinCount = 0;
