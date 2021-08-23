@@ -20,7 +20,14 @@ import { gl } from "../engine/Core";
 import { BOX_DEFAULT_BOUNDS, IBoxBounds } from "../engine/Physics";
 
 // Define common structure for state of these nodes
-interface MoonState extends IRenderableState, IBoxBounds {}
+interface MoonState extends IRenderableState, IBoxBounds {
+	spawnCoord: number[];
+	spawnTime: DOMHighResTimeStamp;
+
+	hoverDistance: number;
+	hoverSpeed: number;
+	spinSpeed: number;
+}
 
 let programInfo: WebGLProgramInfo;
 let vao: WebGLVertexArrayObject;
@@ -57,6 +64,37 @@ export function Init() {
 	});
 }
 
+function HoverAction(
+	deltaTime: DOMHighResTimeStamp,
+	node: RenderNode<MoonState>
+) {
+	let state = node.state;
+	let yPos = utils.ComputePosition(state.localMatrix, [0, 0, 0])[1];
+	let hoverAround = state.spawnCoord[1];
+	let timeOffset = Engine.GetTime() - state.spawnTime;
+	state.localMatrix = utils.multiplyMatrices(
+		state.localMatrix,
+		utils.MakeTranslateMatrix(
+			0,
+			state.hoverDistance * Math.sin(state.hoverSpeed * timeOffset) +
+				hoverAround -
+				yPos,
+			0
+		)
+	);
+}
+
+function SpinAction(
+	deltaTime: DOMHighResTimeStamp,
+	node: RenderNode<MoonState>
+) {
+	let state = node.state;
+	state.localMatrix = utils.multiplyMatrices(
+		state.localMatrix,
+		utils.MakeRotateYMatrix(state.spinSpeed * deltaTime)
+	);
+}
+
 export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	// SETUP NODES
 	let tMatrix = utils.multiplyMatrices(
@@ -79,6 +117,14 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 		emissiveMap: emissiveMap,
 		...moonNode.state,
 	};
+	moonNode.state.spawnCoord = spawnCoord;
+	moonNode.state.spawnTime = Engine.GetTime();
+	moonNode.state.hoverDistance = 0.06; // 6% of a block
+	moonNode.state.hoverSpeed = 1.5;
+	moonNode.state.spinSpeed = 45; // degrees per second
+
+	moonNode.AddAction(HoverAction);
+	moonNode.AddAction(SpinAction);
 
 	let moonLight = new LightNode<State>(
 		"moon-light",

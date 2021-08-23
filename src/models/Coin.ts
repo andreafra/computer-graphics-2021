@@ -17,7 +17,9 @@ import { gl } from "../engine/Core";
 import { BOX_DEFAULT_BOUNDS, IBoxBounds } from "../engine/Physics";
 
 // Define common structure for state of these nodes
-interface CoinState extends IRenderableState, IBoxBounds {}
+interface CoinState extends IRenderableState, IBoxBounds {
+	spinSpeed: number;
+}
 
 let programInfo: WebGLProgramInfo;
 let vao: WebGLVertexArrayObject;
@@ -54,20 +56,33 @@ export function Init() {
 	});
 }
 
+function SpinAction(
+	deltaTime: DOMHighResTimeStamp,
+	node: RenderNode<CoinState>
+) {
+	let state = node.state;
+	state.localMatrix = utils.multiplyMatrices(
+		state.localMatrix,
+		utils.MakeRotateYMatrix(state.spinSpeed * deltaTime)
+	);
+}
+
 export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	// SETUP NODES
+	let scale = 0.7;
+
 	let tMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(spawnCoord[0], spawnCoord[1], spawnCoord[2]),
-		utils.MakeScaleMatrix(1)
+		utils.MakeScaleMatrix(scale)
 	);
 	var coinNode = new RenderNode<CoinState>("coin", tMatrix);
 	coinNode.state = {
-		bounds: BOX_DEFAULT_BOUNDS,
+		bounds: BOX_DEFAULT_BOUNDS.map((pos) => pos.map((x) => x * scale)),
 		// render
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],
 		materialSpecColor: [0.3, 0.3, 0.3],
-		materialEmitColor: [0.1, 0.1, 0.1], // Use emissive map instead
+		materialEmitColor: [0.1, 0.1, 0.1],
 		programInfo: programInfo,
 		bufferLength: coin_OBJ.indices.length,
 		vertexArrayObject: vao,
@@ -76,6 +91,9 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 		specularMap: specMap,
 		...coinNode.state,
 	};
+	coinNode.state.spinSpeed = 180; // degrees per second
+
+	coinNode.AddAction(SpinAction);
 
 	// Set relationships between nodes
 	coinNode.SetParent(mapRoot);
