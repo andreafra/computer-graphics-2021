@@ -104,7 +104,9 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	);
 	var enemyNode = new RenderNode<EnemyState>("enemy", tMatrix);
 	enemyNode.state = {
-		bounds: BOX_DEFAULT_BOUNDS.map((pos) => pos.map((x) => x * scale)),
+		bounds: BOX_DEFAULT_BOUNDS.map((pos) =>
+			pos.map((x) => (x * scale) / 2)
+		),
 		// render
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],

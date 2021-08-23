@@ -47,6 +47,11 @@ interface ToadState extends PhysicsState {
 
 	coinCount: number;
 	moonCount: number;
+
+	invulnerable: boolean;
+	invulnerabilityTime: number;
+	invulnerabilityTimeElapsed: number;
+	lives: number;
 }
 
 let programInfo: WebGLProgramInfo;
@@ -137,6 +142,11 @@ export function Spawn(localMatrix: number[]) {
 	toadNode.state.coinCount = 0;
 	toadNode.state.moonCount = 0;
 
+	toadNode.state.lives = 3;
+	toadNode.state.invulnerable = false;
+	toadNode.state.invulnerabilityTime = 1.0; // seconds
+	toadNode.state.invulnerabilityTimeElapsed = 0;
+
 	var headLight = new LightNode<State>(
 		"headlight",
 		Light.MakeSpot(
@@ -169,6 +179,7 @@ export function Spawn(localMatrix: number[]) {
 	toadNode.AddAction(DestroyBrick); // Run after MovementAction otherwise we miss a roof-hit
 	toadNode.AddAction(CollectCoin);
 	toadNode.AddAction(CollectMoon);
+	toadNode.AddAction(HitEnemy);
 
 	// Set relationships between nodes
 	headLight.SetParent(toadNode);
@@ -387,5 +398,40 @@ const CollectMoon = (
 	for (let c of moons) {
 		Map.RemoveNode(c);
 		node.state.moonCount++;
+	}
+};
+
+const HitEnemy = (
+	deltaTime: DOMHighResTimeStamp,
+	node: PhysicsNode<ToadState>
+): void => {
+	if (GetMode() != "GAME") return;
+
+	let state = node.state;
+
+	// Tick time...
+	if (state.invulnerable) {
+		// Blink toad to show invulnerability
+		if (Math.sin(20 * state.invulnerabilityTimeElapsed) > 0) {
+			state.shouldRender = false;
+		} else {
+			state.shouldRender = true;
+		}
+
+		state.invulnerabilityTimeElapsed += deltaTime;
+	}
+	if (state.invulnerabilityTimeElapsed >= state.invulnerabilityTime) {
+		state.invulnerable = false;
+		state.invulnerabilityTimeElapsed = 0;
+		state.shouldRender = true;
+	}
+
+	let enemies = node.Intersects(
+		Engine.GetAllNodesWithBoxBounds().filter((n) => n.name == "enemy")
+	);
+
+	if (enemies.length > 0 && !state.invulnerable) {
+		state.lives--;
+		state.invulnerable = true;
 	}
 };

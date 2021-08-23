@@ -23,6 +23,7 @@ export class State {
 export type IRenderableState = IRenderable & State;
 
 export interface IRenderable {
+	shouldRender?: boolean;
 	materialColor: number[];
 	materialAmbColor: number[];
 	materialSpecColor: number[];
@@ -133,6 +134,8 @@ export class RenderNode<T extends IRenderableState> extends Node<T> {
 	}
 
 	Render(VPMatrix: number[]) {
+		if (this.state.shouldRender == false) return;
+
 		gl.useProgram(this.state.programInfo.program);
 
 		let projectionMatrix = utils.multiplyMatrices(
