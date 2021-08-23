@@ -86,13 +86,20 @@ export function GetMode() {
 	return mode;
 }
 
+let lastSavedMap: string;
 export function ToggleMode() {
 	mode = mode === "EDITOR" ? "GAME" : "EDITOR";
 
 	FindNode((n) => n.name == "cpt-toad").forEach((n) => n.Remove());
 	if (mode == "GAME") {
+		lastSavedMap = Map.Serialize();
+
 		let spawnPoint = FindNode((n) => n.name == "flag-start")[0];
 		if (spawnPoint) Toad.Spawn(spawnPoint.state.worldMatrix);
+	} else {
+		Map.Clear();
+		Map.Deserialize(lastSavedMap);
+		Map.LoadMap();
 	}
 
 	GetActiveCamera().Update();
