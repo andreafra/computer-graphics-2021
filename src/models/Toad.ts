@@ -33,6 +33,12 @@ import { Shadow } from "../engine/Shadows";
 
 // Define common structure for state of these nodes
 interface ToadState extends PhysicsState {
+	lookAngle: number;
+	lerpingFrom: number;
+	lerpingTo: number;
+	lerpingTimeElapsed: number;
+	lerpDuration: number;
+
 	moveSpeed: number;
 	yVelocity: number;
 	gravity: number;
@@ -116,6 +122,12 @@ export function Spawn(localMatrix: number[]) {
 		...toadNode.state,
 	};
 
+	toadNode.state.lookAngle = 0;
+	toadNode.state.lerpingFrom = toadNode.state.lookAngle;
+	toadNode.state.lerpingTo = toadNode.state.lookAngle;
+	toadNode.state.lerpingTimeElapsed = 0;
+	toadNode.state.lerpDuration = 0.1;
+
 	toadNode.state.moveSpeed = 2.0;
 	toadNode.state.yVelocity = 0;
 	toadNode.state.gravity = 8;
@@ -165,10 +177,6 @@ export function Spawn(localMatrix: number[]) {
 
 	return toadNode;
 }
-
-let lookAngle = 0;
-let lerping = { from: lookAngle, to: lookAngle, timeElapsed: 0 };
-const lerpDuration = 0.1;
 
 const MovementAction = (
 	deltaTime: DOMHighResTimeStamp,
@@ -251,25 +259,25 @@ const MovementAction = (
 		Math.abs(translation[2]) > 0.00001
 	) {
 		let newAngle = -Math.atan2(targetDir[0], targetDir[2]);
-		if (newAngle != lerping.to) {
-			lerping.from = lookAngle;
-			lerping.to = newAngle;
-			lerping.timeElapsed = deltaTime;
+		if (newAngle != state.lerpingTo) {
+			state.lerpingFrom = state.lookAngle;
+			state.lerpingTo = newAngle;
+			state.lerpingTimeElapsed = deltaTime;
 		}
-		if (lerping.timeElapsed < lerpDuration) {
-			lookAngle = utils.LerpAngle(
-				lerping.from,
-				lerping.to,
-				lerping.timeElapsed / lerpDuration
+		if (state.lerpingTimeElapsed < state.lerpDuration) {
+			state.lookAngle = utils.LerpAngle(
+				state.lerpingFrom,
+				state.lerpingTo,
+				state.lerpingTimeElapsed / state.lerpDuration
 			);
 		} else {
-			lookAngle = newAngle;
+			state.lookAngle = newAngle;
 		}
 	} else {
-		lerping.from = lookAngle;
-		lerping.timeElapsed = 0;
+		state.lerpingFrom = state.lookAngle;
+		state.lerpingTimeElapsed = 0;
 	}
-	lerping.timeElapsed += deltaTime;
+	state.lerpingTimeElapsed += deltaTime;
 
 	// Handle gravity differently
 	// Don't ever let toad collide with the ground or bad things happen above
@@ -298,7 +306,7 @@ const MovementAction = (
 			localPosition[1] + translation[1],
 			localPosition[2] + translation[2]
 		),
-		utils.MakeRotateYMatrix(utils.radToDeg(lookAngle))
+		utils.MakeRotateYMatrix(utils.radToDeg(state.lookAngle))
 	);
 
 	// Camera follow toad
