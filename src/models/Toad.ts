@@ -148,6 +148,7 @@ export function Spawn(localMatrix: number[]) {
 
 	toadNode.AddAction(JumpAction);
 	toadNode.AddAction(MovementAction);
+	toadNode.AddAction(DestroyBrick); // Run after MovementAction otherwise we miss a roof-hit
 
 	// Set relationships between nodes
 	headLight.SetParent(toadNode);
@@ -301,7 +302,10 @@ const JumpAction = (
 	deltaTime: DOMHighResTimeStamp,
 	node: PhysicsNode<ToadState>
 ): void => {
+	if (GetMode() != "GAME") return;
+
 	if (Input.moveDir[1] == 1) {
+		Input.moveDir[1] = 0;
 		let pos = node.GetWorldCoordinates();
 		if (
 			Map.IsGrounded(
@@ -310,6 +314,30 @@ const JumpAction = (
 			)
 		) {
 			node.state.yVelocity = node.state.jumpVelocity;
+		}
+	}
+};
+
+const DestroyBrick = (
+	deltaTime: DOMHighResTimeStamp,
+	node: PhysicsNode<ToadState>
+): void => {
+	if (GetMode() != "GAME") return;
+
+	let bricks = node.Intersects(
+		Engine.GetAllNodesWithBoxBounds().filter((n) => n.name == "block-brick")
+	);
+
+	for (let b of bricks) {
+		let toadCellPos = Map.ToMapCoords(node.GetWorldCoordinates());
+		let brickCellPos = Map.ToMapCoords(b.GetWorldCoordinates());
+		if (
+			toadCellPos[0] == brickCellPos[0] &&
+			toadCellPos[1] == brickCellPos[1] - 1 &&
+			toadCellPos[2] == brickCellPos[2]
+		) {
+			Map.RemoveNode(b);
+			return; // only remove one if for whatever reason we matched more
 		}
 	}
 };

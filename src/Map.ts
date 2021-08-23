@@ -138,6 +138,16 @@ function Remove(c: Cell) {
 	c.node = null;
 }
 
+export function RemoveNode(node: SceneGraph.Node<SceneGraph.State>) {
+	map.forEach((a) =>
+		a.forEach((b) =>
+			b.forEach((c) => {
+				if (c.node == node) Remove(c);
+			})
+		)
+	);
+}
+
 export function ClampMapCoordinates(v: number[]) {
 	let x = v[0],
 		y = v[1],
