@@ -380,15 +380,23 @@ const CollectCoin = (
 ): void => {
 	if (GetMode() != "GAME") return;
 
+	let state = node.state;
+
 	let coins = node.Intersects(
 		Engine.GetAllNodesWithBoxBounds().filter((n) => n.name == "coin")
 	);
 
 	for (let c of coins) {
 		Map.RemoveNode(c);
-		node.state.coinCount++;
+		state.coinCount++;
 
-		UI.HandleCoinsChanged(node.state.coinCount);
+		if (state.coinCount >= 10) {
+			state.coinCount -= 10;
+			state.lives++;
+			UI.HandleLivesChanged(state.lives);
+		}
+
+		UI.HandleCoinsChanged(state.coinCount);
 	}
 };
 
