@@ -148,10 +148,10 @@ export function Spawn(localMatrix: number[]) {
 	toadNode.state.invulnerabilityTimeElapsed = 0;
 
 	var headLight = new LightNode<State>(
-		"headlight",
+		"cpt-toad-headlight",
 		Light.MakeSpot(
-			[1.0, 0.9, 0.5], // color
-			120, // coneOut, deg°
+			[1.0, 0.9, 0.0], // color
+			90, // coneOut, deg°
 			0.5, // coneIn, %
 			0.7, // targetDistance
 			1 // decay
@@ -163,7 +163,7 @@ export function Spawn(localMatrix: number[]) {
 	);
 
 	var shadowBelow = new ShadowNode(
-		"shadow-toad",
+		"cpt-toad-shadow",
 		Shadow.Make(
 			[1, 1, 1], // color
 			40, // coneOut, deg°
