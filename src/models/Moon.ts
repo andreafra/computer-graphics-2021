@@ -103,7 +103,7 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	);
 	var moonNode = new RenderNode<MoonState>("moon", tMatrix);
 	moonNode.state = {
-		bounds: BOX_DEFAULT_BOUNDS,
+		bounds: BOX_DEFAULT_BOUNDS.map((pos) => pos.map((x) => x / 3)),
 		// render
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],
