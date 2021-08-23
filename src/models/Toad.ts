@@ -14,6 +14,7 @@ import { Light } from "../engine/Lights";
 import * as Input from "../Input";
 import { GetMode } from "../main";
 import * as Map from "../Map";
+import * as UI from "../UI";
 
 // Assets
 import toad_OBJ from "../assets/cpt_toad/toad.obj";
@@ -146,6 +147,10 @@ export function Spawn(localMatrix: number[]) {
 	toadNode.state.invulnerable = false;
 	toadNode.state.invulnerabilityTime = 1.0; // seconds
 	toadNode.state.invulnerabilityTimeElapsed = 0;
+
+	UI.HandleLivesChanged(toadNode.state.lives);
+	UI.HandleCoinsChanged(toadNode.state.coinCount);
+	UI.HandleMoonsChanged(toadNode.state.moonCount);
 
 	var headLight = new LightNode<State>(
 		"cpt-toad-headlight",
@@ -382,6 +387,8 @@ const CollectCoin = (
 	for (let c of coins) {
 		Map.RemoveNode(c);
 		node.state.coinCount++;
+
+		UI.HandleCoinsChanged(node.state.coinCount);
 	}
 };
 
@@ -398,6 +405,8 @@ const CollectMoon = (
 	for (let c of moons) {
 		Map.RemoveNode(c);
 		node.state.moonCount++;
+
+		UI.HandleMoonsChanged(node.state.moonCount);
 	}
 };
 
@@ -433,5 +442,7 @@ const HitEnemy = (
 	if (enemies.length > 0 && !state.invulnerable) {
 		state.lives--;
 		state.invulnerable = true;
+
+		UI.HandleLivesChanged(state.lives);
 	}
 };

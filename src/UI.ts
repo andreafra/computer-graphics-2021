@@ -32,7 +32,9 @@ const ButtonImage = (
 const contentHtml = `<!-- HTML Added by UI.ts -->
 <div class="ui-flex">
 	<div class="ui-left ui-game hidden">
-		<div class="ui-lives">❤ ❤ ❤</div>
+		<div class="ui-collectable" id="ui-lives"></div>
+		<div class="ui-collectable" id="ui-coins"></div>
+		<div class="ui-collectable" id="ui-moons"></div>
 	</div>
 	<div class="ui-left ui-editor">
 		<!-- ${ButtonIcon("⏏️", "Close")} -->
@@ -74,7 +76,10 @@ let addBtn: HTMLElement,
 	playBtn: HTMLElement,
 	saveBtn: HTMLElement,
 	filePicker: HTMLElement,
-	loadBtn: HTMLElement;
+	loadBtn: HTMLElement,
+	livesDiv: HTMLElement,
+	coinsDiv: HTMLElement,
+	moonsDiv: HTMLElement;
 
 let elementBtns: HTMLElement[] = [];
 const elementCallbacks = [
@@ -90,6 +95,10 @@ const elementCallbacks = [
 export function Init() {
 	container = document.getElementById("main-ui") as HTMLDivElement;
 	container.innerHTML = contentHtml;
+
+	livesDiv = document.getElementById("ui-lives");
+	coinsDiv = document.getElementById("ui-coins");
+	moonsDiv = document.getElementById("ui-moons");
 
 	// Event listeners
 	// const closeBtn = document.getElementById("close-btn");
@@ -225,7 +234,17 @@ function HandleSaveClick() {
 function HandleLoadClick() {
 	filePicker.click();
 }
-async function HandleFileChosen(event: Event) {
+function HandleFileChosen(event: Event) {
 	const fileList = (<HTMLInputElement>event.target).files;
 	fileList[0].text().then(Editor.ImportMap);
+}
+
+export function HandleLivesChanged(lives: number) {
+	livesDiv.innerHTML = "❤".repeat(lives);
+}
+export function HandleCoinsChanged(coins: number) {
+	coinsDiv.innerHTML = "🪙".repeat(coins);
+}
+export function HandleMoonsChanged(moons: number) {
+	moonsDiv.innerHTML = "🌙".repeat(moons);
 }

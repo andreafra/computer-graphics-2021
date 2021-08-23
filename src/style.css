@@ -1,6 +1,7 @@
 * {
 	/* Since it's a fullscreen application, remove annoying  */
 	overflow: hidden;
+	font-family: sans-serif;
 }
 
 :root {
@@ -102,7 +103,7 @@ body {
 	display: flex;
 }
 
-.ui-lives {
+.ui-collectable {
 	display: inline-block;
 	border: none;
 	font-size: 2rem;
