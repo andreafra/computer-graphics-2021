@@ -12,6 +12,9 @@ export enum Features {
 	AmbientOcclusion = 1 << 4,
 }
 
+export const MAX_LIGHTS = 64;
+export const MAX_SHADOWS = 8;
+
 export interface WebGLProgramInfo {
 	program: WebGLProgram;
 	locations: {
@@ -28,6 +31,7 @@ export interface WebGLProgramInfo {
 		specularMap?: WebGLUniformLocation;
 		ambientOcclusion?: WebGLUniformLocation;
 		// lights
+		lightsCount: WebGLUniformLocation;
 		lightType: WebGLUniformLocation;
 		lightPos: WebGLUniformLocation;
 		lightDir: WebGLUniformLocation;
@@ -37,6 +41,7 @@ export interface WebGLProgramInfo {
 		lightTarget: WebGLUniformLocation;
 		lightColor: WebGLUniformLocation;
 		// shadows
+		shadowsCount: WebGLUniformLocation;
 		shadowPos: WebGLUniformLocation;
 		shadowDir: WebGLUniformLocation;
 		shadowConeOut: WebGLUniformLocation;
@@ -54,6 +59,10 @@ export interface WebGLProgramInfo {
 export function getShader(features: number) {
 	let vs = vertexShaderSrc;
 	let fs = fragmentShaderSrc;
+
+	fs = fs.replace("//MAX_LIGHTS", `#define MAX_LIGHTS ${MAX_LIGHTS}`);
+	fs = fs.replace("//MAX_SHADOWS", `#define MAX_SHADOWS ${MAX_SHADOWS}`);
+
 	if (features & Features.Texture) {
 		vs = vs.replace("//NO_USE_TEXTURE", "#define USE_TEXTURE");
 		fs = fs.replace("//NO_USE_TEXTURE", "#define USE_TEXTURE");
@@ -109,6 +118,7 @@ export function getShader(features: number) {
 				features & Features.AmbientOcclusion
 					? gl.getUniformLocation(program, "ambientOcclusion")
 					: undefined,
+			lightsCount: gl.getUniformLocation(program, "lightsCount"),
 			lightType: gl.getUniformLocation(program, "LType"),
 			lightPos: gl.getUniformLocation(program, "LPos"),
 			lightDir: gl.getUniformLocation(program, "LDir"),
@@ -117,6 +127,7 @@ export function getShader(features: number) {
 			lightDecay: gl.getUniformLocation(program, "LDecay"),
 			lightTarget: gl.getUniformLocation(program, "LTarget"),
 			lightColor: gl.getUniformLocation(program, "LColor"),
+			shadowsCount: gl.getUniformLocation(program, "shadowsCount"),
 			shadowPos: gl.getUniformLocation(program, "SdwPos"),
 			shadowDir: gl.getUniformLocation(program, "SdwDir"),
 			shadowConeOut: gl.getUniformLocation(program, "SdwConeOut"),

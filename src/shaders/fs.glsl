@@ -35,26 +35,27 @@ uniform sampler2D specularMap;
 uniform sampler2D ambientOcclusion;
 #endif
 
-// 3 configurable lights
-#define N_LIGHTS 16
+//MAX_LIGHTS
+uniform int lightsCount;
 // Light type is one-hot encoded on 3 bits
-uniform vec3 LType[N_LIGHTS];
-uniform vec3 LPos[N_LIGHTS];
-uniform vec3 LDir[N_LIGHTS];
-uniform float LConeOut[N_LIGHTS];
-uniform float LConeIn[N_LIGHTS];
-uniform float LDecay[N_LIGHTS];
-uniform float LTarget[N_LIGHTS];
-uniform vec4 LColor[N_LIGHTS];
+uniform vec3 LType[MAX_LIGHTS];
+uniform vec3 LPos[MAX_LIGHTS];
+uniform vec3 LDir[MAX_LIGHTS];
+uniform float LConeOut[MAX_LIGHTS];
+uniform float LConeIn[MAX_LIGHTS];
+uniform float LDecay[MAX_LIGHTS];
+uniform float LTarget[MAX_LIGHTS];
+uniform vec4 LColor[MAX_LIGHTS];
 
-#define N_SHADOWS 16
-uniform vec3 SdwPos[N_SHADOWS];
-uniform vec3 SdwDir[N_SHADOWS];
-uniform float SdwConeOut[N_SHADOWS];
-uniform float SdwConeIn[N_SHADOWS];
-uniform float SdwDecay[N_SHADOWS];
-uniform float SdwTarget[N_SHADOWS];
-uniform vec4 SdwColor[N_SHADOWS];
+//MAX_SHADOWS
+uniform int shadowsCount;
+uniform vec3 SdwPos[MAX_SHADOWS];
+uniform vec3 SdwDir[MAX_SHADOWS];
+uniform float SdwConeOut[MAX_SHADOWS];
+uniform float SdwConeIn[MAX_SHADOWS];
+uniform float SdwDecay[MAX_SHADOWS];
+uniform float SdwTarget[MAX_SHADOWS];
+uniform vec4 SdwColor[MAX_SHADOWS];
 
 uniform vec3 ambientLight;
 
@@ -156,7 +157,7 @@ void main() {
 	//lights
 	vec4 lightsDiffuse;
 	vec4 lightsSpecular;
-	for (int i = 0; i < N_LIGHTS; i++) {
+	for (int i = 0; i < lightsCount; i++) {
 		vec3 lightDir = compLightDir(LPos[i], LDir[i], LType[i]);
 		vec4 lightCol = compLightColor(LColor[i], LTarget[i], LDecay[i], LPos[i], LDir[i],
 									     LConeOut[i], LConeIn[i], LType[i]);
@@ -166,7 +167,7 @@ void main() {
 
 	//shadows
 	vec4 shadowsDiffuse;
-	for (int i = 0; i < N_SHADOWS; i++) {
+	for (int i = 0; i < shadowsCount; i++) {
 		vec3 shadowDir = compShadowDir(SdwPos[i], SdwDir[i]);
 		vec4 shadowCol = compShadowColor(SdwColor[i], SdwTarget[i], SdwDecay[i], SdwPos[i], SdwDir[i], SdwConeOut[i], SdwConeIn[i]);
 		shadowsDiffuse += max(0.0, dot(shadowDir, normalVec)) * shadowCol;
