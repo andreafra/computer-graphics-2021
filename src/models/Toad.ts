@@ -150,7 +150,7 @@ export function Spawn(localMatrix: number[]) {
 	var headLight = new LightNode<State>(
 		"headlight",
 		Light.MakeSpot(
-			[1, 0.9, 0.5, 1.0], // color
+			[1.0, 0.9, 0.5], // color
 			120, // coneOut, deg°
 			0.5, // coneIn, %
 			0.7, // targetDistance
@@ -165,7 +165,7 @@ export function Spawn(localMatrix: number[]) {
 	var shadowBelow = new ShadowNode(
 		"shadow-toad",
 		Shadow.Make(
-			[1, 1, 1, 1.0], // color
+			[1, 1, 1], // color
 			40, // coneOut, deg°
 			0.5, // coneIn, %
 			2, // targetDistance

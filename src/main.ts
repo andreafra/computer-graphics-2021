@@ -66,7 +66,7 @@ async function init() {
 
 	// Add some light
 	Engine.SetAmbientLight([0.3, 0.3, 0.4]);
-	let sunlightColor = [1.0, 1.0, 0.9, 1.0];
+	let sunlightColor = [1.0, 1.0, 0.9];
 	let sunlightNode = new LightNode(
 		"sunlight",
 		Light.MakeDirectional(sunlightColor),

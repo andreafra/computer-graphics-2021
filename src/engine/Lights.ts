@@ -27,6 +27,7 @@ export class Light {
 		const l = new Light();
 		l.type = LightType.Direct;
 		l.color = color;
+		if (!l.color[3]) l.color[3] = 1.0;
 		return l;
 	}
 
@@ -34,6 +35,7 @@ export class Light {
 		const l = new Light();
 		l.type = LightType.Point;
 		l.color = color;
+		if (!l.color[3]) l.color[3] = 1.0;
 		if (targetDistance) l.target = targetDistance;
 		if (decay) l.decay = decay;
 		return l;
@@ -49,6 +51,7 @@ export class Light {
 		const l = new Light();
 		l.type = LightType.Spot;
 		l.color = color;
+		if (!l.color[3]) l.color[3] = 1.0;
 		l.coneOut = coneOut;
 		l.coneIn = coneIn;
 		if (targetDistance) l.target = targetDistance;
