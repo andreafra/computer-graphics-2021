@@ -16,14 +16,14 @@ import * as Skybox from "./Skybox";
 import { Camera } from "./Camera";
 import * as Input from "./Input";
 import * as Map from "./Map";
-import { Shadow } from "./engine/Shadows";
 
 type Mode = "EDITOR" | "GAME";
 
 let mode: Mode = "EDITOR";
 
+export let moonsToWin = 1;
+
 let editorCamera: Camera, gameCamera: Camera;
-let mapRoot: Node<State>;
 
 async function init() {
 	const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
@@ -82,19 +82,34 @@ export function GetMode() {
 }
 
 let lastSavedMap: string;
-export function ToggleMode() {
-	mode = mode === "EDITOR" ? "GAME" : "EDITOR";
-
-	FindNode((n) => n.name == "cpt-toad").forEach((n) => n.Remove());
-	if (mode == "GAME") {
+export function ToggleMode(): Mode {
+	FindNode((n) => n.name === "cpt-toad").forEach((n) => n.Remove());
+	if (mode === "EDITOR") {
 		lastSavedMap = Map.Serialize();
 
-		let spawnPoint = FindNode((n) => n.name == "flag-start")[0];
-		if (spawnPoint) Toad.Spawn(spawnPoint.state.worldMatrix);
+		let spawnPoint = FindNode((n) => n.name === "flag-start")[0];
+		let moons = FindNode((n) => n.name === "moon");
+		if (spawnPoint) {
+			if (moons.length === 0) {
+				alert("You must add at least 1 Moon to play the level");
+				mode = "EDITOR";
+			} else {
+				Input.ResetMoveDir();
+				moonsToWin = moons.length;
+				Toad.Spawn(spawnPoint.state.worldMatrix);
+				// Remove spawn location while playing
+				spawnPoint.SetParent(null);
+				mode = "GAME";
+			}
+		} else {
+			alert("You must add a Spawn location first!");
+			mode = "EDITOR";
+		}
 	} else {
 		Map.Clear();
 		Map.Deserialize(lastSavedMap);
 		Map.LoadMap();
+		mode = "EDITOR";
 	}
 
 	GetActiveCamera().Update();

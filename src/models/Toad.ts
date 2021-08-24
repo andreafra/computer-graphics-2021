@@ -12,7 +12,7 @@ import { gl } from "../engine/Core";
 import { utils } from "../utils/utils";
 import { Light } from "../engine/Lights";
 import * as Input from "../Input";
-import { GetMode } from "../main";
+import { GetMode, moonsToWin, ToggleMode } from "../main";
 import * as Map from "../Map";
 import * as UI from "../UI";
 
@@ -415,6 +415,10 @@ const CollectMoon = (
 		node.state.moonCount++;
 
 		UI.HandleMoonsChanged(node.state.moonCount);
+	}
+	if (node.state.moonCount >= moonsToWin) {
+		alert("You won!");
+		ToggleMode();
 	}
 };
 

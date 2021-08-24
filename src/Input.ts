@@ -29,6 +29,10 @@ export function Init() {
 
 export var moveDir = [0, 0, 0];
 
+export function ResetMoveDir() {
+	moveDir = [0, 0, 0];
+}
+
 // Afaik Javascript doesn't let us read keyboard state directly, so we'll have
 // to listen for both a key release and a key press
 

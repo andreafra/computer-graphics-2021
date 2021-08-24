@@ -8,8 +8,9 @@ import moonIcon from "./assets/icons/moon.png";
 import coinIcon from "./assets/icons/coin.png";
 import enemyIcon from "./assets/icons/enemy.png";
 import spawnIcon from "./assets/icons/spawn_point.png";
+import heartIcon from "./assets/icons/heart.png";
 
-import { ToggleMode } from "./main";
+import { GetMode, ToggleMode } from "./main";
 
 const ButtonIcon = (
 	icon: string,
@@ -38,6 +39,10 @@ const contentHtml = `<!-- HTML Added by UI.ts -->
 	</div>
 	<div class="ui-left ui-editor">
 		<!-- ${ButtonIcon("⏏️", "Close")} -->
+		<input id="file-input" type="file" name="name" style="display: none;" />
+		${ButtonIcon("📥", "Save")}
+		${ButtonIcon("📤", "Load")}
+		<div class="ui-separator"></div>
 		${ButtonIcon("➕", "Add")}
 		${ButtonIcon("➖", "Remove")}
 		<div class="ui-separator"></div>
@@ -48,13 +53,6 @@ const contentHtml = `<!-- HTML Added by UI.ts -->
 		${ButtonImage(coinIcon, "Coin")}
 		${ButtonImage(enemyIcon, "Enemy")}
 		${ButtonImage(spawnIcon, "Spawn")}
-	</div>
-	<div class="ui-left ui-editor">
-		<div class="ui-separator"></div>
-		<input id="file-input" type="file" name="name" style="display: none;" />
-		${ButtonIcon("📥", "Save")}
-		${ButtonIcon("📤", "Load")}
-		<div class="ui-separator"></div>
 	</div>
 	<div class="ui-right">
 		<button class="ui-button" id="play-btn">▶️</button>
@@ -217,8 +215,11 @@ function HandleSpawnClick(ev?: MouseEvent) {
 }
 
 function HandlePlayClick() {
+	let prevMode = GetMode();
 	let mode = ToggleMode();
 	playBtn.innerText = mode === "EDITOR" ? "▶️" : "■";
+
+	if (prevMode === mode) return;
 
 	document
 		.querySelectorAll(".ui-editor")
@@ -240,11 +241,11 @@ function HandleFileChosen(event: Event) {
 }
 
 export function HandleLivesChanged(lives: number) {
-	livesDiv.innerHTML = "❤".repeat(lives);
+	livesDiv.innerHTML = `<img src="${heartIcon}" alt="❤"><span>×${lives}</span>`;
 }
 export function HandleCoinsChanged(coins: number) {
-	coinsDiv.innerHTML = "🪙".repeat(coins);
+	coinsDiv.innerHTML = `<img src="${coinIcon}" alt="🪙"><span>×${coins}</span>`;
 }
 export function HandleMoonsChanged(moons: number) {
-	moonsDiv.innerHTML = "🌙".repeat(moons);
+	moonsDiv.innerHTML = `<img src="${moonIcon}" alt="🌙"><span>×${moons}</span>`;
 }
