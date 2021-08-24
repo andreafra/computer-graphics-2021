@@ -1,7 +1,4 @@
-import { utils } from "./utils/utils";
 import * as Editor from "./Editor";
-import * as Map from "./Map";
-import { Camera } from "./Camera";
 import { GetActiveCamera, GetMode } from "./main";
 import { gl } from "./engine/Core";
 import * as Raycast from "./engine/Raycast";
@@ -23,7 +20,10 @@ export function Init() {
 		isPointerSecondaryActive = false;
 	});
 	gl.canvas.addEventListener("pointermove", HandleInputPointerDrag);
-	gl.canvas.addEventListener("contextmenu", HandleRightClick);
+	gl.canvas.addEventListener("contextmenu", (ev: Event) => {
+		ev.preventDefault();
+		return true;
+	});
 	gl.canvas.addEventListener("wheel", HandleInputScroll);
 }
 
@@ -143,15 +143,7 @@ function HandleInputKeyUp(ev: KeyboardEvent) {
 
 function HandleInputPointerDrag(ev: PointerEvent) {
 	ev.preventDefault();
-	if (isPointerActive) {
-		// Do stuff with mouse (requires raycasts)
-		if (ev.ctrlKey) {
-			RotateCamera(ev.clientX, ev.clientY);
-		} else if (ev.shiftKey) {
-			// TODO: PAN CAMERA
-		}
-	}
-	if (isPointerSecondaryActive) {
+	if (isPointerActive && ev.ctrlKey || isPointerSecondaryActive) {
 		RotateCamera(ev.clientX, ev.clientY);
 	}
 
@@ -161,12 +153,6 @@ function HandleInputPointerDrag(ev: PointerEvent) {
 	};
 }
 
-function HandleRightClick(ev: MouseEvent) {
-	ev.preventDefault();
-	isPointerSecondaryActive = true;
-	return false;
-}
-
 function HandleInputPointerDown(ev: PointerEvent) {
 	ev.preventDefault();
 	// Handle mouse down events
@@ -174,7 +160,11 @@ function HandleInputPointerDown(ev: PointerEvent) {
 		x: ev.clientX,
 		y: ev.clientY,
 	};
-	isPointerActive = true;
+	if (ev.button == 0) {
+		isPointerActive = true;
+	} else if (ev.button == 2) {
+		isPointerSecondaryActive = true;
+	}
 
 	if (ev.button == 0 && !ev.ctrlKey) {
 		// Raycast
