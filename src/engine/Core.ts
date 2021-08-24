@@ -25,6 +25,8 @@ export function Setup(_gl: WebGL2RenderingContext) {
 	// ONCE
 	gl.clearColor(1, 1, 1, 1);
 	gl.enable(gl.DEPTH_TEST);
+	gl.enable(gl.CULL_FACE);
+	gl.cullFace(gl.BACK);
 }
 
 let lastUpdate: DOMHighResTimeStamp = 0;
