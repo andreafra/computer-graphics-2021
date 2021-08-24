@@ -18,6 +18,7 @@ export class Shadow {
 		l.color = color;
 		l.coneOut = coneOut;
 		l.coneIn = coneIn;
+		if (!l.color[3]) l.color[3] = 1.0;
 		if (targetDistance) l.target = targetDistance;
 		if (decay) l.decay = decay;
 		return l;
