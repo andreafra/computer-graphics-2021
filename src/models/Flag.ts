@@ -51,7 +51,10 @@ export function Spawn(type: Type, spawnCoord: number[], mapRoot: Node<State>) {
 		tMatrix
 	);
 	node.state = {
-		bounds: BOX_DEFAULT_BOUNDS,
+		bounds: [
+			[0, 0, 0],
+			[0, 0, 0],
+		],
 		// render
 		materialColor: [
 			type == Type.Start ? 0.0 : 1.0,
