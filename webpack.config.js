@@ -17,7 +17,7 @@ module.exports = {
 
 	// Use web server for development.
 	devServer: {
-		contentBase: "./dist",
+		static: "./dist",
 		hot: false,
 	},
 	module: {
