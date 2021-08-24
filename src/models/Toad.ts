@@ -174,7 +174,7 @@ export function Spawn(localMatrix: number[]) {
 			[1, 1, 1], // color
 			40, // coneOut, deg°
 			0.5, // coneIn, %
-			2, // targetDistance
+			1.3, // targetDistance
 			1 // decay)
 		),
 		utils.MakeTranslateMatrix(0, 1, 0)
