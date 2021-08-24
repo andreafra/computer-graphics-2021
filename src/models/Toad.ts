@@ -6,6 +6,7 @@ import {
 	ShadowNode,
 	State,
 	LightNode,
+	FindNode,
 } from "../engine/SceneGraph";
 import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 import { gl } from "../engine/Core";
@@ -185,6 +186,8 @@ export function Spawn(localMatrix: number[]) {
 	toadNode.AddAction(CollectCoin);
 	toadNode.AddAction(CollectMoon);
 	toadNode.AddAction(HitEnemy);
+	toadNode.AddAction(DieFromFall);
+	toadNode.AddAction(CheckIfGameOver);
 
 	// Set relationships between nodes
 	headLight.SetParent(toadNode);
@@ -422,6 +425,26 @@ const CollectMoon = (
 	}
 };
 
+const FALL_KILL_HEIGHT = -5;
+
+const DieFromFall = (
+	deltaTime: DOMHighResTimeStamp,
+	node: PhysicsNode<ToadState>
+): void => {
+	if (node.GetWorldCoordinates()[1] <= FALL_KILL_HEIGHT) {
+		node.state.yVelocity = 0;
+		let spawnPoint = FindNode((n) => n.name === "flag-start")[0];
+		let spawnPointCoords = spawnPoint.GetWorldCoordinates();
+
+		node.state.localMatrix = utils.MakeTranslateMatrix(
+			spawnPointCoords[0],
+			spawnPointCoords[1],
+			spawnPointCoords[2]
+		);
+		node.state.lives--;
+		UI.HandleLivesChanged(node.state.lives);
+	}
+};
 const HitEnemy = (
 	deltaTime: DOMHighResTimeStamp,
 	node: PhysicsNode<ToadState>
@@ -456,5 +479,15 @@ const HitEnemy = (
 		state.invulnerable = true;
 
 		UI.HandleLivesChanged(state.lives);
+	}
+};
+
+const CheckIfGameOver = (
+	deltaTime: DOMHighResTimeStamp,
+	node: PhysicsNode<ToadState>
+): void => {
+	if (node.state.lives < 0) {
+		ToggleMode();
+		alert("Game Over!");
 	}
 };

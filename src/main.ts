@@ -58,7 +58,7 @@ async function init() {
 	// Setup Scenegraph nodes
 	Map.DrawGrid();
 	Map.InitSampleCubes();
-	let mapRoot = Map.Init();
+	Map.Init();
 	Toad.Init();
 
 	Skybox.Init();
@@ -97,19 +97,21 @@ export function ToggleMode(): Mode {
 				Input.ResetMoveDir();
 				moonsToWin = moons.length;
 				Toad.Spawn(spawnPoint.state.worldMatrix);
-				// Remove spawn location while playing
-				spawnPoint.SetParent(null);
+				// spawnPoint.SetParent(null); // Remove spawn location while playing
 				mode = "GAME";
+				UI.ToggleUIMode();
 			}
 		} else {
 			alert("You must add a Spawn location first!");
 			mode = "EDITOR";
 		}
 	} else {
+		// "GAME"
 		Map.Clear();
 		Map.Deserialize(lastSavedMap);
 		Map.LoadMap();
 		mode = "EDITOR";
+		UI.ToggleUIMode();
 	}
 
 	GetActiveCamera().Update();

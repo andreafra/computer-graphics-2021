@@ -215,18 +215,7 @@ function HandleSpawnClick(ev?: MouseEvent) {
 }
 
 function HandlePlayClick() {
-	let prevMode = GetMode();
-	let mode = ToggleMode();
-	playBtn.innerText = mode === "EDITOR" ? "▶️" : "■";
-
-	if (prevMode === mode) return;
-
-	document
-		.querySelectorAll(".ui-editor")
-		.forEach((e) => e.classList.toggle("hidden"));
-	document
-		.querySelectorAll(".ui-game")
-		.forEach((e) => e.classList.toggle("hidden"));
+	ToggleMode();
 }
 
 function HandleSaveClick() {
@@ -248,4 +237,14 @@ export function HandleCoinsChanged(coins: number) {
 }
 export function HandleMoonsChanged(moons: number) {
 	moonsDiv.innerHTML = `<img src="${moonIcon}" alt="🌙"><span>×${moons}</span>`;
+}
+
+export function ToggleUIMode() {
+	playBtn.innerText = GetMode() === "EDITOR" ? "▶️" : "■";
+	document
+		.querySelectorAll(".ui-editor")
+		.forEach((e) => e.classList.toggle("hidden"));
+	document
+		.querySelectorAll(".ui-game")
+		.forEach((e) => e.classList.toggle("hidden"));
 }
