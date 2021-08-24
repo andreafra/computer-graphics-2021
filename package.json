@@ -4,9 +4,9 @@
 	"description": "A template for a simple WebGL 2 application",
 	"private": true,
 	"scripts": {
-		"watch": "NODE_ENV=development webpack --watch",
-		"start": "NODE_ENV=development webpack serve --open",
-		"build": "NODE_ENV=production webpack",
+		"watch": "cross-env NODE_ENV=development webpack --watch",
+		"start": "cross-env NODE_ENV=development webpack serve --open",
+		"build": "cross-env NODE_ENV=production webpack",
 		"prepare": "husky install"
 	},
 	"keywords": [
@@ -36,6 +36,7 @@
 		"webpack-obj-loader": "^1.0.4"
 	},
 	"dependencies": {
+		"cross-env": "^7.0.3",
 		"file-saver": "^2.0.5",
 		"remove": "^0.1.5"
 	},
