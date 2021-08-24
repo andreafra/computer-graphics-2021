@@ -96,6 +96,13 @@ function ScaleAction(
 export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	// SETUP NODES
 	let scale = 0.7;
+	let boundsScale = 1/3;
+
+	let bounds = BOX_DEFAULT_BOUNDS.map((pos) =>
+		pos.map((x) => x * scale * boundsScale)
+	);
+	bounds[1][1] += scale * boundsScale;
+
 	spawnCoord[1] += (1 - scale) / 2;
 
 	let tMatrix = utils.multiplyMatrices(
@@ -104,9 +111,7 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	);
 	var enemyNode = new RenderNode<EnemyState>("enemy", tMatrix);
 	enemyNode.state = {
-		bounds: BOX_DEFAULT_BOUNDS.map((pos) =>
-			pos.map((x) => (x * scale) / 2)
-		),
+		bounds: bounds,
 		// render
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],

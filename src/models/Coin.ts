@@ -70,6 +70,12 @@ function SpinAction(
 export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	// SETUP NODES
 	let scale = 0.7;
+	let boundsScale = 1/3;
+
+	let bounds = BOX_DEFAULT_BOUNDS.map((pos) =>
+		pos.map((x) => x * scale * boundsScale)
+	);
+	bounds[1][1] += scale * boundsScale;
 
 	let tMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(spawnCoord[0], spawnCoord[1], spawnCoord[2]),
@@ -77,9 +83,7 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	);
 	var coinNode = new RenderNode<CoinState>("coin", tMatrix);
 	coinNode.state = {
-		bounds: BOX_DEFAULT_BOUNDS.map((pos) =>
-			pos.map((x) => (x * scale) / 3)
-		),
+		bounds: bounds,
 		// render
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],

@@ -97,13 +97,21 @@ function SpinAction(
 
 export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	// SETUP NODES
+	let scale = 1;
+	let boundsScale = 1/3;
+
+	let bounds = BOX_DEFAULT_BOUNDS.map((pos) =>
+		pos.map((x) => x * scale * boundsScale)
+	);
+	bounds[1][1] += scale * boundsScale;
+
 	let tMatrix = utils.multiplyMatrices(
 		utils.MakeTranslateMatrix(spawnCoord[0], spawnCoord[1], spawnCoord[2]),
-		utils.MakeScaleMatrix(1)
+		utils.MakeScaleMatrix(scale)
 	);
 	var moonNode = new RenderNode<MoonState>("moon", tMatrix);
 	moonNode.state = {
-		bounds: BOX_DEFAULT_BOUNDS.map((pos) => pos.map((x) => x / 3)),
+		bounds: bounds,
 		// render
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],
