@@ -73,7 +73,7 @@ let addBtn: HTMLElement,
 	spawnBtn: HTMLElement,
 	playBtn: HTMLElement,
 	saveBtn: HTMLElement,
-	filePicker: HTMLElement,
+	filePicker: HTMLInputElement,
 	loadBtn: HTMLElement,
 	livesDiv: HTMLElement,
 	coinsDiv: HTMLElement,
@@ -112,7 +112,7 @@ export function Init() {
 	playBtn = document.getElementById("play-btn");
 	loadBtn = document.getElementById("load-btn");
 	saveBtn = document.getElementById("save-btn");
-	filePicker = document.getElementById("file-input");
+	filePicker = document.getElementById("file-input") as HTMLInputElement;
 	// closeBtn.addEventListener("click", () => {})
 
 	elementBtns = [
@@ -222,6 +222,7 @@ function HandleSaveClick() {
 	Editor.ExportMap();
 }
 function HandleLoadClick() {
+	filePicker.value = "";
 	filePicker.click();
 }
 function HandleFileChosen(event: Event) {
