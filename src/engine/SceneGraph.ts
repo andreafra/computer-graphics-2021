@@ -1,4 +1,4 @@
-import * as DebugLine from "./debug/Lines";
+import * as Lines from "./Lines";
 import { utils } from "../utils/utils";
 import * as Engine from "./Core";
 import { Light } from "./Lights";
@@ -237,11 +237,12 @@ export class LightNode<T extends State> extends Node<T> {
 		this.light.dir = utils.normalize(this.light.dir);
 
 		// Draw a vector to represent the light position
-		// DebugLine.DrawLine(
+		// let line = Lines.MakeLine(
 		// 	this.light.pos,
 		// 	utils.addVectors(this.light.pos, this.light.dir),
-		// 	DebugLine.LineColor.YELLOW
+		// 	Lines.LineColor.YELLOW
 		// );
+		// Engine.AddLine(line)
 
 		Engine.AddLight(this.light);
 	}

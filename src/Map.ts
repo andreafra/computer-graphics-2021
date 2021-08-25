@@ -4,9 +4,9 @@ import * as Moon from "./models/Moon";
 import * as Coin from "./models/Coin";
 import * as Enemy from "./models/Enemy";
 import * as Flag from "./models/Flag";
-import * as Core from "./engine/Core";
+import * as Engine from "./engine/Core";
 import * as SceneGraph from "./engine/SceneGraph";
-import * as DebugLine from "./engine/debug/Lines";
+import * as Lines from "./engine/Lines";
 import { utils } from "./utils/utils";
 
 export enum CellType {
@@ -56,7 +56,10 @@ export function Init() {
 	Flag.Init();
 
 	mapRoot = new SceneGraph.Node("map-root");
-	mapRoot.SetParent(Core.ROOT_NODE);
+	mapRoot.SetParent(Engine.ROOT_NODE);
+
+	let grid = MakeGrid();
+	mapRoot.AddAction((deltaTime, node) => grid.forEach(Engine.AddLine));
 
 	LoadMap();
 
@@ -160,25 +163,30 @@ export function ClampMapCoordinates(v: number[]) {
 	];
 }
 
-export function DrawGrid() {
-	const color = DebugLine.LineColor.GREY;
-	const epsilon = -0.00001; // so we can see the axis
+function MakeGrid() {
+	let grid = new Array<Lines.Line>();
+	const color = Lines.LineColor.GREY;
 	for (let x = 0; x <= MAP_MAX_XZ_SIZE; x++) {
 		let _x = x - HALF_MAP_SIZE;
-		DebugLine.DrawLine(
-			[_x, epsilon, -HALF_MAP_SIZE],
-			[_x, epsilon, HALF_MAP_SIZE],
-			color
+		grid.push(
+			Lines.MakeLine(
+				[_x, 0, -HALF_MAP_SIZE],
+				[_x, 0, HALF_MAP_SIZE],
+				color
+			)
 		);
 	}
 	for (let z = 0; z <= MAP_MAX_XZ_SIZE; z++) {
 		let _z = z - HALF_MAP_SIZE;
-		DebugLine.DrawLine(
-			[-HALF_MAP_SIZE, epsilon, _z],
-			[HALF_MAP_SIZE, epsilon, _z],
-			color
+		grid.push(
+			Lines.MakeLine(
+				[-HALF_MAP_SIZE, 0, _z],
+				[HALF_MAP_SIZE, 0, _z],
+				color
+			)
 		);
 	}
+	return grid;
 }
 
 export function ToMapCoords(n: number[]) {

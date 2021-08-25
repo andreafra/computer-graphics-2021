@@ -1,4 +1,4 @@
-import { DrawLine, LineColor } from "./debug/Lines";
+import { MakeLine, Line, LineColor } from "./Lines";
 import { utils } from "../utils/utils";
 import {
 	cameraMatrix,
@@ -22,6 +22,9 @@ export interface HitNode {
 	position: number[];
 	ray: Ray;
 }
+
+//let rayLines = new Array<Line>();
+//Engine.ROOT_NODE.AddAction((deltaTime, node) => rayLines.forEach(Engine.AddLine));
 
 export function Hit(x: number, y: number) {
 	let ray = GetRay(x, y);
@@ -98,7 +101,7 @@ function GetRay(x: number, y: number) {
 	};
 
 	// DEBUG: Draw the ray we're casting
-	// DrawLine(
+	// let line = MakeLine(
 	// 	rayStartPoint,
 	// 	utils.addVectors(
 	// 		rayStartPoint,
@@ -106,6 +109,7 @@ function GetRay(x: number, y: number) {
 	// 	),
 	// 	LineColor.PURPLE
 	// );
+	// rayLines.push(line);
 
 	return ray;
 }

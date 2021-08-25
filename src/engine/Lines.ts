@@ -1,5 +1,5 @@
-import { utils } from "../../utils/utils";
-import { gl } from "../Core";
+import { utils } from "../utils/utils";
+import { gl } from "./Core";
 
 // Vertex shader source code
 const vertexShaderSrc = `#version 300 es
@@ -25,7 +25,7 @@ const fragmentShaderSrc = `#version 300 es
 		outColor = vec4(lineColor, 1.0);
 	}`;
 
-interface Line {
+export interface Line {
 	vao: WebGLVertexArrayObject;
 	color: LineColor;
 	colorLoc: WebGLUniformLocation;
@@ -53,8 +53,6 @@ const COLORS = [
 	[0.5, 0.5, 0.5],
 ];
 
-let lines: Line[] = [];
-
 let program: WebGLProgram;
 
 export function Setup() {
@@ -65,7 +63,7 @@ export function Setup() {
 	]);
 }
 
-export function DrawLine(
+export function MakeLine(
 	start: number[],
 	end: number[],
 	color: LineColor = LineColor.BLACK
@@ -91,27 +89,25 @@ export function DrawLine(
 	gl.vertexAttribPointer(positions, 3, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(positions);
 
-	lines.push({
+	return {
 		vao: vao,
 		color: color,
 		colorLoc: colorLoc,
 		matrix: utils.identityMatrix(),
 		matrixLoc: matrixLoc,
-	});
+	};
 }
 
-export function Render(VPMatrix: number[]) {
+export function DrawLine(line: Line, VPMatrix: number[]) {
 	gl.useProgram(program);
-	for (const line of lines) {
-		let projectionMatrix = utils.multiplyMatrices(VPMatrix, line.matrix);
+	let projectionMatrix = utils.multiplyMatrices(VPMatrix, line.matrix);
 
-		gl.bindVertexArray(line.vao);
-		gl.uniformMatrix4fv(
-			line.matrixLoc,
-			false,
-			utils.transposeMatrix(projectionMatrix)
-		);
-		gl.uniform3fv(line.colorLoc, COLORS[line.color]);
-		gl.drawArrays(gl.LINES, 0, 2);
-	}
+	gl.bindVertexArray(line.vao);
+	gl.uniformMatrix4fv(
+		line.matrixLoc,
+		false,
+		utils.transposeMatrix(projectionMatrix)
+	);
+	gl.uniform3fv(line.colorLoc, COLORS[line.color]);
+	gl.drawArrays(gl.LINES, 0, 2);
 }

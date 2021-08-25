@@ -10,7 +10,7 @@ import {
 	State,
 	FindNode,
 } from "./engine/SceneGraph";
-import * as DebugLine from "./engine/debug/Lines";
+import * as Lines from "./engine/Lines";
 import * as UI from "./UI";
 import * as Skybox from "./Skybox";
 import { Camera } from "./Camera";
@@ -52,11 +52,9 @@ async function init() {
 
 	UI.Init();
 	Input.Init();
-
-	DebugLine.Setup();
+	Lines.Setup();
 
 	// Setup Scenegraph nodes
-	Map.DrawGrid();
 	Map.InitSampleCubes();
 	Map.Init();
 	Toad.Init();

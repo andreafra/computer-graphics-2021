@@ -2,10 +2,10 @@ import { utils } from "../utils/utils";
 import { Light } from "./Lights";
 //import { DoRaycast } from "./Raycast";
 import { IRenderableState, Node, RenderNode, State } from "./SceneGraph";
-import * as DebugLine from "./debug/Lines";
 import { WebGLProgramInfo, MAX_LIGHTS, MAX_SHADOWS } from "./Shaders";
 import { IBoxBounds, PhysicsNode, PhysicsState } from "./Physics";
 import { Shadow } from "./Shadows";
+import { Line, DrawLine } from "./Lines";
 
 export const ROOT_NODE: Node<State> = new Node("root");
 export let gl: WebGL2RenderingContext;
@@ -15,6 +15,7 @@ export let cameraMatrix = utils.identityMatrix();
 const lights = new Array<Light>();
 const shadows = new Array<Shadow>();
 let ambientLight = [0, 0, 0];
+const lines = new Array<Line>();
 
 let renderQueue: ((VPMatrix: number[]) => void)[] = [];
 
@@ -43,6 +44,7 @@ function Render(time: DOMHighResTimeStamp) {
 	// Navigate the SceneGraph tree to update all elements // O(n)
 	lights.length = 0;
 	shadows.length = 0;
+	lines.length = 0;
 	renderQueue = [];
 	ROOT_NODE.Update(deltaTime);
 
@@ -55,7 +57,7 @@ function Render(time: DOMHighResTimeStamp) {
 		renderFunction(viewProjectionMatrix);
 	}
 
-	DebugLine.Render(viewProjectionMatrix);
+	lines.forEach((l) => DrawLine(l, viewProjectionMatrix));
 
 	// Render next frame
 	requestAnimationFrame(Render);
@@ -147,6 +149,10 @@ export function AddLight(light: Light) {
 export function AddShadow(shadow: Shadow) {
 	if (shadows.length >= MAX_SHADOWS) throw "Cannot add any more shadows";
 	shadows.push(shadow);
+}
+
+export function AddLine(line: Line) {
+	lines.push(line);
 }
 
 export function BindAllShadowUniforms(programInfo: WebGLProgramInfo) {

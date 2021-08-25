@@ -25,7 +25,6 @@ import normalMapSrc from "../assets/cpt_toad/Textures/baked_nrm.png";
 import specularMapSrc from "../assets/cpt_toad/Textures/baked_spc.png";
 import ambientOcclusionSrc from "../assets/cpt_toad/Textures/baked_ao.png";
 import { GetActiveCamera } from "../main";
-import { DrawLine, LineColor } from "../engine/debug/Lines";
 import {
 	BOX_DEFAULT_BOUNDS,
 	PhysicsNode,
