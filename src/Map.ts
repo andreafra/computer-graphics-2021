@@ -8,6 +8,7 @@ import * as Engine from "./engine/Core";
 import * as SceneGraph from "./engine/SceneGraph";
 import * as Lines from "./engine/Lines";
 import { utils } from "./utils/utils";
+import { GetMode } from "./main";
 
 export enum CellType {
 	Empty = 0,
@@ -59,7 +60,9 @@ export function Init() {
 	mapRoot.SetParent(Engine.ROOT_NODE);
 
 	let grid = MakeGrid();
-	mapRoot.AddAction((deltaTime, node) => grid.forEach(Engine.AddLine));
+	mapRoot.AddAction((deltaTime, node) => {
+		if (GetMode() == "EDITOR") grid.forEach(Engine.AddLine);
+	});
 
 	LoadMap();
 
