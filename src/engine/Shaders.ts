@@ -12,7 +12,7 @@ export enum Features {
 	AmbientOcclusion = 1 << 4,
 }
 
-export const MAX_LIGHTS = 64;
+export const MAX_LIGHTS = 32;
 export const MAX_SHADOWS = 8;
 
 export interface WebGLProgramInfo {
