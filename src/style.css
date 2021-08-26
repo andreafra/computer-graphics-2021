@@ -1,37 +1,5 @@
 * {
-	/* Since it's a fullscreen application, remove annoying  */
-	overflow: hidden;
-	font-family: sans-serif;
-}
-
-:root {
-	--ui-size-height: 100px;
-	--ui-size-img: 45px;
-	--ui-size-gap: 10px;
-	--ui-color-bg: rgba(255, 255, 255, 0.35);
-	--ui-color-play-btn: rgba(255, 217, 0, 0.75);
-	--ui-color-play-btn-hover: rgba(206, 151, 0, 0.75);
-	--ui-color-btn: rgba(255, 255, 255, 0);
-	--ui-color-btn-hover: rgba(206, 206, 206, 0.3);
-	--ui-color-separator: #aaa;
-	--ui-color-selected: rgb(125, 255, 205, 0.5);
-}
-
-* {
 	box-sizing: border-box;
-}
-
-body {
-	margin: 0;
-	padding: 0;
-	height: 100vh;
-	width: 100vw;
-	background-color: black;
-	position: relative;
-	/* https://css-tricks.com/snippets/css/system-font-stack/ */
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-		"Segoe UI Symbol";
 }
 
 #main-ui {
@@ -53,22 +21,6 @@ body {
 	width: 100%;
 	backdrop-filter: blur(5px) brightness(80%);
 	font-size: 1.2rem;
-}
-
-#loading {
-	display: flex;
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	background-color: black;
-	color: var(--ui-color-play-btn);
-}
-
-#loading h2 {
-	width: 100%;
-	display: block;
-	text-align: center;
-	align-self: center;
 }
 
 #help-ui main {
@@ -189,10 +141,6 @@ body {
 	vertical-align: middle;
 	letter-spacing: 0.2rem;
 	margin-left: 0.4rem;
-}
-
-.hidden {
-	display: none !important;
 }
 
 #play-btn,
