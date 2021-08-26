@@ -52,7 +52,8 @@ export function Spawn(type: Type, spawnCoord: number[], mapRoot: Node<State>) {
 	);
 
 	let flagNode = new RenderNode<FlagState>(
-		`flag-${Type[type].toLowerCase()}`
+		`flag-${Type[type].toLowerCase()}`,
+		tMatrix
 	);
 	flagNode.state = {
 		bounds: [
@@ -75,8 +76,7 @@ export function Spawn(type: Type, spawnCoord: number[], mapRoot: Node<State>) {
 	};
 
 	let poleNode = new RenderNode<FlagState>(
-		`flag-${Type[type].toLowerCase()}-pole`,
-		tMatrix
+		`flag-${Type[type].toLowerCase()}-pole`
 	);
 	poleNode.state = {
 		bounds: [
@@ -95,8 +95,8 @@ export function Spawn(type: Type, spawnCoord: number[], mapRoot: Node<State>) {
 	};
 
 	// Set relationships between nodes
-	flagNode.SetParent(poleNode);
-	poleNode.SetParent(mapRoot);
+	poleNode.SetParent(flagNode);
+	flagNode.SetParent(mapRoot);
 
 	return poleNode;
 }
