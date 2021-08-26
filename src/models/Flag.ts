@@ -10,6 +10,7 @@ import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 
 // Assets
 import flag_OBJ from "../assets/flag/flag.obj";
+import flagPole_OBJ from "../assets/flag/flagpole.obj";
 import { gl } from "../engine/Core";
 import { BOX_DEFAULT_BOUNDS, IBoxBounds } from "../engine/Physics";
 
@@ -22,10 +23,8 @@ export enum Type {
 }
 
 let programInfo: WebGLProgramInfo;
-let vao: WebGLVertexArrayObject;
-let baseTexture: () => void;
-let normalMap: () => void;
-let specMap: () => void;
+let flagVao: WebGLVertexArrayObject;
+let poleVao: WebGLVertexArrayObject;
 
 export function Init() {
 	// SHADERS
@@ -33,10 +32,15 @@ export function Init() {
 	gl.useProgram(programInfo.program);
 
 	// CREATE MODEL
-	vao = MakeVAO(programInfo.program, {
+	flagVao = MakeVAO(programInfo.program, {
 		positions: flag_OBJ.vertices,
 		normals: flag_OBJ.vertexNormals,
 		indices: flag_OBJ.indices,
+	});
+	poleVao = MakeVAO(programInfo.program, {
+		positions: flagPole_OBJ.vertices,
+		normals: flagPole_OBJ.vertexNormals,
+		indices: flagPole_OBJ.indices,
 	});
 }
 
@@ -46,19 +50,19 @@ export function Spawn(type: Type, spawnCoord: number[], mapRoot: Node<State>) {
 		utils.MakeTranslateMatrix(spawnCoord[0], spawnCoord[1], spawnCoord[2]),
 		utils.MakeScaleMatrix(1)
 	);
-	var node = new RenderNode<FlagState>(
-		`flag-${Type[type].toLowerCase()}`,
-		tMatrix
+
+	let flagNode = new RenderNode<FlagState>(
+		`flag-${Type[type].toLowerCase()}`
 	);
-	node.state = {
+	flagNode.state = {
 		bounds: [
 			[0, 0, 0],
 			[0, 0, 0],
 		],
 		// render
 		materialColor: [
-			type == Type.Start ? 0.0 : 1.0,
-			type == Type.Start ? 1.0 : 0.0,
+			type == Type.Start ? 0.3 : 0.9,
+			type == Type.Start ? 0.9 : 0.3,
 			0.1,
 		],
 		materialAmbColor: [1.0, 1.0, 1.0],
@@ -66,15 +70,33 @@ export function Spawn(type: Type, spawnCoord: number[], mapRoot: Node<State>) {
 		materialEmitColor: [0.0, 0.0, 0.0],
 		programInfo: programInfo,
 		bufferLength: flag_OBJ.indices.length,
-		vertexArrayObject: vao,
-		texture: baseTexture,
-		normalMap: normalMap,
-		specularMap: specMap,
-		...node.state,
+		vertexArrayObject: flagVao,
+		...flagNode.state,
+	};
+
+	let poleNode = new RenderNode<FlagState>(
+		`flag-${Type[type].toLowerCase()}-pole`,
+		tMatrix
+	);
+	poleNode.state = {
+		bounds: [
+			[0, 0, 0],
+			[0, 0, 0],
+		],
+		// render
+		materialColor: [0.627, 0.384, 0.224],
+		materialAmbColor: [1.0, 1.0, 1.0],
+		materialSpecColor: [1.0, 1.0, 1.0],
+		materialEmitColor: [0.0, 0.0, 0.0],
+		programInfo: programInfo,
+		bufferLength: flagPole_OBJ.indices.length,
+		vertexArrayObject: poleVao,
+		...poleNode.state,
 	};
 
 	// Set relationships between nodes
-	node.SetParent(mapRoot);
+	flagNode.SetParent(poleNode);
+	poleNode.SetParent(mapRoot);
 
-	return node;
+	return poleNode;
 }
