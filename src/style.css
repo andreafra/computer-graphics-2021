@@ -211,7 +211,7 @@ body {
 }
 
 #play-btn:hover,
-.circle-btn:hovers {
+.circle-btn:hover {
 	background-color: var(--ui-color-play-btn-hover);
 }
 
