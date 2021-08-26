@@ -38,7 +38,8 @@ const contentHtml = `<!-- HTML Added by UI.ts -->
 		<div class="ui-collectable" id="ui-moons"></div>
 	</div>
 	<div class="ui-left ui-editor">
-		<!-- ${ButtonIcon("⏏️", "Close")} -->
+		<button class="circle-btn" id="help-btn">?</button>
+		<span class="ui-spacer"></span>
 		<input id="file-input" type="file" name="name" style="display: none;" />
 		${ButtonIcon("📥", "Save")}
 		${ButtonIcon("📤", "Load")}
@@ -55,7 +56,7 @@ const contentHtml = `<!-- HTML Added by UI.ts -->
 		${ButtonImage(spawnIcon, "Spawn")}
 	</div>
 	<div class="ui-right">
-		<button class="ui-button" id="play-btn">▶️</button>
+		<button class="circle-btn" id="play-btn">&#9658;</button>
 	</div>
 </div>
 `;
@@ -77,7 +78,9 @@ let addBtn: HTMLElement,
 	loadBtn: HTMLElement,
 	livesDiv: HTMLElement,
 	coinsDiv: HTMLElement,
-	moonsDiv: HTMLElement;
+	moonsDiv: HTMLElement,
+	helpBtn: HTMLElement,
+	startBtn: HTMLElement;
 
 let elementBtns: HTMLElement[] = [];
 const elementCallbacks = [
@@ -112,6 +115,8 @@ export function Init() {
 	playBtn = document.getElementById("play-btn");
 	loadBtn = document.getElementById("load-btn");
 	saveBtn = document.getElementById("save-btn");
+	helpBtn = document.getElementById("help-btn");
+	startBtn = document.getElementById("start-btn");
 	filePicker = document.getElementById("file-input") as HTMLInputElement;
 	// closeBtn.addEventListener("click", () => {})
 
@@ -131,7 +136,8 @@ export function Init() {
 	loadBtn.addEventListener("click", HandleLoadClick);
 	playBtn.addEventListener("click", HandlePlayClick);
 	filePicker.addEventListener("change", HandleFileChosen);
-
+	helpBtn.addEventListener("click", HandleHelpClick);
+	startBtn.addEventListener("click", HandleHelpClick);
 	for (let i = 0; i < elementBtns.length; i++) {
 		elementBtns[i].addEventListener("click", elementCallbacks[i]);
 	}
@@ -230,6 +236,10 @@ function HandleFileChosen(event: Event) {
 	fileList[0].text().then(Editor.ImportMap);
 }
 
+function HandleHelpClick() {
+	document.getElementById("help-ui").classList.toggle("hidden");
+}
+
 export function HandleLivesChanged(lives: number) {
 	livesDiv.innerHTML = `<img src="${heartIcon}" alt="❤"><span>×${lives}</span>`;
 }
@@ -241,7 +251,7 @@ export function HandleMoonsChanged(moons: number) {
 }
 
 export function ToggleUIMode() {
-	playBtn.innerText = GetMode() === "EDITOR" ? "▶️" : "■";
+	playBtn.innerHTML = GetMode() === "EDITOR" ? "&#9658;" : "&#9632;";
 	document
 		.querySelectorAll(".ui-editor")
 		.forEach((e) => e.classList.toggle("hidden"));

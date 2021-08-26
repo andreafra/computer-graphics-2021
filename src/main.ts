@@ -120,4 +120,9 @@ export function GetActiveCamera() {
 	return mode === "EDITOR" ? editorCamera : gameCamera;
 }
 
-window.onload = () => init();
+window.onload = () => {
+	// Remove loading screen
+	document.getElementById("loading").classList.add("hidden");
+	// Init app
+	init();
+};

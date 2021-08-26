@@ -8,12 +8,45 @@
 	</head>
 	<body>
 		<div id="main-ui"></div>
+		<div id="help-ui">
+			<main>
+				<h2>Controls</h2>
+				<h3>Editor</h3>
+				<p>
+					Use the toolbar at the top to place blocks. In order to make
+					a level, you'll need to place the <em>Spawn</em> and at
+					least <em>1 Moon</em>.
+				</p>
+				<p>
+					You can rotate the camera with <kbd>Ctrl</kbd> +
+					<kbd>Left Click</kbd> or with <kbd>Right Click</kbd>.
+				</p>
+				<p>
+					When you are done, click the <em>Play</em> button in the top
+					right corner!
+				</p>
+				<h3>In Game</h3>
+				<p>
+					Move around with <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd>
+					<kbd>D</kbd>.
+				</p>
+				<p>Jump with <kbd>Spacebar</kbd>.</p>
+				<p>Collect every <em>Moon</em> to win!</p>
+				<p>P.S.: Every 10 Coins you gain an extra life!</p>
+				<p class="start-btn-container">
+					<button id="start-btn">START</button>
+				</p>
+			</main>
+			<div id="loading">
+				<h2>Loading...</h2>
+			</div>
+		</div>
 		<canvas id="main-canvas"></canvas>
 		<script src="./bundle.js"></script>
 		<iframe
 			allow="autoplay"
 			src="https://www.youtube.com/embed?listType=playlist&list=PLz5gUls4mkX-AM61S5BeBt_UaxPvXF4iZ&autoplay=1"
-			style="display: none"
+			class="hidden"
 		></iframe>
 	</body>
 </html>
