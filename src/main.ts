@@ -121,8 +121,9 @@ export function GetActiveCamera() {
 }
 
 window.onload = () => {
-	// Remove loading screen
-	document.getElementById("loading").classList.add("hidden");
 	// Init app
 	init();
+
+	// Remove loading screen
+	document.getElementById("loading").classList.add("hidden");
 };
