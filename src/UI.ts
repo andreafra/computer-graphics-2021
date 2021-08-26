@@ -12,6 +12,8 @@ import heartIcon from "./assets/icons/heart.png";
 
 import { GetMode, ToggleMode } from "./main";
 
+const SEEN_HELP_COOKIE = "seen_help=";
+
 const ButtonIcon = (
 	icon: string,
 	label: string
@@ -142,6 +144,10 @@ export function Init() {
 		elementBtns[i].addEventListener("click", elementCallbacks[i]);
 	}
 
+	if (document.cookie.indexOf(SEEN_HELP_COOKIE) == -1) {
+		HandleHelpClick();
+	}
+
 	HandleAddClick(null);
 }
 
@@ -236,8 +242,11 @@ function HandleFileChosen(event: Event) {
 	fileList[0].text().then(Editor.ImportMap);
 }
 
-function HandleHelpClick() {
-	document.getElementById("help-ui").classList.toggle("hidden");
+export function HandleHelpClick() {
+	let hide = document.getElementById("help-ui").classList.toggle("hidden");
+	if (hide) {
+		document.cookie = SEEN_HELP_COOKIE;
+	}
 }
 
 export function HandleLivesChanged(lives: number) {
