@@ -98,5 +98,5 @@ export function Spawn(type: Type, spawnCoord: number[], mapRoot: Node<State>) {
 	poleNode.SetParent(flagNode);
 	flagNode.SetParent(mapRoot);
 
-	return poleNode;
+	return flagNode;
 }
