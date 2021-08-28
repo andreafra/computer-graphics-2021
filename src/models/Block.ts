@@ -11,7 +11,8 @@ import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 // Assets
 import cube_W_OBJ from "../assets/cube/cube_white.obj";
 import cube_Y_OBJ from "../assets/cube/cube_yellow.obj";
-import cubeTextureSrc from "../assets/cube/grass.png";
+import cube_W_TextureSrc from "../assets/cube/grass_white.png";
+import cube_Y_TextureSrc from "../assets/cube/grass_yellow.png";
 import cubeNormMapSrc from "../assets/cube/grass_norm.png";
 import { BOX_DEFAULT_BOUNDS, IBoxBounds } from "../engine/Physics";
 import { gl } from "../engine/Core";
@@ -25,7 +26,9 @@ export enum Type {
 }
 
 const MESHES = [cube_W_OBJ, cube_Y_OBJ];
+const BASE_TEXTURES_SRC = [cube_W_TextureSrc, cube_Y_TextureSrc];
 const VAOS = new Array<WebGLVertexArrayObject>();
+const BASE_TEXTURES = new Array<() => void>();
 let programInfo: WebGLProgramInfo;
 let baseTexture: () => void;
 let normMap: () => void;
@@ -45,12 +48,12 @@ export function Init() {
 			indices: blockOBJ.indices,
 			uvCoord: blockOBJ.textures,
 		});
-	}
 
-	baseTexture = MakeTexture(programInfo, {
-		dataSrc: cubeTextureSrc,
-		type: TextureType.BaseTexture,
-	});
+		BASE_TEXTURES[type] = MakeTexture(programInfo, {
+			dataSrc: BASE_TEXTURES_SRC[type],
+			type: TextureType.BaseTexture,
+		});
+	}
 
 	normMap = MakeTexture(programInfo, {
 		dataSrc: cubeNormMapSrc,
@@ -83,7 +86,7 @@ export function Spawn(
 		programInfo: programInfo,
 		bufferLength: blockOBJ.indices.length,
 		vertexArrayObject: VAOS[type],
-		texture: baseTexture,
+		texture: BASE_TEXTURES[type],
 		normalMap: normMap,
 		...blockNode.state,
 	};
