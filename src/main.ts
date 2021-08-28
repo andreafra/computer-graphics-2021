@@ -81,6 +81,7 @@ export function GetMode() {
 
 let lastSavedMap: string;
 export function ToggleMode(): Mode {
+	Input.ResetInput();
 	FindNode((n) => n.name === "cpt-toad").forEach((n) => n.Remove());
 	if (mode === "EDITOR") {
 		lastSavedMap = Map.Serialize();
@@ -92,7 +93,6 @@ export function ToggleMode(): Mode {
 				alert("You must add at least 1 Moon to play the level");
 				mode = "EDITOR";
 			} else {
-				Input.ResetMoveDir();
 				moonsToWin = moons.length;
 				Toad.Spawn(spawnPoint.state.worldMatrix);
 				// spawnPoint.SetParent(null); // Remove spawn location while playing

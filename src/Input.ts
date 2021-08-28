@@ -29,8 +29,11 @@ export function Init() {
 
 export var moveDir = [0, 0, 0];
 
-export function ResetMoveDir() {
+export function ResetInput() {
 	moveDir = [0, 0, 0];
+	isPointerActive = false;
+	isPointerSecondaryActive = false;
+	pressedState = { left: false, right: false, up: false, down: false };
 }
 
 // Afaik Javascript doesn't let us read keyboard state directly, so we'll have
@@ -143,7 +146,7 @@ function HandleInputKeyUp(ev: KeyboardEvent) {
 
 function HandleInputPointerDrag(ev: PointerEvent) {
 	ev.preventDefault();
-	if (isPointerActive && ev.ctrlKey || isPointerSecondaryActive) {
+	if ((isPointerActive && ev.ctrlKey) || isPointerSecondaryActive) {
 		RotateCamera(ev.clientX, ev.clientY);
 	}
 
