@@ -98,7 +98,7 @@ function SpinAction(
 export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	// SETUP NODES
 	let scale = 1;
-	let boundsScale = 1/3;
+	let boundsScale = 1 / 3;
 
 	let bounds = BOX_DEFAULT_BOUNDS.map((pos) =>
 		pos.map((x) => x * scale * boundsScale)
@@ -116,7 +116,7 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],
 		materialSpecColor: [0.3, 0.3, 0.3],
-		materialEmitColor: [0, 0.9, 0], // Use emissive map instead
+		materialEmitColor: [0, 0, 0], // Use emissive map instead
 		programInfo: programInfo,
 		bufferLength: moon_OBJ.indices.length,
 		vertexArrayObject: vao,

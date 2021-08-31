@@ -12,7 +12,6 @@ import { getShader, Features, WebGLProgramInfo } from "../engine/Shaders";
 import coin_OBJ from "../assets/coin/coin.obj";
 import baseTextureSrc from "../assets/coin/Textures/coinbody00_alb.png";
 import normalMapSrc from "../assets/coin/Textures/coinbody00_nrm.png";
-import specMapSrc from "../assets/coin/Textures/coinbody00_rgh.png";
 import { gl } from "../engine/Core";
 import { BOX_DEFAULT_BOUNDS, IBoxBounds } from "../engine/Physics";
 
@@ -25,13 +24,10 @@ let programInfo: WebGLProgramInfo;
 let vao: WebGLVertexArrayObject;
 let baseTexture: () => void;
 let normalMap: () => void;
-let specMap: () => void;
 
 export function Init() {
 	// SHADERS
-	programInfo = getShader(
-		Features.Texture | Features.NormalMap | Features.SpecularMap
-	);
+	programInfo = getShader(Features.Texture | Features.NormalMap);
 	gl.useProgram(programInfo.program);
 
 	// CREATE MODEL
@@ -50,10 +46,6 @@ export function Init() {
 		dataSrc: normalMapSrc,
 		type: TextureType.NormalMap,
 	});
-	specMap = MakeTexture(programInfo, {
-		dataSrc: specMapSrc,
-		type: TextureType.SpecularMap,
-	});
 }
 
 function SpinAction(
@@ -70,7 +62,7 @@ function SpinAction(
 export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	// SETUP NODES
 	let scale = 0.7;
-	let boundsScale = 1/3;
+	let boundsScale = 1 / 3;
 
 	let bounds = BOX_DEFAULT_BOUNDS.map((pos) =>
 		pos.map((x) => x * scale * boundsScale)
@@ -87,14 +79,13 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 		// render
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],
-		materialSpecColor: [0.3, 0.3, 0.3],
+		materialSpecColor: [1.0, 0.9, 0.0],
 		materialEmitColor: [0.1, 0.1, 0.1],
 		programInfo: programInfo,
 		bufferLength: coin_OBJ.indices.length,
 		vertexArrayObject: vao,
 		texture: baseTexture,
 		normalMap: normalMap,
-		specularMap: specMap,
 		...coinNode.state,
 	};
 	coinNode.state.spinSpeed = 180; // degrees per second

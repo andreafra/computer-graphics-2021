@@ -14,7 +14,6 @@ import enemy_OBJ from "../assets/enemy/enemy.obj";
 import baseTextureSrc from "../assets/enemy/Textures/chorobonbody00_alb.png";
 import normalMapSrc from "../assets/enemy/Textures/chorobonbody00_nrm.png";
 import emissiveMapSrc from "../assets/enemy/Textures/chorobonbody00_emm.png";
-import aoMapSrc from "../assets/enemy/Textures/chorobonbody00_rgh.png";
 import { gl } from "../engine/Core";
 import { BOX_DEFAULT_BOUNDS, IBoxBounds } from "../engine/Physics";
 
@@ -32,15 +31,11 @@ let vao: WebGLVertexArrayObject;
 let baseTexture: () => void;
 let normalMap: () => void;
 let emissiveMap: () => void;
-let aoMap: () => void;
 
 export function Init() {
 	// SHADERS
 	programInfo = getShader(
-		Features.Texture |
-			Features.NormalMap |
-			Features.EmissiveMap |
-			Features.AmbientOcclusion
+		Features.Texture | Features.NormalMap | Features.EmissiveMap
 	);
 	gl.useProgram(programInfo.program);
 
@@ -62,11 +57,7 @@ export function Init() {
 	});
 	emissiveMap = MakeTexture(programInfo, {
 		dataSrc: emissiveMapSrc,
-		type: TextureType.SpecularMap,
-	});
-	aoMap = MakeTexture(programInfo, {
-		dataSrc: aoMapSrc,
-		type: TextureType.AmbientOcclusion,
+		type: TextureType.EmissiveMap,
 	});
 }
 
@@ -96,7 +87,7 @@ function ScaleAction(
 export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 	// SETUP NODES
 	let scale = 0.7;
-	let boundsScale = 1/3;
+	let boundsScale = 1 / 3;
 
 	let bounds = BOX_DEFAULT_BOUNDS.map((pos) =>
 		pos.map((x) => x * scale * boundsScale)
@@ -116,14 +107,13 @@ export function Spawn(spawnCoord: number[], mapRoot: Node<State>) {
 		materialColor: [1.0, 1.0, 1.0],
 		materialAmbColor: [0, 0, 0],
 		materialSpecColor: [0.3, 0.3, 0.3],
-		materialEmitColor: [0.1, 0.1, 0.1], // Use emissive map instead
+		materialEmitColor: [0.0, 0.0, 0.0], // Use emissive map instead
 		programInfo: programInfo,
 		bufferLength: enemy_OBJ.indices.length,
 		vertexArrayObject: vao,
 		texture: baseTexture,
 		normalMap: normalMap,
 		emissiveMap: emissiveMap,
-		ambientOcclusion: aoMap,
 		...enemyNode.state,
 	};
 	enemyNode.state.spawnCoord = spawnCoord;
