@@ -24,14 +24,7 @@ export function SetEditMode(mode: EditMode) {
 export function DoActionOnSelectedBlock(hit: HitNode) {
 	if (hit.node) {
 		if (editMode === "REMOVE") {
-			let mapPos = Map.ToMapCoords(
-				utils.addVectors(
-					hit.node.GetWorldCoordinates(),
-					[-0.5, 0.0, -0.5]
-				)
-			);
-			if (!hit.node.name.startsWith("cpt-toad")) hit.node.Remove();
-			Map.SetCell(mapPos, Map.CellType.Empty);
+			if (!hit.node.name.startsWith("cpt-toad")) Map.RemoveNode(hit.node);
 		}
 		if (editMode === "ADD") {
 			// Move the point away from the current node to make sure
